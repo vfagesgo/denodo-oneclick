@@ -348,14 +348,6 @@ sudo chown -R denodo:denodo /opt/denodo
 log_step "Faking JAVA JRE in Denodo Home"
 # -f/-n so re-running after a failed install doesn't crash on "File exists".
 ln -sfn "$JAVA_HOME" jre
-
-# installer_cli.sh treats "jre" as its own private, writable bundled JRE and
-# recursively chmods it. $JAVA_HOME is actually the real, apt-installed Zulu
-# JDK (owned by root), so those chmod calls - running as the unprivileged
-# denodo user - fail with "Operation not permitted" on every file under it.
-# Nothing else needs this JDK to stay root-owned, so hand it to denodo.
-sudo chown -R denodo:denodo "$JAVA_HOME"
-
 cd denodo-update
 rm -rf jre
 mkdir -p jre
@@ -379,13 +371,13 @@ change_config() {
       "$CONF_FILE"
 }
 log_step "JAVA Config: Change -Xmx in VDBConfiguration.properties"
-change_config "-Xmx" "/opt/denodo/conf/vdp/VDBConfiguration.properties" "2048m"
+change_config "-Xmx" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "2048m"
 log_step "JAVA Config: Change -XX:ReservedCodeCacheSize= in VDBConfiguration.properties"
-change_config "-XX:ReservedCodeCacheSize=" "/opt/denodo/conf/vdp/VDBConfiguration.properties" "256m"
+change_config "-XX:ReservedCodeCacheSize=" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "256m"
 log_step "JAVA Config: Change -Xmx in resources/apache-tomcat/conf/tomcat.properties"
-change_config "-Xmx" "/opt/denodo/resources/apache-tomcat/conf/tomcat.properties" "1024m"
+change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/tomcat.properties" "1024m"
 
-/opt/denodo/bin/regenerateFiles.sh
+/opt/denodo/denodo-platform/bin/regenerateFiles.sh
 
 # Section 13:
 # The AI SDK lives in its own Git repository. On first install it is cloned;
