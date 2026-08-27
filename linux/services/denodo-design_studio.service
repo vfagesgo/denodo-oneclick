@@ -1,0 +1,16 @@
+[Unit]
+Description=Denodo Design Studio
+After=local-fs.target systemd-remount-fs.service denodo-vdp-server.service
+Wants=network-pre.target NetworkManager.service
+
+[Service]
+Type=simple
+User=denodo
+Group=denodo
+ExecStartPre=/bin/sleep 30
+ExecStart=/opt/denodo-9/bin/designstudio_startup.sh
+ExecStop=/opt/denodo-9/bin/designstudio_shutdown.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

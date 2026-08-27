@@ -1,0 +1,25 @@
+[Unit]
+Description=Denodo AISDK and Chatbot
+After=local-fs.target systemd-remount-fs.service denodo-data-marketplace.service
+Requires=denodo-data-marketplace.service
+Wants=network-pre.target NetworkManager.service
+
+[Service]
+Type=simple
+User=denodo
+Group=denodo
+MemoryMax=1G
+WorkingDirectory=/opt/denodo-aisdk
+
+ExecStartPre=/bin/sleep 120
+TimeoutStartSec=180
+ExecStart=/home/denodo/venv_denodo/bin/python run.py both
+ExecStop=/home/denodo/venv_denodo/bin/python stop.py both
+
+RemainAfterExit=yes
+
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

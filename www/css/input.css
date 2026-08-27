@@ -1,0 +1,48 @@
+/*
+  INPUT
+
+  Based on the denodo-webapps-frontend project
+*/
+
+.input {
+  height: 24px;
+  padding: var(--s1) var(--s3);
+  line-height: 1.5;
+  color: var(--dark-blue);
+  background-color: var(--light-grey-b);
+  background-clip: padding-box;
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  border: 0;
+}
+
+.input:focus {
+  outline: 0;
+  border: 1px solid var(--light-blue);
+  box-shadow: 0 0 10px 2px rgba(132, 181, 206, 0.7);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.input___wide {
+  height: 33px;
+  width: 100%;
+}
+
+.input___fill {
+  width: 100%;
+}
+
+.input___white {
+  background-color: var(--white);
+  border: 1px solid var(--light-grey);
+}
+
+.input___error,
+.input___error:focus {
+  border: 1px solid var(--warning-red);
+  box-shadow: 0 0 10px 2px rgba(240, 81, 73, 0.7);
+}

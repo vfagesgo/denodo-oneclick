@@ -1,0 +1,179 @@
+/*
+  BUTTON
+
+  Copied from the denodo-webapps-frontend project
+*/
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  user-select: none;
+  transition: color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+  cursor: pointer;
+  position: relative;
+}
+
+.button_text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.button:hover {
+  text-decoration: none;
+}
+
+/* variants */
+
+.button___blank {
+  padding: var(--s0);
+  border: 0;
+  background-color: transparent;
+  outline: 0;
+}
+
+.button___icon {
+  color: var(--peacock-blue);
+  padding: var(--s0);
+  border: 0;
+  background-color: transparent;
+  transition: transform 0.5s ease;
+  outline: 0;
+}
+
+.button___icon:hover {
+  outline: 0;
+  transform: perspective(1px) translateZ(0);
+  transition-duration: 0.3s;
+}
+
+.button___icon:hover i {
+  transform: scale(1.1) translateZ(0);
+}
+
+.button___action {
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: var(--s1) var(--s2);
+  border-radius: 4px;
+}
+
+.button___table {
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0;
+  border-radius: 4px;
+  margin: 1px;
+}
+
+.button___table:focus {
+  box-shadow: none;
+}
+
+.button___action:focus {
+  outline: 0;
+  box-shadow: var(--shadow-input);
+}
+
+.button___primary {
+  background-color: var(--dark-blue);
+  border: 1px solid transparent;
+  padding: var(--s2) var(--s4);
+  border-radius: 4px;
+  color:white;
+}
+
+.button___primary:focus {
+  outline: 0;
+  box-shadow: var(--shadow-input);
+}
+
+.button___secondary {
+  background-color: var(--light-blue);
+  border: 1px solid transparent;
+  padding: var(--s2) var(--s4);
+  border-radius: 4px;
+  color:white;
+}
+
+.button___secondary:focus {
+  outline: 0;
+  box-shadow: var(--shadow-input);
+}
+
+/* Other */
+
+.button___wide {
+  padding-top: var(--s2);
+  padding-bottom: var(--s2);
+  width: 100%;
+}
+
+.button___xl {
+  font-size: 18px;
+}
+
+
+.Button___tableSize {
+  height: 22px;
+  display: flex;
+  padding-bottom: 1px;
+  padding-top: 1px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.button_effectText {
+  position: absolute;
+  background-color: var(--dark-blue);
+  color: var(--color-white);
+  padding: 8px 8px;
+  border-radius: var(--border-radius);
+  z-index: 10000;
+}
+
+.button_effectText___top {
+  top: -40px;
+}
+
+.button_effectText___bottom {
+  bottom: -36px;
+}
+
+.button_effectText___right {
+  right: -66px;
+}
+
+.button_effectText::after {
+  content: "";
+  position: absolute;
+  border-style: solid;
+  border-width: 5px;
+}
+
+.button_effectText___top::after {
+  border-color: var(--dark-blue) transparent transparent transparent;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+}
+
+.button_effectText___bottom::after {
+  border-color: transparent transparent var(--dark-blue) transparent;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+}
+
+.button_effectText___right::after {
+  border-color: transparent var(--dark-blue) transparent transparent;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+}

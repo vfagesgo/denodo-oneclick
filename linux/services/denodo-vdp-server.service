@@ -1,0 +1,15 @@
+[Unit]
+Description=VDP VQL  Server
+After=local-fs.target systemd-remount-fs.service wifi-network-init.service
+Wants=network-pre.target NetworkManager.service
+
+[Service]
+Type=simple
+User=denodo
+Group=denodo
+ExecStart=/opt/denodo-9/bin/vqlserver_startup.sh
+ExecStop=/opt/denodo-9/bin/vqlserver_shutdown.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,208 @@
+html {
+    position: relative;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: ProximaNova, sans-serif;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    color: var(--white);
+}
+
+/* FOOTER */
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding-bottom: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 2;
+    text-align: center;
+}
+
+/* CONTENT */
+
+.full-page-container {
+    position: absolute;
+    top: 0;
+    min-height: 100vh;
+    width: 100%;
+    background-image: url(../images/login-background.jpg);
+    background-position: center;
+    background-color: var(--midnight-blue);
+    background-repeat: no-repeat;
+}
+
+@media (orientation: landscape) and (min-width: 3800px) {
+    .full-page-container {
+        background-size: 100% auto;
+    }
+}
+
+@media (orientation: portrait) and (min-height: 2160px) {
+    .full-page-container {
+        background-size: auto 100%;
+    }
+}
+
+.vertical-horizontal-center {
+    min-height: 100%;  /* Fallback for vh unit */
+    min-height: 100vh; /* You might also want to use
+                          'height' property instead.
+
+                          Note that for percentage values of
+                          'height' or 'min-height' properties,
+                          the 'height' of the parent element
+                          should be specified explicitly.
+
+                          In this case the parent of '.vertical-center'
+                          is the <body> element */
+
+    /* Make it a flex container */
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    /* Align the bootstrap's container vertically */
+    -webkit-box-align : center;
+    -webkit-align-items : center;
+    -moz-box-align : center;
+    -ms-flex-align : center;
+    align-items : center;
+
+    /* In legacy web browsers such as Firefox 9
+       we need to specify the width of the flex container */
+    width: 100%;
+    height: 100%;
+
+    /* Also 'margin: 0 auto' doesn't have any effect on flex items in such web browsers
+       hence the bootstrap's container won't be aligned to the center anymore.
+
+       Therefore, we should use the following declarations to get it centered again */
+    -webkit-box-pack : center;
+    -moz-box-pack : center;
+    -ms-flex-pack : center;
+    -webkit-justify-content : center;
+    justify-content : center;
+}
+
+.main-container {
+    padding-bottom: 124px;
+    padding-top: 20px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+.form-signin {
+    -webkit-flex-grow: 1;
+    -moz-flex-grow: 1;
+    -ms-flex-grow: 1;
+    flex-grow: 1;
+    max-width: 550px;
+    min-width: 240px;
+}
+
+.form-signin h1 {
+    margin-top: 0;
+    margin-bottom: 42px;
+    font-family: inherit;
+}
+
+.denodo-logo {
+    height: 40px;
+    position: relative;
+    bottom: 16px;
+    margin-right: 14px;
+}
+
+@media (max-width: 495px) {
+    .denodo-logo {
+        bottom: 0;
+    }
+}
+
+.denodo-product-name {
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.38;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+@media (max-width: 338px) {
+    .denodo-product-name {
+        font-size: 24px;
+    }
+}
+
+.form-signin label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.form-signin input {
+    background-color: var(--white);
+    height: 38px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.14;
+    color: var(--gunmetal);
+}
+
+.form-signin #username {
+    margin-bottom: 18px;
+}
+
+.form-signin #password {
+    margin-bottom: 42px;
+}
+
+.form-signin .button {
+    background-color: var(--peacock-blue);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 8px;
+}
+
+.form-signin .button:hover {
+    background-color: var(--peacock-blue-hover);
+}
+
+.form-signin .button:active {
+    background-color: var(--peacock-blue-active);
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+.form-signin .button_text {
+    font-weight: 600;
+}
+
+.form-signin .button .spinner-container {
+    position: relative;
+}
+
+.form-signin .button .spinner-container .fa-spinner {
+    position: absolute;
+    left: .6em;
+    top: -.5em;
+}
+
+.form-signin label.or-separator {
+    margin-top: 42px;
+    margin-bottom: 42px;
+    width: 100%;
+    text-align: center;
+}

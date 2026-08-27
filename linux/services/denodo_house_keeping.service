@@ -1,0 +1,12 @@
+[Unit]
+Description=Denodo logs house keeping
+After=local-fs.target systemd-remount-fs.service
+Before=wifi-network-init.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/denodo-pi/tools/startup_house_keeping.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

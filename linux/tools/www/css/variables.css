@@ -1,0 +1,48 @@
+/*
+  Copied from the denodo-webapps-frontend project
+*/
+
+:root {
+    --midnight-blue: #112533;
+    --dark-midgnight-blue: #0a3f5b;
+    --light-blue: #84b5ce;
+    --dark-blue: #2d3f4b;
+    --peacock-blue: #006699;
+    --peacock-blue-hover: #3276b1;
+    --peacock-blue-active: #204d74;
+    --color-black: black;
+    --color-midnight-blue: #112533;
+    --color-green-success: #42b044;
+    --color-white: #fff;
+    --gunmetal: #4f5e69;
+    --grey: #c7c9ca;
+    --light-grey: #e7e9ea;
+    --light-grey-b: #f3f4f5;
+    --active-grey: #9da1a3;
+    --white: #ffffff;
+    --black: #000000;
+    --highlight-orange: #ff9933;
+    --warning-red: #f05149;
+    --shadow-dialog: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+
+    --border-radius: 4px;
+
+    --s0: 0;
+    --s1: 4px;
+    --s1-half: 6px; /* use with care */
+    --s2: 8px;
+    --s2-minus: -8px;
+    --s3: 12px;
+    --s4: 18px;
+    --s4-minus: -18px;
+    --s5: 24px;
+    --s6: 32px;
+    --s7: 40px;
+    --s8: 48px;
+    --s9: 60px;
+    --s10: 80px;
+
+    --shadow-input: 0 0 0 0.2rem rgba(0, 102, 153, 0.25) !important;
+
+    --font-icons: "Font Awesome 5 Pro";
+}
