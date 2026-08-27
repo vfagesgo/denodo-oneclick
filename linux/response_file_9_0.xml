@@ -6,7 +6,7 @@
         <userInput>
             <entry key="LICENSE_FILE" value="/home/denodo/denodo-install-9/denodo-developer-lic-9.lic"/>
             <entry key="SETUP_TYPE" value="custom"/>
-            <entry key="INSTALL_PATH" value="/opt/denodo"/>
+            <entry key="INSTALL_PATH" value="/opt/denodo/denodo-platform"/>
         </userInput>
     </com.izforge.izpack.panels.UserInputPanel>
     <com.izforge.izpack.panels.DenodoTreePacksPanel id="UNKNOWN (com.izforge.izpack.panels.DenodoTreePacksPanel)">

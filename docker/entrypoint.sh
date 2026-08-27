@@ -29,7 +29,7 @@ sudo apt install git unzip -y
 
 # Defaults (in case .env is missing values)
 GITHUB_REPO=${GITHUB_REPO:-"vfagesgo/denodo-oneclick"}
-INSTALL_DIR="/opt/denodo"
+INSTALL_DIR="/opt/denodo-oneclick"
 BRANCH=${BRANCH:-"main"}
 
 GITHUB_REPO_URL="https://github.com/$GITHUB_REPO.git"

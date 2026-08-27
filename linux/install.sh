@@ -747,9 +747,6 @@ else
     restart=$(service_field "$service_file" "Restart")
     run_user=${run_user:-denodo}
 
-    # Same stale /opt/denodo-pi normalization as the systemd path above.
-    exec_start=${exec_start//\/opt\/denodo-pi/$SCRIPT_DIR}
-
     if [ -z "$exec_start" ]; then
       log_step "Skipping $name: no ExecStart in $service_file"
       return
