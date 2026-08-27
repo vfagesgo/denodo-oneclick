@@ -385,7 +385,11 @@ change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/t
 log_section "13" "Install Denodo AI SDK"
 GITHUB_REPO_URL="https://github.com/denodo/denodo-ai-sdk.git"
 # Was referenced below without ever being set, which crashed under `set -u`.
-AISDK_INSTALL_DIR=${AISDK_INSTALL_DIR:-"/home/denodo/denodo-ai-sdk"}
+# Must match denodo-aisdk.service's WorkingDirectory=/opt/denodo-aisdk (and
+# linux/install_ori.sh's own default) - an earlier fix guessed a different
+# path here, which silently broke the aisdk service's background start
+# (wrong `cd` inside its subshell) without failing the overall install.
+AISDK_INSTALL_DIR=${AISDK_INSTALL_DIR:-"/opt/denodo-aisdk"}
 
 log_step "Repository: denodo-ai-sdk"
 log_step "Install directory: $AISDK_INSTALL_DIR"
