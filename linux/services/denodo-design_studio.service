@@ -8,8 +8,8 @@ Type=simple
 User=denodo
 Group=denodo
 ExecStartPre=/bin/sleep 30
-ExecStart=/opt/denodo-9/bin/designstudio_startup.sh
-ExecStop=/opt/denodo-9/bin/designstudio_shutdown.sh
+ExecStart=/opt/denodo/bin/designstudio_startup.sh
+ExecStop=/opt/denodo/bin/designstudio_shutdown.sh
 RemainAfterExit=yes
 
 [Install]

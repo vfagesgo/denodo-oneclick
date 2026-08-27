@@ -8,8 +8,8 @@ Type=simple
 User=denodo
 Group=denodo
 ExecStartPre=/bin/sleep 60
-ExecStart=/opt/denodo-9/bin/datacatalog_startup.sh
-ExecStop=/opt/denodo-9/bin/datacatalog_shutdown.sh
+ExecStart=/opt/denodo/bin/datacatalog_startup.sh
+ExecStop=/opt/denodo/bin/datacatalog_shutdown.sh
 RemainAfterExit=yes
 
 [Install]

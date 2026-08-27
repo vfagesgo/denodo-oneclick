@@ -7,8 +7,8 @@ Wants=network-pre.target NetworkManager.service
 Type=simple
 User=denodo
 Group=denodo
-ExecStart=/opt/denodo-9/bin/vqlserver_startup.sh
-ExecStop=/opt/denodo-9/bin/vqlserver_shutdown.sh
+ExecStart=/opt/denodo/bin/vqlserver_startup.sh
+ExecStop=/opt/denodo/bin/vqlserver_shutdown.sh
 RemainAfterExit=yes
 
 [Install]
