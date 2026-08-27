@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ## Entrypoint for the denodo-oneclick Docker image.
 ## Confirms the container received its configuration correctly; does not
 ## install or run Denodo VDP yet.
@@ -69,8 +69,11 @@ if [ -f "$INSTALL_DIR/linux/install.sh" ]; then
   echo "denodo ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/denodo
   chmod 440 /etc/sudoers.d/denodo
 
-  sudo -H -u denodo bash "$INSTALL_DIR/install.sh" >> $LOG 2>&1
-  
+  # Was fully redirected to $LOG before (invisible on `docker run` output,
+  # and lost entirely once the --rm container exits). Tee it instead so the
+  # real error is visible immediately, while still keeping the log copy.
+  set -o pipefail
+  sudo -H -u denodo bash "$INSTALL_DIR/install.sh" 2>&1 | tee -a "$LOG"
   rc=$?
 
   echo "[INIT] install.sh exit code=$rc" | tee -a "$LOG"
