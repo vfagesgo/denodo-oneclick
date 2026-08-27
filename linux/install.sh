@@ -231,26 +231,60 @@ ZIP_URL="https://github.com/denodo/$DENODO_UTILS_URL"
 TARGET_DIR="/home/denodo/"
 DENODO_INSTALL="/home/denodo/denodo-install-9"
 
-curl -L "$ZIP_URL" -o $TARGET_DIR/Denodo.Support.Utilities.zip
-unzip -o $TARGET_DIR/Denodo.Support.Utilities.zip -d "$TARGET_DIR"
-rm -f $TARGET_DIR/Denodo.Support.Utilities.zip
+# Section 11.5+12 involve multi-GB downloads (installer + update archives).
+# Everything below is guarded to skip work that a previous, failed run
+# already completed, so re-running install.sh after a crash doesn't
+# re-download or re-extract from scratch.
+
+if [ -x "$TARGET_DIR/denodo-support-utils/bin/denodo-support" ]; then
+  log_step "denodo-support already installed, skipping"
+else
+  curl -L "$ZIP_URL" -o "${TARGET_DIR}Denodo.Support.Utilities.zip"
+  unzip -o "${TARGET_DIR}Denodo.Support.Utilities.zip" -d "$TARGET_DIR"
+  rm -f "${TARGET_DIR}Denodo.Support.Utilities.zip"
+fi
 
 cd $TARGET_DIR/denodo-support-utils/bin/
 chmod +x denodo-support
 
-log_step "Download Installer"
-./denodo-support -t installer -n denodo-install-9-ga -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
-log_step "Download Update$DENODO_UPDATE"
-./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+if [ -f "/home/denodo/denodo-install-9-ga.zip" ]; then
+  log_step "Installer archive already downloaded, skipping (remove /home/denodo/denodo-install-9-ga.zip to force a re-download)"
+else
+  log_step "Download Installer"
+  ./denodo-support -t installer -n denodo-install-9-ga -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+fi
+
+if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
+  log_step "Update archive already downloaded, skipping (remove /home/denodo/$DENODO_UPDATE.zip to force a re-download)"
+else
+  log_step "Download Update$DENODO_UPDATE"
+  ./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+fi
 
 log_step "Prepare install folder"
 cd /home/denodo
-unzip -o denodo-install-9-ga.zip 
 
-DENODO_INSTALL="/home/denodo/denodo-install-9"
-mkdir "$DENODO_INSTALL/denodo-update"
-unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
-mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
+if [ -d "$DENODO_INSTALL" ]; then
+  log_step "$DENODO_INSTALL already extracted, skipping unzip"
+else
+  unzip -o denodo-install-9-ga.zip
+fi
+
+mkdir -p "$DENODO_INSTALL/denodo-update"
+# The jar gets renamed to a fixed "denodo-update.jar" below, so its mere
+# presence can't tell two different $DENODO_UPDATE versions apart - a stale
+# jar from a previous version would wrongly look "already staged" on a
+# rerun with a newer DENODO_UPDATE. Track which version was actually staged
+# alongside it instead.
+DENODO_UPDATE_MARKER="$DENODO_INSTALL/denodo-update/.staged_version"
+if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ] \
+  && [ "$(cat "$DENODO_UPDATE_MARKER" 2>/dev/null)" = "$DENODO_UPDATE" ]; then
+  log_step "Update $DENODO_UPDATE already staged, skipping unzip"
+else
+  unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
+  mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
+  echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
+fi
 
 # Section 12:
 # Prepare the Denodo installer directory, link the detected JVM, place the
@@ -270,32 +304,41 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 chmod +x installer_cli.sh
 
-log_step "Copy Denodo Lincense: $DENODO_LIC"
+# Default must be set before it's ever referenced - the log line below used
+# to read $DENODO_LIC first, which crashed with "unbound variable" whenever
+# the caller didn't set it (e.g. the Docker flow, which only mounts the
+# license file and never sets this env var).
 DENODO_LIC=${DENODO_LIC:-"denodo-developer-lic-9.lic"}
+log_step "Copy Denodo License: $DENODO_LIC"
 
-
-# Docker install mode, where the license is mounted at /denodo/license.lic) pass an actual
-# path, so prefer that if it already exists before falling back to the Pi
-# convention.
+# Docker install mode mounts the license at /denodo/license.lic and never
+# sets $DENODO_LIC, so prefer an existing path if one was passed, then the
+# Docker mount, then the Raspberry Pi boot-partition convention.
 if [ -f "$DENODO_LIC" ]; then
   DENODO_LIC_SRC="$DENODO_LIC"
 elif [ -f "/denodo/license.lic" ]; then
   DENODO_LIC_SRC="/denodo/license.lic"
+elif [ -f "/boot/firmware/denodo/$DENODO_LIC" ]; then
+  DENODO_LIC_SRC="/boot/firmware/denodo/$DENODO_LIC"
+else
+  log_step "ERROR: no Denodo license file found (checked '$DENODO_LIC', /denodo/license.lic, /boot/firmware/denodo/$DENODO_LIC)"
+  exit 1
 fi
 
 sudo cp "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 #./installer_cli.sh install
-sudo mkdir /opt/denodo-9
+sudo mkdir -p /opt/denodo-9
 sudo chown -R denodo:denodo /opt/denodo-9
 
 log_step "Faking JAVA JRE in Denodo Home"
-ln -s "$JAVA_HOME" jre
+# -f/-n so re-running after a failed install doesn't crash on "File exists".
+ln -sfn "$JAVA_HOME" jre
 cd denodo-update
 rm -rf jre
-mkdir jre
+mkdir -p jre
 cd jre
-ln -s "$JAVA_HOME" jre-linux
+ln -sfn "$JAVA_HOME" jre-linux
 cd "$DENODO_INSTALL"
 
 log_step "Start Denodo Install"
