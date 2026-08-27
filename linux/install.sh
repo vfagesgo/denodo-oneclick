@@ -328,12 +328,17 @@ else
   exit 1
 fi
 
-# Idempotency belt-and-suspenders: skip the copy entirely if the resolved
-# source and destination are already the same file, however that happened.
+# Always overwrite an existing destination copy with whatever license was
+# just resolved above (e.g. a newer one mounted at /denodo/license.lic) -
+# `cp` does this by default. The one case that must be skipped is the
+# source and destination already being the exact same file (only possible
+# via the bare-filename fallback above): there's nothing to "overwrite"
+# there, and `cp` would just error out on a self-copy.
 if [ "$(readlink -f "$DENODO_LIC_SRC" 2>/dev/null)" = "$(readlink -f "$DENODO_INSTALL/denodo-developer-lic-9.lic" 2>/dev/null)" ]; then
-  log_step "License already in place at $DENODO_INSTALL/denodo-developer-lic-9.lic, skipping copy"
+  log_step "License source and destination are the same file, nothing to copy"
 else
-  sudo cp "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
+  log_step "Copying license from $DENODO_LIC_SRC (overwriting any existing destination copy)"
+  sudo cp -f "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 fi
 sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 #./installer_cli.sh install
@@ -343,6 +348,14 @@ sudo chown -R denodo:denodo /opt/denodo
 log_step "Faking JAVA JRE in Denodo Home"
 # -f/-n so re-running after a failed install doesn't crash on "File exists".
 ln -sfn "$JAVA_HOME" jre
+
+# installer_cli.sh treats "jre" as its own private, writable bundled JRE and
+# recursively chmods it. $JAVA_HOME is actually the real, apt-installed Zulu
+# JDK (owned by root), so those chmod calls - running as the unprivileged
+# denodo user - fail with "Operation not permitted" on every file under it.
+# Nothing else needs this JDK to stay root-owned, so hand it to denodo.
+sudo chown -R denodo:denodo "$JAVA_HOME"
+
 cd denodo-update
 rm -rf jre
 mkdir -p jre
