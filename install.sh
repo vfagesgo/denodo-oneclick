@@ -14,8 +14,10 @@ REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denod
 
 IMAGE_NAME="denodo-oneclick"
 IMAGE_TAG="hello-world"
+VOLUME_PREFIX="denodo-oneclick"
 
 MODE="docker"
+RESET=0
 
 # --- 0. Resolve a working directory that has docker/ + denodo_config.env ---
 # Local checkout (repo cloned, install.sh run in place): use it as-is.
@@ -61,6 +63,8 @@ Overrides (default comes from denodo_config.env):
 Optional (CLI only):
   --CLOUDFLARE_TUNNEL_KEY <value>
   --mode <docker|local>          Default: docker (local not implemented yet)
+  --reset                        Wipe any existing container + its volumes first,
+                                  so the install starts truly from scratch
 EOF
 }
 
@@ -87,6 +91,7 @@ while [[ $# -gt 0 ]]; do
     --DENODO_VDP_PWD) DENODO_VDP_PWD="$2"; shift 2 ;;
     --CLOUDFLARE_TUNNEL_KEY) CLOUDFLARE_TUNNEL_KEY="$2"; shift 2 ;;
     --mode) MODE="$2"; shift 2 ;;
+    --reset) RESET=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage; exit 1 ;;
   esac
@@ -124,7 +129,17 @@ esac
 
 echo "== denodo-oneclick: Docker install mode =="
 
-VOLUME_PREFIX="denodo-oneclick"
+if [[ "$RESET" -eq 1 ]]; then
+  # Manually running `docker rm -f` + `docker volume rm ...` (the command
+  # printed at the end of a normal run) is easy to get wrong - miss one
+  # volume name and the "fresh" container silently reattaches to old state.
+  # This does the full, reliable teardown in one step.
+  echo "--reset: removing any existing '${IMAGE_NAME}' container and its volumes"
+  docker rm -f "${IMAGE_NAME}" >/dev/null 2>&1 || true
+  docker volume rm \
+    "${VOLUME_PREFIX}-repo" "${VOLUME_PREFIX}-home" "${VOLUME_PREFIX}-install" "${VOLUME_PREFIX}-postgres" \
+    >/dev/null 2>&1 || true
+fi
 
 # The previous version always did `docker rm -f` + a fresh `docker run`
 # here, which wiped the container's entire filesystem on every retry -
@@ -175,7 +190,9 @@ else
 fi
 
 echo ""
-echo "Follow install/startup progress with: docker logs -f ${IMAGE_NAME}"
-echo "Once install completes, the app is at http://localhost"
+echo "Container is running in the background. Once install completes, the app is at http://localhost"
+echo "Following its logs now (Ctrl-C stops watching - the container keeps running):"
 echo ""
-echo "From-scratch reinstall: docker rm -f ${IMAGE_NAME} && docker volume rm ${VOLUME_PREFIX}-repo ${VOLUME_PREFIX}-home ${VOLUME_PREFIX}-install ${VOLUME_PREFIX}-postgres"
+docker logs -f "${IMAGE_NAME}"
+echo ""
+echo "From-scratch reinstall: re-run this script with --reset"

@@ -705,7 +705,12 @@ else
   # file. Fine here because none of these fields repeat across sections in
   # our own unit files.
   service_field() {
-    grep -E "^${2}=" "$1" | head -n1 | cut -d= -f2-
+    # grep exits 1 when the field is simply absent (many are optional -
+    # e.g. denodo_house_keeping.service has no User/WorkingDirectory/
+    # ExecStop). Under `set -euo pipefail`, `var=$(service_field ...)`
+    # failing like that killed the whole script on the very first
+    # service, before it even printed which one or why.
+    grep -E "^${2}=" "$1" | head -n1 | cut -d= -f2- || true
   }
 
   start_service() {

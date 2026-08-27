@@ -18,6 +18,9 @@ curl -fsSL https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/insta
 --DENODO_LIC ./denodo-developer-lic-9.lic
 ```
 
+docker ps -a --filter name=denodo-oneclick
+docker logs -f denodo-oneclick
+
 
 ### Mandatory parameters
 - `--DENODO_SUPPORT_CI <value>`
