@@ -1,2 +1,4 @@
 #!/bin/bash
-## This file. provide the ability to install and auto-update Denodo!
+## This file provides the ability to install and auto-update Denodo!
+
+echo 'hello'
