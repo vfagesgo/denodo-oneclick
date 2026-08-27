@@ -14,7 +14,10 @@ REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denod
 
 IMAGE_NAME="denodo-oneclick"
 IMAGE_TAG="hello-world"
-VOLUME_PREFIX="denodo-oneclick"
+# Single volume: entrypoint.sh mounts everything that needs to persist
+# (repo checkout, downloads, Denodo install, AI SDK, Postgres data) as
+# symlinks into subdirectories of /data instead of one volume per path.
+VOLUME_NAME="denodo-oneclick-data"
 
 MODE="docker"
 RESET=0
@@ -134,11 +137,9 @@ if [[ "$RESET" -eq 1 ]]; then
   # printed at the end of a normal run) is easy to get wrong - miss one
   # volume name and the "fresh" container silently reattaches to old state.
   # This does the full, reliable teardown in one step.
-  echo "--reset: removing any existing '${IMAGE_NAME}' container and its volumes"
+  echo "--reset: removing any existing '${IMAGE_NAME}' container and its volume"
   docker rm -f "${IMAGE_NAME}" >/dev/null 2>&1 || true
-  docker volume rm \
-    "${VOLUME_PREFIX}-repo" "${VOLUME_PREFIX}-home" "${VOLUME_PREFIX}-install" "${VOLUME_PREFIX}-postgres" \
-    >/dev/null 2>&1 || true
+  docker volume rm "${VOLUME_NAME}" >/dev/null 2>&1 || true
 fi
 
 # The previous version always did `docker rm -f` + a fresh `docker run`
@@ -167,16 +168,15 @@ else
 
   docker build -t "${IMAGE_NAME}:${IMAGE_TAG}" "${SCRIPT_DIR}/docker"
 
-  # Named volumes are a second safety net (on top of container reuse above):
-  # they keep the Denodo install/database intact even if this container is
+  # A named volume is a second safety net (on top of container reuse above):
+  # it keeps the Denodo install/database intact even if this container is
   # later removed and recreated (e.g. after an image rebuild). Docker
-  # creates them automatically on first use.
+  # creates it automatically on first use; entrypoint.sh symlinks the
+  # various real paths (repo, /home/denodo, Denodo install, AI SDK,
+  # Postgres) into subdirectories of it.
   docker run --name "${IMAGE_NAME}" -d \
     -p 80:80 \
-    -v "${VOLUME_PREFIX}-repo":/opt/denodo \
-    -v "${VOLUME_PREFIX}-home":/home/denodo \
-    -v "${VOLUME_PREFIX}-install":/opt/denodo-9 \
-    -v "${VOLUME_PREFIX}-postgres":/var/lib/postgresql \
+    -v "${VOLUME_NAME}":/data \
     -e DENODO_SUPPORT_CI="${DENODO_SUPPORT_CI}" \
     -e DENODO_SUPPORT_SECRET="${DENODO_SUPPORT_SECRET}" \
     -e DENODO_UPDATE="${DENODO_UPDATE:-}" \

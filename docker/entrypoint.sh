@@ -17,6 +17,44 @@ echo "  DENODO_VDP_PWD         = ${DENODO_VDP_PWD:+<set>}"
 echo "  CLOUDFLARE_TUNNEL_KEY  = ${CLOUDFLARE_TUNNEL_KEY:+<set>}"
 
 
+## Single persistent volume: install.sh mounts one named volume at /data
+## instead of one volume per directory. Everything that needs to survive a
+## container recreation is symlinked into a subdirectory of /data instead.
+DATA_ROOT="/data"
+mkdir -p "$DATA_ROOT"
+
+link_to_data() {
+  local real_path="$1" data_subdir="$2" owner="${3:-}"
+  local data_path="$DATA_ROOT/$data_subdir"
+  mkdir -p "$data_path"
+
+  if [ -L "$real_path" ]; then
+    return 0 # already linked on a previous boot
+  fi
+
+  if [ -e "$real_path" ]; then
+    # First boot with something already at this path (e.g. useradd -m's
+    # skeleton files under /home/denodo) - move it into the volume once so
+    # nothing is silently lost, then replace the real path with a symlink.
+    if [ -z "$(ls -A "$data_path" 2>/dev/null)" ]; then
+      (shopt -s dotglob; mv "$real_path"/* "$data_path"/ 2>/dev/null || true)
+    fi
+    rm -rf "$real_path"
+  fi
+
+  ln -sfn "$data_path" "$real_path"
+  [ -n "$owner" ] && chown "$owner" "$data_path"
+}
+
+# postgres's own ownership isn't set here - the apt-installed package
+# manages that itself during initdb, same as before this existed.
+# No separate link for the AI SDK: it now lives at /opt/denodo/denodo-aisdk,
+# already covered by the /opt/denodo link below.
+link_to_data /opt/denodo-oneclick repo denodo:denodo
+link_to_data /home/denodo home denodo:denodo
+link_to_data /opt/denodo denodo denodo:denodo
+link_to_data /var/lib/postgresql postgres
+
 ## Installing dependencies inthe container
 LOG="/var/log/denodo-entrypoint.log"
 touch "$LOG"
