@@ -18,6 +18,9 @@ echo "  CLOUDFLARE_TUNNEL_KEY  = ${CLOUDFLARE_TUNNEL_KEY:+<set>}"
 
 
 ## Installing dependencies inthe container
+LOG="/var/log/denodo-entrypoint.log"
+touch "$LOG"
+
 echo "[INIT] Installing dependencies..." | tee -a $LOG
 sudo apt update
 sudo apt install git unzip -y
