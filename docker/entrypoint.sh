@@ -72,8 +72,18 @@ if [ -f "$INSTALL_DIR/linux/install.sh" ]; then
   # Was fully redirected to $LOG before (invisible on `docker run` output,
   # and lost entirely once the --rm container exits). Tee it instead so the
   # real error is visible immediately, while still keeping the log copy.
+  #
+  # Two fixes vs. the previous version:
+  # - Run linux/install.sh (the tested Raspberry Pi installer) instead of
+  #   the repo's top-level install.sh (the Docker orchestrator itself,
+  #   also present since the whole repo was cloned into $INSTALL_DIR).
+  # - `sudo -u denodo` without -E/--preserve-env strips the DENODO_* vars
+  #   that `docker run -e` set, so explicitly preserve the ones the
+  #   installer reads.
   set -o pipefail
-  sudo -H -u denodo bash "$INSTALL_DIR/install.sh" 2>&1 | tee -a "$LOG"
+  sudo -H -u denodo \
+    --preserve-env=DENODO_SUPPORT_CI,DENODO_SUPPORT_SECRET,DENODO_LIC,DENODO_UPDATE,DENODO_PG_USER,DENODO_PG_PWD,DENODO_VDP_USER,DENODO_VDP_PWD \
+    bash "$INSTALL_DIR/linux/install.sh" 2>&1 | tee -a "$LOG"
   rc=$?
 
   echo "[INIT] install.sh exit code=$rc" | tee -a "$LOG"
