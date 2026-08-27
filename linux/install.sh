@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Resolve paths relative to this script instead of hardcoding an install
+# location. Previously Section 15/16 hardcoded /opt/denodo-pi or referenced
+# $INSTALL_DIR without ever setting it, which failed regardless of where
+# the repo was actually cloned.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+
 LOG=/var/log/1-denodo_install.log
 sudo touch $LOG
 sudo chown -R denodo:denodo "$LOG"
 # This installer makes privileged changes across the OS, so fail early on
 # missing variables, command failures inside pipelines, and unexpected errors.
-set -uo pipefail
+set -euo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 log_section() {
@@ -157,11 +164,14 @@ for conf in "${pg_hba_files[@]}"; do
   version=$(echo "$conf" | cut -d/ -f4)
   name=$(echo "$conf" | cut -d/ -f5)
 
-  sudo pg_ctlcluster "$version" "$name" restart 
+  log_step "Restarting PostgreSQL cluster $version/$name"
+  # pg_ctlcluster works with or without systemd. The `systemctl restart
+  # postgresql` that used to run right after this loop was both redundant
+  # with it and fatal outside a real systemd environment (e.g. inside a
+  # plain Docker container: "System has not been booted with systemd as
+  # init system (PID 1)").
+  sudo pg_ctlcluster "$version" "$name" restart
 done
-
-log_step "Restarting PostgreSQL"
-sudo systemctl restart postgresql
 
 # Section 10:
 # Create the PostgreSQL role and database expected by Denodo. Re-running the
@@ -213,7 +223,11 @@ sudo apt install -y zulu17-jdk
 # on later runs it is refreshed so the workspace matches the remote branch.
 
 log_section "11.5" "Install Denodo Support Tools"
-ZIP_URL="https://github.com/denodo/$GITHUB_DENODO_UTILS"
+# denodo_config.env defines this as DENODO_UTILS_URL. The script previously
+# referenced $GITHUB_DENODO_UTILS, which was never set anywhere and crashed
+# here under `set -u`.
+DENODO_UTILS_URL=${DENODO_UTILS_URL:-"denodocommunity-resources/releases/download/v1.3.2/Denodo.Support.Utilities.v1.3.2.zip"}
+ZIP_URL="https://github.com/denodo/$DENODO_UTILS_URL"
 TARGET_DIR="/home/denodo/"
 DENODO_INSTALL="/home/denodo/denodo-install-9"
 
@@ -259,7 +273,17 @@ chmod +x installer_cli.sh
 log_step "Copy Denodo Lincense: $DENODO_LIC"
 DENODO_LIC=${DENODO_LIC:-"denodo-developer-lic-9.lic"}
 
-sudo cp "/boot/firmware/denodo/$DENODO_LIC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
+
+# Docker install mode, where the license is mounted at /denodo/license.lic) pass an actual
+# path, so prefer that if it already exists before falling back to the Pi
+# convention.
+if [ -f "$DENODO_LIC" ]; then
+  DENODO_LIC_SRC="$DENODO_LIC"
+elif [ -f "/denodo/license.lic" ]; then
+  DENODO_LIC_SRC="/denodo/license.lic"
+fi
+
+sudo cp "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 #./installer_cli.sh install
 sudo mkdir /opt/denodo-9
@@ -275,7 +299,7 @@ ln -s "$JAVA_HOME" jre-linux
 cd "$DENODO_INSTALL"
 
 log_step "Start Denodo Install"
-./installer_cli.sh install --autoinstaller /boot/firmware/denodo/response_file_9_0.xml | tee -a $LOG
+./installer_cli.sh install --autoinstaller "$SCRIPT_DIR/response_file_9_0.xml" | tee -a $LOG
 
 ## Change Java memory parameters to be able to run on a Raspeberry PI
 log_step "Change Java Config"
@@ -303,6 +327,8 @@ change_config "-Xmx" "/opt/denodo-9/resources/apache-tomcat/conf/tomcat.properti
 # on later runs it is refreshed so the workspace matches the remote branch.
 log_section "13" "Install Denodo AI SDK"
 GITHUB_REPO_URL="https://github.com/denodo/denodo-ai-sdk.git"
+# Was referenced below without ever being set, which crashed under `set -u`.
+AISDK_INSTALL_DIR=${AISDK_INSTALL_DIR:-"/home/denodo/denodo-ai-sdk"}
 
 log_step "Repository: denodo-ai-sdk"
 log_step "Install directory: $AISDK_INSTALL_DIR"
@@ -560,36 +586,122 @@ log_section "15" "Configure nginx"
 
 log_step "Installing Nginx configuration file"
 
-sudo cp -f /opt/denodo-pi/nginx-site.conf /etc/nginx/sites-enabled/default
+sudo cp -f "$SCRIPT_DIR/nginx-site.conf" /etc/nginx/sites-enabled/default
 
 sudo chmod o+rx /opt
-sudo chmod o+rx /opt/denodo-pi
-sudo chmod -R o+rx /opt/denodo-pi/www
+sudo chmod o+rx "$REPO_ROOT"
+sudo chmod -R o+rx "$REPO_ROOT/www"
 
-sudo chgrp -R www-data /opt/denodo-pi/www
-sudo chmod -R 750 /opt/denodo-pi/www
+sudo chgrp -R www-data "$REPO_ROOT/www"
+sudo chmod -R 750 "$REPO_ROOT/www"
 
 sudo usermod -aG www-data www-data
- 
-log_step "Restarting Nginx" 
-sudo systemctl restart nginx
+
+log_step "Restarting Nginx"
+# `service` works whether or not systemd is PID 1 (it falls back to the
+# init.d script), unlike `systemctl`, which fails outside a real systemd
+# environment such as a plain Docker container.
+sudo service nginx restart
   
 
-# copy service files
+# Start the Denodo services, either via systemd (regular Linux install) or
+# as supervised background processes (no systemd available, e.g. inside a
+# Docker container). Both paths read the same *.service files under
+# $SCRIPT_DIR/services so there is one source of truth for what each
+# service runs.
 log_section "16" "Configuring the different services"
-log_step "Installing service files"
-for service_file in $INSTALL_DIR/services/*.service ; do
-  name=`basename ${service_file}`
-  echo "Installing service ${name}"
-  sudo cp $INSTALL_DIR/services/${name} /lib/systemd/system/${name}
-  sudo chown root /lib/systemd/system/${name}
+
+SERVICE_DIR="$SCRIPT_DIR/services"
+RUN_DIR="/var/run/denodo-oneclick"
+sudo mkdir -p "$RUN_DIR"
+sudo chown denodo:denodo "$RUN_DIR"
+
+# Fixed start order: vdp-server first, then the two that depend on it, then
+# aisdk which depends on data-marketplace. House-keeping has no dependents.
+SERVICE_ORDER=(
+  denodo_house_keeping
+  denodo-vdp-server
+  denodo-design_studio
+  denodo-data-marketplace
+  denodo-aisdk
+)
+
+if [ -d /run/systemd/system ]; then
+  log_step "systemd detected - installing and starting services via systemctl"
+
+  for name in "${SERVICE_ORDER[@]}"; do
+    service_file="$SERVICE_DIR/${name}.service"
+    [ -f "$service_file" ] || continue
+    echo "Installing service ${name}.service"
+    # denodo_house_keeping.service still hardcodes /opt/denodo-pi (stale,
+    # same issue as the nginx paths fixed above); normalize it to wherever
+    # this script actually lives instead of editing the checked-in unit file.
+    sed "s#/opt/denodo-pi#${SCRIPT_DIR}#g" "$service_file" | sudo tee "/lib/systemd/system/${name}.service" >/dev/null
+    sudo chown root "/lib/systemd/system/${name}.service"
+  done
 
   sudo systemctl daemon-reload
 
-  # 🔑 critical fix
-  sudo systemctl unmask ${name}
+  for name in "${SERVICE_ORDER[@]}"; do
+    [ -f "$SERVICE_DIR/${name}.service" ] || continue
+    sudo systemctl unmask "${name}.service"
+    sudo systemctl enable "${name}.service"
+    sudo systemctl start "${name}.service"
+  done
+else
+  log_step "No systemd detected - starting services directly as background processes"
 
-  sudo systemctl enable ${name}
-done
+  # Read a single-valued field (e.g. ExecStart, User) out of a .service
+  # file. Fine here because none of these fields repeat across sections in
+  # our own unit files.
+  service_field() {
+    grep -E "^${2}=" "$1" | head -n1 | cut -d= -f2-
+  }
 
-sudo reboot
+  start_service() {
+    local service_file="$1"
+    local name exec_start run_user working_dir pre_start restart
+
+    name=$(basename "$service_file" .service)
+    exec_start=$(service_field "$service_file" "ExecStart")
+    run_user=$(service_field "$service_file" "User")
+    working_dir=$(service_field "$service_file" "WorkingDirectory")
+    pre_start=$(service_field "$service_file" "ExecStartPre")
+    restart=$(service_field "$service_file" "Restart")
+    run_user=${run_user:-denodo}
+
+    # Same stale /opt/denodo-pi normalization as the systemd path above.
+    exec_start=${exec_start//\/opt\/denodo-pi/$SCRIPT_DIR}
+
+    if [ -z "$exec_start" ]; then
+      log_step "Skipping $name: no ExecStart in $service_file"
+      return
+    fi
+
+    service_field "$service_file" "ExecStop" | sudo tee "$RUN_DIR/${name}.stop" >/dev/null
+
+    (
+      [ -n "$pre_start" ] && eval "$pre_start"
+      cd "${working_dir:-/}" || exit 1
+      if [ "$restart" = "always" ]; then
+        while true; do
+          sudo -u "$run_user" bash -c "$exec_start"
+          sleep 5
+        done
+      else
+        sudo -u "$run_user" bash -c "$exec_start"
+      fi
+    ) >>"$LOG" 2>&1 &
+
+    echo $! | sudo tee "$RUN_DIR/${name}.pid" >/dev/null
+    log_step "Started $name (pid $!, log: $LOG)"
+  }
+
+  for name in "${SERVICE_ORDER[@]}"; do
+    service_file="$SERVICE_DIR/${name}.service"
+    [ -f "$service_file" ] && start_service "$service_file"
+  done
+
+  log_step "Services started in the background. PIDs/stop commands are under $RUN_DIR"
+  log_step "Note: keeping the container itself alive (e.g. a foreground wait loop) is the entrypoint's responsibility, not this script's"
+fi
