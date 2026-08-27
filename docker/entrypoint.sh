@@ -48,7 +48,7 @@ if [ ! -d "$INSTALL_DIR/.git" ]; then
   chown -R denodo:denodo "$INSTALL_DIR" | tee -a $LOG
   
 else
-  echo "[INIT] Updating repository (force reset)..." | tee -a "$LOG"
+  echo "[INIT] Updating repository (force reset)..." | tee -a $LOG
   cd "$INSTALL_DIR" || exit 1
 
   git fetch origin
@@ -61,15 +61,15 @@ if [ -f "$INSTALL_DIR/linux/install.sh" ]; then
   echo "[INIT] Running install.sh as Denodo" | tee -a $LOG
   chmod +x "$INSTALL_DIR/linux/install.sh" 
 
-  echo "[INIT] whoami=$(whoami)" | tee -a "$LOG"
-  echo "[INIT] denodo user:" | tee -a "$LOG"
+  echo "[INIT] whoami=$(whoami)" | tee -a $LOG
+  echo "[INIT] denodo user:" | tee -a $LOG
   id denodo >> "$LOG" 2>&1
-  ls -l "$INSTALL_DIR/linux/install.sh" >> "$LOG" 2>&1
+  ls -l "$INSTALL_DIR/linux/install.sh" >> $LOG 2>&1
 
   echo "denodo ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/denodo
   chmod 440 /etc/sudoers.d/denodo
 
-  sudo -H -u denodo bash "$INSTALL_DIR/install.sh" >> "$LOG" 2>&1
+  sudo -H -u denodo bash "$INSTALL_DIR/install.sh" >> $LOG 2>&1
   
   rc=$?
 
