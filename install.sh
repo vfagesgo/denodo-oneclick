@@ -7,12 +7,40 @@
 ## Local install mode is not implemented yet.
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-CONFIG_FILE="${SCRIPT_DIR}/denodo_config.env"
+# Raw-file base used to fetch install artifacts when this script is run via
+# `curl | bash` (no local checkout to read docker/, denodo_config.env from).
+# Override with an env var for testing against a fork/branch.
+REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main}"
+
 IMAGE_NAME="denodo-oneclick"
 IMAGE_TAG="hello-world"
 
 MODE="docker"
+
+# --- 0. Resolve a working directory that has docker/ + denodo_config.env ---
+# Local checkout (repo cloned, install.sh run in place): use it as-is.
+# Piped install (`curl ... | bash`): there is no local file to derive a
+# script directory from, so fetch the required artifacts from GitHub into a
+# throwaway temp dir instead of assuming anything exists on disk.
+CANDIDATE_DIR=""
+if [[ -n "${BASH_SOURCE[0]:-}" ]] && [[ -f "${BASH_SOURCE[0]}" ]]; then
+  CANDIDATE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+
+if [[ -n "$CANDIDATE_DIR" ]] && [[ -f "${CANDIDATE_DIR}/docker/Dockerfile" ]]; then
+  SCRIPT_DIR="$CANDIDATE_DIR"
+else
+  WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/denodo-oneclick.XXXXXX")"
+  trap 'rm -rf "$WORK_DIR"' EXIT
+  echo "No local checkout found — fetching install artifacts from ${REPO_RAW_BASE}"
+  mkdir -p "${WORK_DIR}/docker"
+  curl -fsSL "${REPO_RAW_BASE}/docker/Dockerfile" -o "${WORK_DIR}/docker/Dockerfile"
+  curl -fsSL "${REPO_RAW_BASE}/docker/entrypoint.sh" -o "${WORK_DIR}/docker/entrypoint.sh"
+  curl -fsSL "${REPO_RAW_BASE}/denodo_config.env" -o "${WORK_DIR}/denodo_config.env" || true
+  SCRIPT_DIR="$WORK_DIR"
+fi
+
+CONFIG_FILE="${SCRIPT_DIR}/denodo_config.env"
 
 usage() {
   cat <<EOF
