@@ -39,4 +39,8 @@ LABEL org.opencontainers.image.title="denodo-oneclick" \
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# nginx (installed by linux/install.sh) serves the app on 80. Documentation
+# only - install.sh actually publishes it via `docker run -p 80:80`.
+EXPOSE 80
+
 ENTRYPOINT ["/entrypoint.sh"]

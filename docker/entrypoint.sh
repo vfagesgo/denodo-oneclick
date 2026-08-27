@@ -57,6 +57,7 @@ else
 fi
 
 # Example: run install script if exists
+rc=1
 if [ -f "$INSTALL_DIR/linux/install.sh" ]; then
   echo "[INIT] Running install.sh as Denodo" | tee -a $LOG
   chmod +x "$INSTALL_DIR/linux/install.sh" 
@@ -90,5 +91,20 @@ if [ -f "$INSTALL_DIR/linux/install.sh" ]; then
 
 fi
 
+# If the install failed (or linux/install.sh wasn't even found), the
+# container must actually exit here. install.sh on the host resumes a
+# stopped container with `docker start` rather than recreating it, so
+# staying "up" despite a failure would make that resume a no-op and the
+# install would never actually retry.
+if [ "$rc" -ne 0 ]; then
+  echo "[INIT] Install did not complete successfully (exit $rc) - exiting so the next 'docker start' retries it" | tee -a "$LOG"
+  exit "$rc"
+fi
+
 echo "[INIT] Completed" | tee -a $LOG
+echo "[INIT] Install succeeded - keeping the container up (nginx should be serving on port 80)" | tee -a "$LOG"
+
+# Keep the container's main process alive so it stays up once the install
+# succeeds. `-F` (not `-f`) keeps following across log rotation/truncation.
+exec tail -F "$LOG" /var/log/1-denodo_install.log 2>/dev/null
 

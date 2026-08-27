@@ -328,8 +328,8 @@ fi
 sudo cp "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 #./installer_cli.sh install
-sudo mkdir -p /opt/denodo-9
-sudo chown -R denodo:denodo /opt/denodo-9
+sudo mkdir -p /opt/denodo
+sudo chown -R denodo:denodo /opt/denodo
 
 log_step "Faking JAVA JRE in Denodo Home"
 # -f/-n so re-running after a failed install doesn't crash on "File exists".
@@ -357,13 +357,13 @@ change_config() {
       "$CONF_FILE"
 }
 log_step "JAVA Config: Change -Xmx in VDBConfiguration.properties"
-change_config "-Xmx" "/opt/denodo-9/conf/vdp/VDBConfiguration.properties" "2048m"
+change_config "-Xmx" "/opt/denodo/conf/vdp/VDBConfiguration.properties" "2048m"
 log_step "JAVA Config: Change -XX:ReservedCodeCacheSize= in VDBConfiguration.properties"
-change_config "-XX:ReservedCodeCacheSize=" "/opt/denodo-9/conf/vdp/VDBConfiguration.properties" "256m"
+change_config "-XX:ReservedCodeCacheSize=" "/opt/denodo/conf/vdp/VDBConfiguration.properties" "256m"
 log_step "JAVA Config: Change -Xmx in resources/apache-tomcat/conf/tomcat.properties"
-change_config "-Xmx" "/opt/denodo-9/resources/apache-tomcat/conf/tomcat.properties" "1024m"
+change_config "-Xmx" "/opt/denodo/resources/apache-tomcat/conf/tomcat.properties" "1024m"
 
-/opt/denodo-9/bin/regenerateFiles.sh
+/opt/denodo/bin/regenerateFiles.sh
 
 # Section 13:
 # The AI SDK lives in its own Git repository. On first install it is cloned;
@@ -514,10 +514,17 @@ fi
 log_step "Installing ${#available_packages[@]} apt package(s)"
 sudo apt-get install -y "${available_packages[@]}"
 
-# Install pyenv to manage the project Python version.
+# Install pyenv to manage the project Python version. This used to
+# unconditionally `rm -rf ~/.pyenv` and rebuild Python 3.11 from source on
+# every run - one of the "rebuilds/redownloads everything on retry"
+# problems, since $HOME (/home/denodo) can now persist across container
+# restarts. Skip entirely if it's already there.
 log_step "Installing pyenv"
-sudo rm -rf ~/.pyenv
-curl -fsSL https://pyenv.run | bash
+if [ -x "$HOME/.pyenv/bin/pyenv" ]; then
+  log_step "pyenv already installed, skipping"
+else
+  curl -fsSL https://pyenv.run | bash
+fi
 
 # Add pyenv init hooks to .bashrc only once.
 if ! grep -q 'pyenv init' "$HOME/.bashrc"; then

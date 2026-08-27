@@ -124,30 +124,58 @@ esac
 
 echo "== denodo-oneclick: Docker install mode =="
 
-# Rollback safety: keep the previous image under a ':previous' tag instead
-# of letting a new build silently replace it.
-if docker image inspect "${IMAGE_NAME}:${IMAGE_TAG}" >/dev/null 2>&1; then
-  echo "Tagging existing ${IMAGE_NAME}:${IMAGE_TAG} as ${IMAGE_NAME}:previous for rollback."
-  docker tag "${IMAGE_NAME}:${IMAGE_TAG}" "${IMAGE_NAME}:previous"
+VOLUME_PREFIX="denodo-oneclick"
+
+# The previous version always did `docker rm -f` + a fresh `docker run`
+# here, which wiped the container's entire filesystem on every retry -
+# including apt-installed packages and, before named volumes existed, the
+# multi-GB Denodo downloads. If a container from a previous attempt already
+# exists, resume *that* container instead: `docker start` keeps everything
+# it had (downloaded files, installed packages, partial progress), and
+# entrypoint.sh + linux/install.sh's own idempotency checks pick up wherever
+# they left off.
+if docker inspect "${IMAGE_NAME}" >/dev/null 2>&1; then
+  echo "Found an existing '${IMAGE_NAME}' container - resuming it instead of rebuilding, so any"
+  echo "partially completed install work isn't thrown away."
+  echo "(Env vars like --DENODO_UPDATE can't be changed on a resumed container - remove it first"
+  echo "if you need to change them; see the from-scratch command below.)"
+  docker start "${IMAGE_NAME}" >/dev/null
+else
+  echo "No existing container found - building the image and creating a new one."
+
+  # Rollback safety: keep the previous image under a ':previous' tag instead
+  # of letting a new build silently replace it.
+  if docker image inspect "${IMAGE_NAME}:${IMAGE_TAG}" >/dev/null 2>&1; then
+    echo "Tagging existing ${IMAGE_NAME}:${IMAGE_TAG} as ${IMAGE_NAME}:previous for rollback."
+    docker tag "${IMAGE_NAME}:${IMAGE_TAG}" "${IMAGE_NAME}:previous"
+  fi
+
+  docker build -t "${IMAGE_NAME}:${IMAGE_TAG}" "${SCRIPT_DIR}/docker"
+
+  # Named volumes are a second safety net (on top of container reuse above):
+  # they keep the Denodo install/database intact even if this container is
+  # later removed and recreated (e.g. after an image rebuild). Docker
+  # creates them automatically on first use.
+  docker run --name "${IMAGE_NAME}" -d \
+    -p 80:80 \
+    -v "${VOLUME_PREFIX}-repo":/opt/denodo \
+    -v "${VOLUME_PREFIX}-home":/home/denodo \
+    -v "${VOLUME_PREFIX}-install":/opt/denodo-9 \
+    -v "${VOLUME_PREFIX}-postgres":/var/lib/postgresql \
+    -e DENODO_SUPPORT_CI="${DENODO_SUPPORT_CI}" \
+    -e DENODO_SUPPORT_SECRET="${DENODO_SUPPORT_SECRET}" \
+    -e DENODO_UPDATE="${DENODO_UPDATE:-}" \
+    -e DENODO_PG_USER="${DENODO_PG_USER:-}" \
+    -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
+    -e DENODO_VDP_USER="${DENODO_VDP_USER:-}" \
+    -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
+    -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY:-}" \
+    -v "$(cd "$(dirname "$DENODO_LIC")" && pwd)/$(basename "$DENODO_LIC")":/denodo/license.lic:ro \
+    "${IMAGE_NAME}:${IMAGE_TAG}"
 fi
 
-docker build -t "${IMAGE_NAME}:${IMAGE_TAG}" "${SCRIPT_DIR}/docker"
-
-# Remove any prior container of the same name so we can re-run install.sh
-# idempotently (previous image tag above still allows a rollback).
-docker rm -f "${IMAGE_NAME}" >/dev/null 2>&1 || true
-
-docker run --name "${IMAGE_NAME}" --rm \
-  -e DENODO_SUPPORT_CI="${DENODO_SUPPORT_CI}" \
-  -e DENODO_SUPPORT_SECRET="${DENODO_SUPPORT_SECRET}" \
-  -e DENODO_UPDATE="${DENODO_UPDATE:-}" \
-  -e DENODO_PG_USER="${DENODO_PG_USER:-}" \
-  -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
-  -e DENODO_VDP_USER="${DENODO_VDP_USER:-}" \
-  -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
-  -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY:-}" \
-  -v "$(cd "$(dirname "$DENODO_LIC")" && pwd)/$(basename "$DENODO_LIC")":/denodo/license.lic:ro \
-  "${IMAGE_NAME}:${IMAGE_TAG}"
-
 echo ""
-echo "Rollback: docker run/tag ${IMAGE_NAME}:previous to go back to the prior image."
+echo "Follow install/startup progress with: docker logs -f ${IMAGE_NAME}"
+echo "Once install completes, the app is at http://localhost"
+echo ""
+echo "From-scratch reinstall: docker rm -f ${IMAGE_NAME} && docker volume rm ${VOLUME_PREFIX}-repo ${VOLUME_PREFIX}-home ${VOLUME_PREFIX}-install ${VOLUME_PREFIX}-postgres"
