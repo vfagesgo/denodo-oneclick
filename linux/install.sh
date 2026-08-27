@@ -311,21 +311,30 @@ chmod +x installer_cli.sh
 DENODO_LIC=${DENODO_LIC:-"denodo-developer-lic-9.lic"}
 log_step "Copy Denodo License: $DENODO_LIC"
 
-# Docker install mode mounts the license at /denodo/license.lic and never
-# sets $DENODO_LIC, so prefer an existing path if one was passed, then the
-# Docker mount, then the Raspberry Pi boot-partition convention.
-if [ -f "$DENODO_LIC" ]; then
-  DENODO_LIC_SRC="$DENODO_LIC"
-elif [ -f "/denodo/license.lic" ]; then
+# Check the unambiguous absolute-path locations (Docker mount, Pi boot
+# partition) before the bare $DENODO_LIC filename: cwd is $DENODO_INSTALL
+# here, and on a resumed run $DENODO_INSTALL/denodo-developer-lic-9.lic
+# (the copy *destination*) already exists - checking the relative filename
+# first previously matched that destination file itself as the "source"
+# and made `cp` fail with "are the same file".
+if [ -f "/denodo/license.lic" ]; then
   DENODO_LIC_SRC="/denodo/license.lic"
 elif [ -f "/boot/firmware/denodo/$DENODO_LIC" ]; then
   DENODO_LIC_SRC="/boot/firmware/denodo/$DENODO_LIC"
+elif [ -f "$DENODO_LIC" ]; then
+  DENODO_LIC_SRC="$DENODO_LIC"
 else
-  log_step "ERROR: no Denodo license file found (checked '$DENODO_LIC', /denodo/license.lic, /boot/firmware/denodo/$DENODO_LIC)"
+  log_step "ERROR: no Denodo license file found (checked /denodo/license.lic, /boot/firmware/denodo/$DENODO_LIC, '$DENODO_LIC')"
   exit 1
 fi
 
-sudo cp "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
+# Idempotency belt-and-suspenders: skip the copy entirely if the resolved
+# source and destination are already the same file, however that happened.
+if [ "$(readlink -f "$DENODO_LIC_SRC" 2>/dev/null)" = "$(readlink -f "$DENODO_INSTALL/denodo-developer-lic-9.lic" 2>/dev/null)" ]; then
+  log_step "License already in place at $DENODO_INSTALL/denodo-developer-lic-9.lic, skipping copy"
+else
+  sudo cp "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
+fi
 sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 #./installer_cli.sh install
 sudo mkdir -p /opt/denodo
