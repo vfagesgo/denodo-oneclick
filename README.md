@@ -11,7 +11,9 @@ To install Denodo Developper you just need to follow those steaps
 
 You can then run the following command to install your own local container image of Denodo Developper by running the following command (change the parameters first)
 
-Note that you must have Docker install on your machine
+> **_NOTE:_**  You must have Docker priorly installed on your machine
+
+### Linux / MacOS
 
 ```shell
 curl -fsSL https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.sh | bash  -s -- \
@@ -35,16 +37,17 @@ On Windows, use `install.ps1` from a PowerShell prompt. Docker Desktop's Linux c
 
 ```powershell
 iwr -useb https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.ps1 -OutFile install.ps1
+
 .\install.ps1 -DENODO_SUPPORT_CI <Support_CI> -DENODO_SUPPORT_SECRET <Support_Secret> -DENODO_LIC <Path to your Denodo license file>
 ```
 
 If you already have this repository checked out locally, run `.\install.ps1 ...` directly instead.
 
+### Next Steps 
+
 The install runs in the background; the script automatically follows its logs in your terminal until you Ctrl-C (the container keeps running either way). Once it completes, Denodo is available at http://localhost. To reattach to the logs later:
 
-```shell
-docker logs -f denodo-oneclick
-```
+## Options
 
 ### Mandatory parameters
 - `--DENODO_SUPPORT_CI <value>`
@@ -73,10 +76,7 @@ If you do want a totally clean install, add `--reset` to remove the existing con
 ## Persistence
 
 Install progress and data live in a set of named Docker volumes, so they survive the container being removed and recreated (for example after rebuilding the image):
-- `denodo-oneclick-repo` — this repository's checkout inside the container
-- `denodo-oneclick-home` — downloaded installer/update archives and the AI SDK
-- `denodo-oneclick-install` — the installed Denodo platform
-- `denodo-oneclick-postgres` — the PostgreSQL database
+- `denodo-oneclick-data` — this conatians the repository's, Denodo install, PostgreSQL database
 
 `--reset` removes all of these along with the container.
 
