@@ -15,7 +15,7 @@ You can then run the following command to install your own local container image
 
 ### Linux / MacOS
 
-```shell
+```zsh
 curl -fsSL https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.sh | bash  -s -- \
 --DENODO_SUPPORT_CI <Support_CI> \
 --DENODO_SUPPORT_SECRET <Support_CI> \
@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/insta
 
 If you already have this repository checked out locally, you can run the script directly instead of piping it from GitHub:
 
-```shell
+```zsh
 ./install.sh \
   --DENODO_SUPPORT_CI <Support_CI> \
   --DENODO_SUPPORT_SECRET <Support_Secret> \
