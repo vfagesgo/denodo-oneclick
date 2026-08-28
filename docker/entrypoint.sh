@@ -55,6 +55,11 @@ link_to_data /home/denodo home denodo:denodo
 link_to_data /opt/denodo denodo denodo:denodo
 link_to_data /var/lib/postgresql postgres
 
+## Marker set once a full install has completed successfully (see below).
+## Persisted in /data itself (not one of the symlinked subdirs), so it
+## survives container recreation as long as the volume does.
+INSTALL_MARKER="$DATA_ROOT/.denodo_install_complete"
+
 ## Installing dependencies inthe container
 LOG="/var/log/denodo-entrypoint.log"
 touch "$LOG"
@@ -112,20 +117,38 @@ if [ -f "$INSTALL_DIR/linux/install.sh" ]; then
   # and lost entirely once the --rm container exits). Tee it instead so the
   # real error is visible immediately, while still keeping the log copy.
   #
-  # Two fixes vs. the previous version:
+  # Fixes vs. earlier versions:
   # - Run linux/install.sh (the tested Raspberry Pi installer) instead of
   #   the repo's top-level install.sh (the Docker orchestrator itself,
   #   also present since the whole repo was cloned into $INSTALL_DIR).
   # - `sudo -u denodo` without -E/--preserve-env strips the DENODO_* vars
   #   that `docker run -e` set, so explicitly preserve the ones the
   #   installer reads.
+  # - If a previous run already finished successfully (INSTALL_MARKER), skip
+  #   straight to (re)starting services instead of redoing the whole install
+  #   - but only if the OS-level install actually looks intact. The marker
+  #   lives on the volume and can outlive a container recreation, while
+  #   apt-installed packages/config under / do not, so trust it only when
+  #   both agree.
+  DENODO_SERVICES_ONLY=0
+  if [ -f "$INSTALL_MARKER" ] && command -v nginx >/dev/null 2>&1 && command -v pg_ctlcluster >/dev/null 2>&1; then
+    echo "[INIT] Previous install marker found and OS packages look intact - services-only start" | tee -a "$LOG"
+    DENODO_SERVICES_ONLY=1
+  fi
+  export DENODO_SERVICES_ONLY
+
   set -o pipefail
   sudo -H -u denodo \
-    --preserve-env=DENODO_SUPPORT_CI,DENODO_SUPPORT_SECRET,DENODO_LIC,DENODO_UPDATE,DENODO_PG_USER,DENODO_PG_PWD,DENODO_VDP_USER,DENODO_VDP_PWD \
+    --preserve-env=DENODO_SUPPORT_CI,DENODO_SUPPORT_SECRET,DENODO_LIC,DENODO_UPDATE,DENODO_PG_USER,DENODO_PG_PWD,DENODO_VDP_USER,DENODO_VDP_PWD,DENODO_SERVICES_ONLY \
     bash "$INSTALL_DIR/linux/install.sh" 2>&1 | tee -a "$LOG"
   rc=$?
 
   echo "[INIT] install.sh exit code=$rc" | tee -a "$LOG"
+
+  if [ "$rc" -eq 0 ] && [ "$DENODO_SERVICES_ONLY" -eq 0 ]; then
+    echo "[INIT] Full install succeeded - writing $INSTALL_MARKER so future starts skip straight to services" | tee -a "$LOG"
+    date -u +%Y-%m-%dT%H:%M:%SZ > "$INSTALL_MARKER"
+  fi
 
 fi
 

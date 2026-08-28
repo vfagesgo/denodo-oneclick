@@ -24,7 +24,161 @@ log_step() {
   echo "[STEP] $1" | tee -a "$LOG"
 }
 
+# --- Reusable pieces -------------------------------------------------------
+# Defined up front (rather than inline further down) so the services-only
+# fast path below and the normal full-install flow can both call them
+# without duplicating the logic.
+RUN_DIR="/var/run/denodo-oneclick"
 
+restart_postgresql() {
+  local pg_hba_files=(/etc/postgresql/*/main/pg_hba.conf)
+  local conf version name
+  for conf in "${pg_hba_files[@]}"; do
+    [ -f "$conf" ] || continue
+    version=$(echo "$conf" | cut -d/ -f4)
+    name=$(echo "$conf" | cut -d/ -f5)
+    log_step "Restarting PostgreSQL cluster $version/$name"
+    sudo pg_ctlcluster "$version" "$name" restart
+  done
+}
+
+# Read a single-valued field (e.g. ExecStart, User) out of a .service file.
+# Fine here because none of these fields repeat across sections in our own
+# unit files. grep exits 1 when a field is simply absent (many are optional
+# - e.g. denodo_house_keeping.service has no User/WorkingDirectory/
+# ExecStop); the `|| true` keeps that from tripping `set -e` in callers.
+service_field() {
+  grep -E "^${2}=" "$1" | head -n1 | cut -d= -f2- || true
+}
+
+start_service() {
+  local service_file="$1"
+  local name exec_start run_user working_dir pre_start restart
+
+  name=$(basename "$service_file" .service)
+  exec_start=$(service_field "$service_file" "ExecStart")
+  run_user=$(service_field "$service_file" "User")
+  working_dir=$(service_field "$service_file" "WorkingDirectory")
+  pre_start=$(service_field "$service_file" "ExecStartPre")
+  restart=$(service_field "$service_file" "Restart")
+  run_user=${run_user:-denodo}
+
+  if [ -z "$exec_start" ]; then
+    log_step "Skipping $name: no ExecStart in $service_file"
+    return
+  fi
+
+  service_field "$service_file" "ExecStop" | sudo tee "$RUN_DIR/${name}.stop" >/dev/null
+
+  (
+    [ -n "$pre_start" ] && eval "$pre_start"
+    cd "${working_dir:-/}" || exit 1
+    if [ "$restart" = "always" ]; then
+      while true; do
+        sudo -u "$run_user" bash -c "$exec_start"
+        sleep 5
+      done
+    else
+      sudo -u "$run_user" bash -c "$exec_start"
+    fi
+  ) >>"$LOG" 2>&1 &
+
+  echo $! | sudo tee "$RUN_DIR/${name}.pid" >/dev/null
+  log_step "Started $name (pid $!, log: $LOG)"
+}
+
+# Start the Denodo services, either via systemd (regular Linux install) or
+# as supervised background processes (no systemd available, e.g. inside a
+# Docker container). Both paths read the same *.service files under
+# $SCRIPT_DIR/services so there is one source of truth for what each
+# service runs.
+start_denodo_services() {
+  local SERVICE_DIR="$SCRIPT_DIR/services"
+  sudo mkdir -p "$RUN_DIR"
+  sudo chown denodo:denodo "$RUN_DIR"
+
+  # Fixed start order: vdp-server first, then the two that depend on it,
+  # then aisdk which depends on data-marketplace. House-keeping has no
+  # dependents.
+  local SERVICE_ORDER=(
+    denodo_house_keeping
+    denodo-vdp-server
+    denodo-design_studio
+    denodo-data-marketplace
+    denodo-aisdk
+  )
+  local name service_file
+
+  if [ -d /run/systemd/system ]; then
+    log_step "systemd detected - installing and starting services via systemctl"
+
+    for name in "${SERVICE_ORDER[@]}"; do
+      service_file="$SERVICE_DIR/${name}.service"
+      [ -f "$service_file" ] || continue
+      echo "Installing service ${name}.service"
+      # denodo_house_keeping.service still hardcodes /opt/denodo-pi (stale);
+      # normalize it to wherever this script actually lives instead of
+      # editing the checked-in unit file.
+      sed "s#/opt/denodo-pi#${SCRIPT_DIR}#g" "$service_file" | sudo tee "/lib/systemd/system/${name}.service" >/dev/null
+      sudo chown root "/lib/systemd/system/${name}.service"
+    done
+
+    sudo systemctl daemon-reload
+
+    for name in "${SERVICE_ORDER[@]}"; do
+      [ -f "$SERVICE_DIR/${name}.service" ] || continue
+      sudo systemctl unmask "${name}.service"
+      sudo systemctl enable "${name}.service"
+      sudo systemctl start "${name}.service"
+    done
+  else
+    log_step "No systemd detected - starting services directly as background processes"
+
+    for name in "${SERVICE_ORDER[@]}"; do
+      service_file="$SERVICE_DIR/${name}.service"
+      [ -f "$service_file" ] && start_service "$service_file"
+    done
+
+    log_step "Services started in the background. PIDs/stop commands are under $RUN_DIR"
+    log_step "Note: keeping the container itself alive (e.g. a foreground wait loop) is the entrypoint's responsibility, not this script's"
+  fi
+}
+
+# Friendly, hard-to-miss confirmation once the install (or a services-only
+# restart) has succeeded.
+print_welcome_banner() {
+  if ! command -v figlet >/dev/null 2>&1; then
+    sudo apt-get install -y figlet >/dev/null 2>&1 || true
+  fi
+
+  echo ""
+  if command -v figlet >/dev/null 2>&1; then
+    figlet -c "Denodo Developer"
+    figlet -c "Welcome"
+  else
+    # figlet unavailable (e.g. offline apt install failure) - plain fallback.
+    echo "=== Denodo Developer ==="
+    echo "===      Welcome      ==="
+  fi
+  echo ""
+  echo "Installation completed successfully. To get started open"
+  echo "http://localhost"
+  echo ""
+}
+
+# --- Services-only fast path ------------------------------------------------
+# entrypoint.sh sets DENODO_SERVICES_ONLY=1 once a previous run has fully
+# completed (tracked via a marker file), so a plain container restart just
+# restarts what's already installed instead of redoing the whole install.
+if [ "${DENODO_SERVICES_ONLY:-0}" = "1" ]; then
+  log_section "00" "Services-only start (install already completed previously)"
+  restart_postgresql
+  log_step "Restarting Nginx"
+  sudo service nginx restart
+  start_denodo_services
+  print_welcome_banner
+  exit 0
+fi
 
 # Section 03:
 # Running directly as root would hide which user should own the installed
@@ -669,132 +823,18 @@ log_step "Restarting Nginx"
 # init.d script), unlike `systemctl`, which fails outside a real systemd
 # environment such as a plain Docker container.
 sudo service nginx restart
-  
 
+# Section 16:
 # Start the Denodo services, either via systemd (regular Linux install) or
 # as supervised background processes (no systemd available, e.g. inside a
-# Docker container). Both paths read the same *.service files under
-# $SCRIPT_DIR/services so there is one source of truth for what each
-# service runs.
+# Docker container). Defined up top as start_denodo_services() so the
+# services-only fast path can call the exact same logic.
 log_section "16" "Configuring the different services"
-
-SERVICE_DIR="$SCRIPT_DIR/services"
-RUN_DIR="/var/run/denodo-oneclick"
-sudo mkdir -p "$RUN_DIR"
-sudo chown denodo:denodo "$RUN_DIR"
-
-# Fixed start order: vdp-server first, then the two that depend on it, then
-# aisdk which depends on data-marketplace. House-keeping has no dependents.
-SERVICE_ORDER=(
-  denodo_house_keeping
-  denodo-vdp-server
-  denodo-design_studio
-  denodo-data-marketplace
-  denodo-aisdk
-)
-
-if [ -d /run/systemd/system ]; then
-  log_step "systemd detected - installing and starting services via systemctl"
-
-  for name in "${SERVICE_ORDER[@]}"; do
-    service_file="$SERVICE_DIR/${name}.service"
-    [ -f "$service_file" ] || continue
-    echo "Installing service ${name}.service"
-    # denodo_house_keeping.service still hardcodes /opt/denodo-pi (stale,
-    # same issue as the nginx paths fixed above); normalize it to wherever
-    # this script actually lives instead of editing the checked-in unit file.
-    sed "s#/opt/denodo-pi#${SCRIPT_DIR}#g" "$service_file" | sudo tee "/lib/systemd/system/${name}.service" >/dev/null
-    sudo chown root "/lib/systemd/system/${name}.service"
-  done
-
-  sudo systemctl daemon-reload
-
-  for name in "${SERVICE_ORDER[@]}"; do
-    [ -f "$SERVICE_DIR/${name}.service" ] || continue
-    sudo systemctl unmask "${name}.service"
-    sudo systemctl enable "${name}.service"
-    sudo systemctl start "${name}.service"
-  done
-else
-  log_step "No systemd detected - starting services directly as background processes"
-
-  # Read a single-valued field (e.g. ExecStart, User) out of a .service
-  # file. Fine here because none of these fields repeat across sections in
-  # our own unit files.
-  service_field() {
-    # grep exits 1 when the field is simply absent (many are optional -
-    # e.g. denodo_house_keeping.service has no User/WorkingDirectory/
-    # ExecStop). Under `set -euo pipefail`, `var=$(service_field ...)`
-    # failing like that killed the whole script on the very first
-    # service, before it even printed which one or why.
-    grep -E "^${2}=" "$1" | head -n1 | cut -d= -f2- || true
-  }
-
-  start_service() {
-    local service_file="$1"
-    local name exec_start run_user working_dir pre_start restart
-
-    name=$(basename "$service_file" .service)
-    exec_start=$(service_field "$service_file" "ExecStart")
-    run_user=$(service_field "$service_file" "User")
-    working_dir=$(service_field "$service_file" "WorkingDirectory")
-    pre_start=$(service_field "$service_file" "ExecStartPre")
-    restart=$(service_field "$service_file" "Restart")
-    run_user=${run_user:-denodo}
-
-    if [ -z "$exec_start" ]; then
-      log_step "Skipping $name: no ExecStart in $service_file"
-      return
-    fi
-
-    service_field "$service_file" "ExecStop" | sudo tee "$RUN_DIR/${name}.stop" >/dev/null
-
-    (
-      [ -n "$pre_start" ] && eval "$pre_start"
-      cd "${working_dir:-/}" || exit 1
-      if [ "$restart" = "always" ]; then
-        while true; do
-          sudo -u "$run_user" bash -c "$exec_start"
-          sleep 5
-        done
-      else
-        sudo -u "$run_user" bash -c "$exec_start"
-      fi
-    ) >>"$LOG" 2>&1 &
-
-    echo $! | sudo tee "$RUN_DIR/${name}.pid" >/dev/null
-    log_step "Started $name (pid $!, log: $LOG)"
-  }
-
-  for name in "${SERVICE_ORDER[@]}"; do
-    service_file="$SERVICE_DIR/${name}.service"
-    [ -f "$service_file" ] && start_service "$service_file"
-  done
-
-  log_step "Services started in the background. PIDs/stop commands are under $RUN_DIR"
-  log_step "Note: keeping the container itself alive (e.g. a foreground wait loop) is the entrypoint's responsibility, not this script's"
-fi
+start_denodo_services
 
 # Section 17:
 # Friendly, hard-to-miss confirmation once everything above succeeded
 # (reaching this point means every prior command exited 0, since `set -e`
 # would have already stopped the script otherwise).
 log_section "17" "Installation complete"
-
-if ! command -v figlet >/dev/null 2>&1; then
-  sudo apt-get install -y figlet >/dev/null 2>&1 || true
-fi
-
-echo ""
-if command -v figlet >/dev/null 2>&1; then
-  figlet -c "Denodo Developer"
-  figlet -c "Welcome"
-else
-  # figlet unavailable (e.g. offline apt install failure) - plain fallback.
-  echo "=== Denodo Developer ==="
-  echo "===      Welcome      ==="
-fi
-echo ""
-echo "Installation completed successfully. To get started open"
-echo "http://localhost"
-echo ""
+print_welcome_banner
