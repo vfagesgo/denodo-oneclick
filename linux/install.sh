@@ -774,3 +774,27 @@ else
   log_step "Services started in the background. PIDs/stop commands are under $RUN_DIR"
   log_step "Note: keeping the container itself alive (e.g. a foreground wait loop) is the entrypoint's responsibility, not this script's"
 fi
+
+# Section 17:
+# Friendly, hard-to-miss confirmation once everything above succeeded
+# (reaching this point means every prior command exited 0, since `set -e`
+# would have already stopped the script otherwise).
+log_section "17" "Installation complete"
+
+if ! command -v figlet >/dev/null 2>&1; then
+  sudo apt-get install -y figlet >/dev/null 2>&1 || true
+fi
+
+echo ""
+if command -v figlet >/dev/null 2>&1; then
+  figlet -c "Denodo Developer"
+  figlet -c "Welcome"
+else
+  # figlet unavailable (e.g. offline apt install failure) - plain fallback.
+  echo "=== Denodo Developer ==="
+  echo "===      Welcome      ==="
+fi
+echo ""
+echo "Installation completed successfully. To get started open"
+echo "http://localhost"
+echo ""
