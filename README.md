@@ -29,6 +29,17 @@ If you already have this repository checked out locally, you can run the script 
   --DENODO_LIC <Path to your Denodo license file>
 ```
 
+### Windows
+
+On Windows, use `install.ps1` from a PowerShell prompt. Docker Desktop's Linux container backend builds/runs the exact same image as the bash version. PowerShell doesn't support piping a script straight into execution the way `curl | bash` does, so download it first, then run it:
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.ps1 -OutFile install.ps1
+.\install.ps1 -DENODO_SUPPORT_CI <Support_CI> -DENODO_SUPPORT_SECRET <Support_Secret> -DENODO_LIC <Path to your Denodo license file>
+```
+
+If you already have this repository checked out locally, run `.\install.ps1 ...` directly instead.
+
 The install runs in the background; the script automatically follows its logs in your terminal until you Ctrl-C (the container keeps running either way). Once it completes, Denodo is available at http://localhost. To reattach to the logs later:
 
 ```shell
