@@ -31,6 +31,13 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+# PowerShell 7.3+ otherwise treats stderr output from native commands (docker
+# included) as a terminating error under $ErrorActionPreference = "Stop" -
+# even when redirected with `*> $null` - which is what turned the expected
+# "no such object" from the exit-code probes below into a hard failure
+# instead of just setting $LASTEXITCODE. Restore the classic behavior so
+# those probes work the same way the bash version's `|| true` does.
+$PSNativeCommandUseErrorActionPreference = $false
 
 function Show-Usage {
   @"

@@ -33,15 +33,23 @@ If you already have this repository checked out locally, you can run the script 
 
 ### Windows
 
-On Windows, use `install.ps1` from a PowerShell prompt. Docker Desktop's Linux container backend builds/runs the exact same image as the bash version. PowerShell doesn't support piping a script straight into execution the way `curl | bash` does, so download it first, then run it:
+On Windows, use `install.ps1` from a PowerShell prompt. Docker Desktop's Linux container backend builds/runs the exact same image as the bash version.
+
+> **_NOTE:_** Start Docker Desktop before running the script — it calls `docker` directly and fails immediately if the Docker engine isn't running.
+
+PowerShell doesn't support piping a script straight into execution the way `curl | bash` does, so download it first, then run it. PowerShell also blocks running downloaded `.ps1` scripts by default, so bypass that for the current session with `Set-ExecutionPolicy`:
 
 ```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
 iwr -useb https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.ps1 -OutFile install.ps1
 
 .\install.ps1 -DENODO_SUPPORT_CI <Support_CI> -DENODO_SUPPORT_SECRET <Support_Secret> -DENODO_LIC <Path to your Denodo license file>
 ```
 
-If you already have this repository checked out locally, run `.\install.ps1 ...` directly instead.
+`-Scope Process` only relaxes the policy for the current PowerShell session, not your machine's overall setting.
+
+If you already have this repository checked out locally, run `.\install.ps1 ...` directly instead (still preceded by the `Set-ExecutionPolicy` line above if needed).
 
 ### Next Steps 
 
