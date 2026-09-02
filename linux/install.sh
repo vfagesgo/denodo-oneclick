@@ -839,7 +839,7 @@ if [ -f "/home/denodo/Denodo MCP Server.zip" ]; then
   log_step "Installer archive already downloaded, skipping (remove /home/denodo/Denodo MCP Server.zip to force a re-download)"
 else
   log_step "Download Denodo MCP Installer"
-  ./denodo-support -t installer -n "Denodo MCP Server" -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+  ./denodo-support -t denodoconnect-enterprise -n 'Denodo MCP Server' -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
 fi
 
 log_step "Prepare mcp folder"
