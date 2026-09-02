@@ -1,5 +1,5 @@
 [Unit]
-Description=Denodo AISDK and Chatbot
+Description=Denodo MCP Serice
 After=local-fs.target systemd-remount-fs.service denodo-data-marketplace.service
 Requires=denodo-data-marketplace.service
 Wants=network-pre.target NetworkManager.service
