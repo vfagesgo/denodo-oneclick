@@ -553,9 +553,29 @@ sudo chown -R denodo:denodo "$AISDK_INSTALL_DIR"
 # Clone the repo on first install, otherwise refresh the existing checkout.
 if [ ! -d "$AISDK_INSTALL_DIR/.git" ]; then
   log_step "Cloning denodo-ai-sdk repository"
-  git clone "$GITHUB_REPO_URL" "$AISDK_INSTALL_DIR"
+  # The repo is public, so a bare "could not read Username" failure here is
+  # not a real auth problem - it's git's smart-HTTP client misreporting a
+  # connection that got cut mid-transfer (flaky network, e.g. Docker
+  # Desktop's network layer) as an auth prompt it can't answer
+  # non-interactively. Retry a few times before giving up.
+  clone_attempts=0
+  clone_max_attempts=3
+  until git clone "$GITHUB_REPO_URL" "$AISDK_INSTALL_DIR"; do
+    clone_attempts=$((clone_attempts + 1))
+    if [ "$clone_attempts" -ge "$clone_max_attempts" ]; then
+      log_step "ERROR: git clone of denodo-ai-sdk failed after ${clone_attempts} attempts"
+      exit 1
+    fi
+    log_step "git clone failed (attempt ${clone_attempts}/${clone_max_attempts}) - retrying in 5s"
+    sleep 5
+    # A failed clone can leave a partial, non-empty directory behind; git
+    # refuses to clone into that on retry, so clear it first.
+    sudo rm -rf "$AISDK_INSTALL_DIR"
+    sudo mkdir -p "$AISDK_INSTALL_DIR"
+    sudo chown -R denodo:denodo "$AISDK_INSTALL_DIR"
+  done
   chown -R denodo:denodo "$AISDK_INSTALL_DIR"
-  
+
 else
   log_step "Updating denodo-ai-sdk repository"
   cd "$AISDK_INSTALL_DIR" || exit 1
