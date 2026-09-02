@@ -550,14 +550,23 @@ log_step "Branch: main"
 sudo mkdir -p "$AISDK_INSTALL_DIR"
 sudo chown -R denodo:denodo "$AISDK_INSTALL_DIR"
 
+# The repo is public, so "could not read Username" / "expected flush after
+# ref listing" here is not a real auth problem - it's git's smart-HTTP client
+# misreporting a truncated response as an auth prompt it can't answer
+# non-interactively. Seen consistently (not just intermittently) behind
+# Docker Desktop network paths with an MTU smaller than Docker's default
+# (common with VPNs/virtual adapters on Windows): HTTP/2's larger frames get
+# cut at the same point every time. Forcing HTTP/1.1 avoids that; the larger
+# buffer is a cheap second safeguard. Global (not just this repo) since it
+# only affects this container's git, not the host's.
+git config --global http.version HTTP/1.1
+git config --global http.postBuffer 157286400
+
 # Clone the repo on first install, otherwise refresh the existing checkout.
 if [ ! -d "$AISDK_INSTALL_DIR/.git" ]; then
   log_step "Cloning denodo-ai-sdk repository"
-  # The repo is public, so a bare "could not read Username" failure here is
-  # not a real auth problem - it's git's smart-HTTP client misreporting a
-  # connection that got cut mid-transfer (flaky network, e.g. Docker
-  # Desktop's network layer) as an auth prompt it can't answer
-  # non-interactively. Retry a few times before giving up.
+  # Retry a few times too, in case a real transient drop happens on top of
+  # the MTU issue above.
   clone_attempts=0
   clone_max_attempts=3
   until git clone "$GITHUB_REPO_URL" "$AISDK_INSTALL_DIR"; do
