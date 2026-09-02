@@ -68,6 +68,19 @@ echo "[INIT] Installing dependencies..." | tee -a $LOG
 sudo apt update
 sudo apt install git unzip -y
 
+# Seen consistently (not just intermittently) on some networks: git's
+# smart-HTTP client over HTTP/2 gets a truncated response - reported as
+# "could not read Username" / "expected flush after ref listing" - which is
+# actually an MTU mismatch on the container's network path (common with
+# Docker Desktop behind a VPN/virtual adapter with a smaller MTU than
+# Docker's default), not a real auth problem. Forcing HTTP/1.1 avoids
+# HTTP/2's larger frames; the bigger buffer is a cheap second safeguard.
+# --system (not --global) so this covers every clone in the container,
+# regardless of which user runs it (root here, "denodo" later in
+# linux/install.sh for the AI SDK clone).
+sudo git config --system http.version HTTP/1.1
+sudo git config --system http.postBuffer 157286400
+
 # Install Denodo-Oneclick repository
 
 # Defaults (in case .env is missing values)
