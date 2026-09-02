@@ -13,8 +13,7 @@ WorkingDirectory=/opt/denodo/denodo-aisdk
 
 ExecStartPre=/bin/sleep 120
 TimeoutStartSec=180
-#ExecStart=/home/denodo/venv_denodo/bin/python run.py both
-#ExecStop=/home/denodo/venv_denodo/bin/python stop.py both
+ExecStart=//opt/denodo/denodo-mcp-server/bin/denodo-mcp-server.sh
 
 RemainAfterExit=yes
 

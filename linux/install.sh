@@ -801,9 +801,36 @@ fi
 
 
 # Section 15:
+log_section "15" "Configure Denodo MCP Services"
+
+log_step "Installing Denodo MCP Services"
+
+if [ -f "/home/denodo/Denodo MCP Server.zip" ]; then
+  log_step "Installer archive already downloaded, skipping (remove /home/denodo/Denodo MCP Server.zip to force a re-download)"
+else
+  log_step "Download Denodo MCP Installer"
+  ./denodo-support -t installer -n 'Denodo MCP Server' -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+fi
+
+log_step "Prepare mcp folder"
+
+if [ -d "/opt/denodo/denodo-mcp-server" ]; then
+  log_step "denodo-mcp-server already extracted, skipping unzip"
+else
+  mkdir /opt/denodo/denodo-mcp-server
+  cd /opt/denodo/denodo-mcp-server
+  unzip -o "/home/denodo/Denodo MCP Server.zip"
+  mv denodo-mcp-server-*/* .
+  rm -rf denodo-mcp-server-*
+
+  chmod +x /opt/denodo/denodo-mcp-server/bin/denodo-mcp-server.sh
+fi
+
+
+# Section 16:
 # nginx wiring is still commented out, but the placeholder remains so the
 # script structure matches the intended install phases.
-log_section "15" "Configure nginx"
+log_section "16" "Configure nginx"
 
 log_step "Installing Nginx configuration file"
 
@@ -824,17 +851,17 @@ log_step "Restarting Nginx"
 # environment such as a plain Docker container.
 sudo service nginx restart
 
-# Section 16:
+# Section 17:
 # Start the Denodo services, either via systemd (regular Linux install) or
 # as supervised background processes (no systemd available, e.g. inside a
 # Docker container). Defined up top as start_denodo_services() so the
 # services-only fast path can call the exact same logic.
-log_section "16" "Configuring the different services"
+log_section "17" "Configuring the different services"
 start_denodo_services
 
-# Section 17:
+# Section 18:
 # Friendly, hard-to-miss confirmation once everything above succeeded
 # (reaching this point means every prior command exited 0, since `set -e`
 # would have already stopped the script otherwise).
-log_section "17" "Installation complete"
+log_section "18" "Installation complete"
 print_welcome_banner
