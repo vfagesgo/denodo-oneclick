@@ -162,7 +162,11 @@ if [[ -n "$ACTION" ]]; then
   # unconditionally here so --refresh/--upgrade work regardless of whether
   # the container has been restarted since that fix landed.
   docker exec -u root "${IMAGE_NAME}" bash -c '
-    chown -R denodo:denodo /opt/denodo-oneclick
+    # -H: /opt/denodo-oneclick is a symlink to /data/repo - without it,
+    # `chown -R` only reowns that target directory itself, not its
+    # contents (e.g. .git/), which is exactly what caused
+    # "cannot open .git/FETCH_HEAD: Permission denied" here.
+    chown -R -H denodo:denodo /opt/denodo-oneclick
     sudo -H -u denodo git config --global --get-all safe.directory 2>/dev/null | grep -qx "*" \
       || sudo -H -u denodo git config --global --add safe.directory "*"
   '

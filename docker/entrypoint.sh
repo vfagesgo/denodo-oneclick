@@ -101,7 +101,11 @@ if [ ! -d "$INSTALL_DIR/.git" ]; then
   echo "[INIT] GITHUB_REPO: $GITHUB_REPO" | tee -a $LOG
   echo "[INIT] GITHUB_REPO_URL: $GITHUB_REPO_URL" | tee -a $LOG
   git clone -b "$BRANCH" "$GITHUB_REPO_URL" "$INSTALL_DIR" | tee -a $LOG
-  chown -R denodo:denodo "$INSTALL_DIR" | tee -a $LOG
+  # -H: $INSTALL_DIR is a symlink to /data/repo (see link_to_data above) -
+  # without it, `chown -R` only reowns the symlink's target directory
+  # itself, not everything inside it, leaving files from the clone above
+  # (done as root) unwritable by "denodo".
+  chown -R -H denodo:denodo "$INSTALL_DIR" | tee -a $LOG
   
 else
   echo "[INIT] Updating repository (force reset)..." | tee -a $LOG
@@ -117,7 +121,9 @@ else
   # but broke `git` commands run directly as "denodo" later - e.g.
   # install.sh's --upgrade/--refresh, which exec into the container as
   # denodo and got "detected dubious ownership in repository".
-  chown -R denodo:denodo "$INSTALL_DIR"
+  # -H: see the comment on the clone branch's chown above - same symlink
+  # caveat applies here.
+  chown -R -H denodo:denodo "$INSTALL_DIR"
 fi
 
 # Belt-and-suspenders alongside the chown above: explicitly mark this repo
