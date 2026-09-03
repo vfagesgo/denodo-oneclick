@@ -141,6 +141,15 @@ if [[ -n "$ACTION" ]]; then
   if [[ "$(docker inspect -f '{{.State.Running}}' "${IMAGE_NAME}")" != "true" ]]; then
     echo "Container '${IMAGE_NAME}' is stopped - starting it first."
     docker start "${IMAGE_NAME}" >/dev/null
+    # entrypoint.sh runs its own git fetch/reset + chown on every boot,
+    # racing the exec-based refresh below if it starts immediately -
+    # `docker start` returns as soon as the container's process launches,
+    # not once entrypoint.sh's own repo sync/services-only pass has
+    # finished. Give it a head start so the two don't touch the repo
+    # directory at the same time (which can leave ownership in a state
+    # that trips git's "dubious ownership" check right back up).
+    echo "Waiting for the container's own startup sequence to settle..."
+    sleep 20
   fi
 
   echo "== denodo-oneclick: ${ACTION} =="
@@ -154,8 +163,8 @@ if [[ -n "$ACTION" ]]; then
   # the container has been restarted since that fix landed.
   docker exec -u root "${IMAGE_NAME}" bash -c '
     chown -R denodo:denodo /opt/denodo-oneclick
-    sudo -u denodo git config --global --get-all safe.directory 2>/dev/null | grep -qx "*" \
-      || sudo -u denodo git config --global --add safe.directory "*"
+    sudo -H -u denodo git config --global --get-all safe.directory 2>/dev/null | grep -qx "*" \
+      || sudo -H -u denodo git config --global --add safe.directory "*"
   '
 
   echo "Pulling the latest denodo-oneclick repo into the container and running linux/install.sh --${ACTION}..."
