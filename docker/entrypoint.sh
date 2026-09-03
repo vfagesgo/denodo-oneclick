@@ -126,6 +126,17 @@ else
   chown -R -H denodo:denodo "$INSTALL_DIR"
 fi
 
+# The chown -R above (needed so "denodo" can run git directly - see the
+# comments on it) recurses into every file in the repo, including www/ -
+# undoing the `chgrp -R www-data .../www` + `chmod -R 750` that
+# linux/install.sh's Section 16 sets up so nginx (running as www-data) can
+# read it. Without this, every container boot silently broke the site with
+# a 403. Reapply it unconditionally here, after either branch above.
+if [ -d "$INSTALL_DIR/www" ]; then
+  chgrp -R www-data "$INSTALL_DIR/www"
+  chmod -R 750 "$INSTALL_DIR/www"
+fi
+
 # Belt-and-suspenders alongside the chown above: explicitly mark this repo
 # (and everything under the persisted volume, since /opt/denodo-oneclick is
 # itself a symlink into it) as safe for git run as "denodo", regardless of

@@ -167,6 +167,13 @@ if [[ -n "$ACTION" ]]; then
     # contents (e.g. .git/), which is exactly what caused
     # "cannot open .git/FETCH_HEAD: Permission denied" here.
     chown -R -H denodo:denodo /opt/denodo-oneclick
+    # The chown above recurses into www/ too, undoing the www-data
+    # group/permissions nginx needs to serve it (see the matching comment
+    # in docker/entrypoint.sh) - reapply them.
+    if [ -d /opt/denodo-oneclick/www ]; then
+      chgrp -R www-data /opt/denodo-oneclick/www
+      chmod -R 750 /opt/denodo-oneclick/www
+    fi
     sudo -H -u denodo git config --global --get-all safe.directory 2>/dev/null | grep -qx "*" \
       || sudo -H -u denodo git config --global --add safe.directory "*"
   '
