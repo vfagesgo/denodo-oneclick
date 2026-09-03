@@ -12,7 +12,7 @@ MemoryMax=1G
 WorkingDirectory=/opt/denodo/denodo-mcp-server
 ExecStartPre=/bin/sleep 90
 TimeoutStartSec=120
-ExecStart=/opt/denodo/denodo-mcp-server/bin/denodo-mcp-server.sh
+ExecStart=./denodo-mcp-server.sh
 
 RemainAfterExit=yes
 
