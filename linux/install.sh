@@ -315,6 +315,36 @@ if [ "$DENODO_ACTION" = "upgrade" ]; then
 fi
 
 # Section 03:
+# Install Cloudflare tunnel if env variable is set
+# Add cloudflare gpg key
+
+log_section "03" "Install Cloudflare"
+log_step "Add cloudflare gpg key"
+sudo mkdir -p --mode=0755 /usr/share/keyrings
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+
+log_step "Add this repo to your apt repositories"
+# Add this repo to your apt repositories
+echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+
+log_step "install cloudflared"
+# install cloudflared
+sudo apt-get update && sudo apt-get install cloudflared
+
+if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
+  if [ -f /etc/systemd/system/cloudflared.service ]; then
+    log_step "Removing existing cloudflared service"
+
+    sudo systemctl stop cloudflared || true
+    sudo cloudflared service uninstall || true
+  fi
+
+  sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
+  sudo systemctl enable cloudflared
+  sudo systemctl restart cloudflared
+fi
+
+# Section 03:
 # Running directly as root would hide which user should own the installed
 # files. This check enforces the expected pattern: regular user + sudo.
 log_section "03" "Validate the install user"
@@ -963,7 +993,7 @@ log_step "Installing AI SDK requirements"
 sudo apt update
 
 # Force the requirements to use the system sqlite build. This avoids pulling
-# an extra binary package that is not needed on the Raspberry Pi image.
+# an extra binary package that is not needed.
 sed -i 's/^pysqlite3-binary==/pysqlite3==/' requirements.txt
 
 /home/denodo/$VENV_DIR/bin/python -m pip install --no-cache-dir --prefer-binary -r requirements.txt
