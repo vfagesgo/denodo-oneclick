@@ -23,6 +23,43 @@ MODE="docker"
 RESET=0
 ACTION=""
 
+# WORKAROUND: some services (design_studio, data-marketplace) can lose a
+# startup race against denodo-vdp-server on their very first boot right
+# after a fresh install/upgrade, when the host is busiest - resulting in a
+# 502 from nginx for those. A plain `docker restart` reliably fixes it
+# (the later "services-only" boot has none of that contention), so do it
+# automatically once install/upgrade genuinely finishes, until the
+# underlying race in linux/install.sh's service startup is fully solved.
+workaround_restart_for_startup_race() {
+  echo ""
+  echo "Restarting the container once as a workaround for a known service-startup"
+  echo "race (some services can fail their very first start right after a fresh"
+  echo "install/upgrade; a restart reliably fixes it)."
+  docker restart "${IMAGE_NAME}" >/dev/null
+}
+
+# Only meaningful for a fresh install/--reset, where "finished" can be
+# minutes away and restarting mid-install would corrupt it. Polls the
+# container's logs for the line install.sh prints on completion.
+wait_for_install_then_restart_workaround() {
+  local timeout=2400 elapsed=0 interval=15
+  echo "Waiting for the install to finish, to then apply the startup-race workaround above..."
+  while [ "$elapsed" -lt "$timeout" ]; do
+    if docker logs "${IMAGE_NAME}" 2>&1 | grep -q '\[SECTION 18\] Installation complete\|Services-only start (install already completed previously)'; then
+      workaround_restart_for_startup_race
+      return 0
+    fi
+    if [ "$(docker inspect -f '{{.State.Running}}' "${IMAGE_NAME}" 2>/dev/null)" != "true" ]; then
+      echo "Container isn't running - install may have failed; skipping the workaround restart. Check the logs." >&2
+      return 1
+    fi
+    sleep "$interval"
+    elapsed=$((elapsed + interval))
+  done
+  echo "WARNING: timed out waiting for the install to finish - skipping the automatic workaround restart. Check the logs and restart manually if needed." >&2
+  return 1
+}
+
 # --- 0. Resolve a working directory that has docker/ + denodo_config.env ---
 # Local checkout (repo cloned, install.sh run in place): use it as-is.
 # Piped install (`curl ... | bash`): there is no local file to derive a
@@ -205,6 +242,8 @@ if [[ -n "$ACTION" ]]; then
     exit "$rc"
   fi
 
+  workaround_restart_for_startup_race
+
   echo ""
   echo "--${ACTION} completed."
   exit 0
@@ -302,6 +341,13 @@ fi
 echo ""
 echo "Container is running in the background. Once install completes, the app is at http://localhost"
 echo "Following its logs now (Ctrl-C stops watching - the container keeps running):"
+echo ""
+docker logs -f "${IMAGE_NAME}" &
+LOGS_PID=$!
+wait_for_install_then_restart_workaround
+kill "$LOGS_PID" >/dev/null 2>&1 || true
+echo ""
+echo "Reattaching to logs after the workaround restart above (Ctrl-C stops watching - the container keeps running):"
 echo ""
 docker logs -f "${IMAGE_NAME}"
 echo ""
