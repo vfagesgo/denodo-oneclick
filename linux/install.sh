@@ -30,6 +30,16 @@ log_step() {
 # without duplicating the logic.
 RUN_DIR="/var/run/denodo-oneclick"
 
+# `service nginx restart` only ever reports a generic "nginx failed!" on
+# error - unhelpful for actually debugging what's wrong. Run `nginx -t`
+# first so the real config/state error lands in the log before that.
+nginx_restart() {
+  log_step "Checking nginx configuration"
+  sudo nginx -t
+  log_step "Restarting Nginx"
+  sudo service nginx restart
+}
+
 restart_postgresql() {
   local pg_hba_files=(/etc/postgresql/*/main/pg_hba.conf)
   local conf version name
@@ -249,8 +259,7 @@ DENODO_ACTION="${DENODO_ACTION:-install}"
 if [ "$DENODO_ACTION" = "services-only" ]; then
   log_section "00" "Services-only start (install already completed previously)"
   restart_postgresql
-  log_step "Restarting Nginx"
-  sudo service nginx restart
+  nginx_restart
   start_denodo_services
   print_welcome_banner
   exit 0
@@ -261,7 +270,7 @@ if [ "$DENODO_ACTION" = "refresh" ]; then
   restart_postgresql
   log_step "Reinstalling Nginx configuration file"
   sudo cp -f "$SCRIPT_DIR/nginx-site.conf" /etc/nginx/sites-enabled/default
-  sudo service nginx restart
+  nginx_restart
   stop_denodo_services
   start_denodo_services
   print_welcome_banner
@@ -1006,11 +1015,10 @@ sudo chmod -R 750 "$REPO_ROOT/www"
 
 sudo usermod -aG www-data www-data
 
-log_step "Restarting Nginx"
 # `service` works whether or not systemd is PID 1 (it falls back to the
 # init.d script), unlike `systemctl`, which fails outside a real systemd
 # environment such as a plain Docker container.
-sudo service nginx restart
+nginx_restart
 
 # Section 17:
 # Start the Denodo services, either via systemd (regular Linux install) or
