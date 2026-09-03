@@ -110,6 +110,22 @@ else
   git fetch origin
   git reset --hard "origin/$BRANCH"
   git clean -fd
+  # Unlike the first-clone branch above, this ran without re-chowning
+  # afterward - files touched by `git reset`/`clean` here (run as root)
+  # drifted back to root ownership on every restart. Harmless for this
+  # script (root's own git calls are exempt from git's ownership check),
+  # but broke `git` commands run directly as "denodo" later - e.g.
+  # install.sh's --upgrade/--refresh, which exec into the container as
+  # denodo and got "detected dubious ownership in repository".
+  chown -R denodo:denodo "$INSTALL_DIR"
+fi
+
+# Belt-and-suspenders alongside the chown above: explicitly mark this repo
+# (and everything under the persisted volume, since /opt/denodo-oneclick is
+# itself a symlink into it) as safe for git run as "denodo", regardless of
+# whatever UID actually owns it at any given moment.
+if ! sudo -u denodo git config --global --get-all safe.directory 2>/dev/null | grep -qx '\*'; then
+  sudo -u denodo git config --global --add safe.directory '*'
 fi
 
 # Example: run install script if exists

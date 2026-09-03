@@ -144,6 +144,20 @@ if [[ -n "$ACTION" ]]; then
   fi
 
   echo "== denodo-oneclick: ${ACTION} =="
+
+  # Repo ownership inside the container can drift back to root between
+  # restarts (a bug in an older entrypoint.sh - now fixed there too, but
+  # already-running containers won't pick that fix up until their next full
+  # restart). git then refuses to touch the directory as "denodo" with a
+  # "dubious ownership" error. Reassert ownership + mark it safe for git
+  # unconditionally here so --refresh/--upgrade work regardless of whether
+  # the container has been restarted since that fix landed.
+  docker exec -u root "${IMAGE_NAME}" bash -c '
+    chown -R denodo:denodo /opt/denodo-oneclick
+    sudo -u denodo git config --global --get-all safe.directory 2>/dev/null | grep -qx "*" \
+      || sudo -u denodo git config --global --add safe.directory "*"
+  '
+
   echo "Pulling the latest denodo-oneclick repo into the container and running linux/install.sh --${ACTION}..."
   docker exec \
     -e DENODO_ACTION="${ACTION}" \
