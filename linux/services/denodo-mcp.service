@@ -9,11 +9,11 @@ Type=simple
 User=denodo
 Group=denodo
 MemoryMax=1G
-WorkingDirectory=/opt/denodo/denodo-aisdk
+WorkingDirectory=/opt/denodo/denodo-mcp-server
 
 ExecStartPre=/bin/sleep 120
 TimeoutStartSec=180
-ExecStart=//opt/denodo/denodo-mcp-server/bin/denodo-mcp-server.sh
+ExecStart=/opt/denodo/denodo-mcp-server/bin/denodo-mcp-server.sh
 
 RemainAfterExit=yes
 

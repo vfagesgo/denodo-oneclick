@@ -1,5 +1,22 @@
 # denodo-oneclick
-Denodo developer one click install for Docker
+Denodo developer one click install for Docker on Windows and Linux.
+
+This package automatically deploys the following Denodo components:
+* Denodo Virtual Data Port
+* Design Studio
+* Data Marketplace
+* AI-SDK API and Chatbot
+* AI-SDK MCP Server
+* Denodo VDP MCP Server
+* Other components:
+  * PostgreSQL DB
+  * Nginx HTTP Server
+  
+Following a successful deployment you have access to a landing webpage with link to all the install components.
+
+![landing page](./landing.png)
+
+
 
 ## Usage
 

@@ -106,6 +106,7 @@ start_denodo_services() {
     denodo-design_studio
     denodo-data-marketplace
     denodo-aisdk
+    denodo-mcp
   )
   local name service_file
 
