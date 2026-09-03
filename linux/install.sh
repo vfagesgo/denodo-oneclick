@@ -36,8 +36,28 @@ RUN_DIR="/var/run/denodo-oneclick"
 nginx_restart() {
   log_step "Checking nginx configuration"
   sudo nginx -t
+
   log_step "Restarting Nginx"
-  sudo service nginx restart
+  if sudo service nginx restart; then
+    return 0
+  fi
+
+  # A generic "nginx failed!" with a passing `nginx -t` almost always means
+  # a process-state issue, not a config problem: a stale /run/nginx.pid, or
+  # a leftover master process still bound to port 80 that the init script's
+  # "stop" half didn't actually kill, so "start" fails on something like
+  # "address already in use" - a detail `service` swallows entirely.
+  log_step "nginx restart failed despite a valid config - clearing a possible stale PID/process and retrying"
+  sudo pkill -f 'nginx: master' 2>/dev/null || true
+  sleep 2
+  sudo rm -f /run/nginx.pid
+  if sudo service nginx start; then
+    return 0
+  fi
+
+  log_step "nginx still won't start - recent nginx error log:"
+  sudo tail -n 30 /var/log/nginx/error.log 2>/dev/null || true
+  return 1
 }
 
 restart_postgresql() {
