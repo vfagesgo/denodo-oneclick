@@ -113,22 +113,27 @@ start_service() {
       # denodo-vdp-server being fully ready, but that's only enforced via a
       # fixed ExecStartPre sleep above, not a real readiness check - its
       # margin is thinnest exactly when the host is busiest, e.g. right
-      # after a fresh install still finishing other work. A crash shortly
-      # after launch is almost always that race, not a real failure, and
-      # (unlike the Restart=always services above) nothing here would
-      # otherwise retry it before the whole container restarts. Retry a
-      # few times with a growing backoff instead of giving up after one
-      # attempt.
+      # after a fresh install still finishing other work. A crash here is
+      # almost always that race, not a real failure, and (unlike the
+      # Restart=always services above) nothing here would otherwise retry
+      # it before the whole container restarts. Retry a few times with a
+      # growing backoff instead of giving up after one attempt.
+      #
+      # Deliberately NOT skipping the retry just because an attempt ran a
+      # while before failing: this is a Spring Boot app behind a 60s
+      # ExecStartPre sleep plus its own JVM/context-load time before it can
+      # even report a failure, so a "slow" failure is not evidence it was a
+      # real (non-race) failure - a duration-based cutoff here previously
+      # caused this to give up silently on the very first attempt instead
+      # of ever retrying.
       attempt=1
       max_attempts=3
       while true; do
-        start_ts=$(date +%s)
         sudo -u "$run_user" bash -c "$exec_start" && rc=0 || rc=$?
-        ran_for=$(( $(date +%s) - start_ts ))
-        if [ "$rc" -eq 0 ] || [ "$ran_for" -ge 120 ] || [ "$attempt" -ge "$max_attempts" ]; then
+        if [ "$rc" -eq 0 ] || [ "$attempt" -ge "$max_attempts" ]; then
           break
         fi
-        echo "$name exited (rc=$rc) after only ${ran_for}s - likely started before a dependency was ready; retrying in $((attempt * 30))s (attempt $attempt/$max_attempts)"
+        echo "$name exited (rc=$rc) - likely started before a dependency was ready; retrying in $((attempt * 30))s (attempt $attempt/$max_attempts)"
         sleep $((attempt * 30))
         attempt=$((attempt + 1))
       done
