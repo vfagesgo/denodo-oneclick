@@ -30,6 +30,8 @@ You can then run the following command to install your own local container image
 
 > **_NOTE:_**  You must have Docker priorly installed on your machine
 
+> **_NOTE:_** Give Docker at least 6 GB of memory (8 GB recommended). VDP Server, Design Studio, Data Marketplace, and the MCP server all run as separate concurrent Java processes, and running them under too little memory causes them to crash shortly after starting (often showing as a 502 from nginx) rather than a clean out-of-memory error. This is especially easy to hit with [Colima](https://github.com/abiosoft/colima), whose default profile only allocates 2 GB - increase it with `colima stop && colima start --memory 8 --cpu 4`, or by setting `memory: 8` in `~/.colima/default/colima.yaml`. On Docker Desktop, adjust it under Settings → Resources → Memory.
+
 ### Linux / MacOS
 
 ```zsh
