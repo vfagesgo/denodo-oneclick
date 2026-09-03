@@ -143,22 +143,29 @@ if [ -f "$INSTALL_DIR/linux/install.sh" ]; then
   #   lives on the volume and can outlive a container recreation, while
   #   apt-installed packages/config under / do not, so trust it only when
   #   both agree.
-  DENODO_SERVICES_ONLY=0
+  # DENODO_ACTION controls how much of linux/install.sh runs - see that
+  # script for the full list ("install", "services-only", "refresh",
+  # "upgrade"). This normal container-boot path only ever decides between
+  # "install" (first time / OS looks reset) and "services-only" (repeat
+  # start); "refresh" and "upgrade" are triggered separately on demand via
+  # `docker exec`, not through this boot path - see the top-level
+  # install.sh's --refresh/--upgrade flags.
+  DENODO_ACTION="install"
   if [ -f "$INSTALL_MARKER" ] && command -v nginx >/dev/null 2>&1 && command -v pg_ctlcluster >/dev/null 2>&1; then
     echo "[INIT] Previous install marker found and OS packages look intact - services-only start" | tee -a "$LOG"
-    DENODO_SERVICES_ONLY=1
+    DENODO_ACTION="services-only"
   fi
-  export DENODO_SERVICES_ONLY
+  export DENODO_ACTION
 
   set -o pipefail
   sudo -H -u denodo \
-    --preserve-env=DENODO_SUPPORT_CI,DENODO_SUPPORT_SECRET,DENODO_LIC,DENODO_UPDATE,DENODO_PG_USER,DENODO_PG_PWD,DENODO_VDP_USER,DENODO_VDP_PWD,DENODO_SERVICES_ONLY \
+    --preserve-env=DENODO_SUPPORT_CI,DENODO_SUPPORT_SECRET,DENODO_LIC,DENODO_UPDATE,DENODO_PG_USER,DENODO_PG_PWD,DENODO_VDP_USER,DENODO_VDP_PWD,DENODO_ACTION \
     bash "$INSTALL_DIR/linux/install.sh" 2>&1 | tee -a "$LOG"
   rc=$?
 
   echo "[INIT] install.sh exit code=$rc" | tee -a "$LOG"
 
-  if [ "$rc" -eq 0 ] && [ "$DENODO_SERVICES_ONLY" -eq 0 ]; then
+  if [ "$rc" -eq 0 ] && [ "$DENODO_ACTION" = "install" ]; then
     echo "[INIT] Full install succeeded - writing $INSTALL_MARKER so future starts skip straight to services" | tee -a "$LOG"
     date -u +%Y-%m-%dT%H:%M:%SZ > "$INSTALL_MARKER"
   fi

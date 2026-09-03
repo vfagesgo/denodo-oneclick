@@ -145,6 +145,44 @@ start_denodo_services() {
   fi
 }
 
+# Symmetric counterpart to start_denodo_services(), needed before an
+# "upgrade" touches the platform install (the Denodo installer requires the
+# servers to be stopped) and before a "refresh" restarts everything cleanly.
+stop_denodo_services() {
+  local SERVICE_DIR="$SCRIPT_DIR/services"
+  local SERVICE_ORDER=(
+    denodo-mcp
+    denodo-aisdk
+    denodo-data-marketplace
+    denodo-design_studio
+    denodo-vdp-server
+    denodo_house_keeping
+  )
+  local name stop_cmd pid_file
+
+  if [ -d /run/systemd/system ]; then
+    for name in "${SERVICE_ORDER[@]}"; do
+      [ -f "$SERVICE_DIR/${name}.service" ] || continue
+      sudo systemctl stop "${name}.service" 2>/dev/null || true
+    done
+  else
+    for name in "${SERVICE_ORDER[@]}"; do
+      pid_file="$RUN_DIR/${name}.pid"
+      [ -f "$pid_file" ] || continue
+      stop_cmd=$(cat "$RUN_DIR/${name}.stop" 2>/dev/null || true)
+      if [ -n "$stop_cmd" ]; then
+        log_step "Stopping $name via its ExecStop command"
+        sudo -u denodo bash -c "$stop_cmd" || true
+      fi
+      # The supervising loop in start_service() restarts on exit when
+      # Restart=always, so kill the whole process group, not just the pid.
+      pid=$(cat "$pid_file" 2>/dev/null || true)
+      [ -n "$pid" ] && sudo kill -- "-$pid" 2>/dev/null || true
+      sudo rm -f "$pid_file"
+    done
+  fi
+}
+
 # Friendly, hard-to-miss confirmation once the install (or a services-only
 # restart) has succeeded.
 print_welcome_banner() {
@@ -167,11 +205,26 @@ print_welcome_banner() {
   echo ""
 }
 
-# --- Services-only fast path ------------------------------------------------
-# entrypoint.sh sets DENODO_SERVICES_ONLY=1 once a previous run has fully
-# completed (tracked via a marker file), so a plain container restart just
-# restarts what's already installed instead of redoing the whole install.
-if [ "${DENODO_SERVICES_ONLY:-0}" = "1" ]; then
+# --- Action dispatch ---------------------------------------------------
+# DENODO_ACTION controls how much of this script runs:
+#   install       (default) - full install, top to bottom. Used the very
+#                 first time, and whenever entrypoint.sh's marker/OS sanity
+#                 check says a full install is still needed.
+#   services-only - install already completed; just (re)start everything.
+#                 Set automatically by entrypoint.sh on every later
+#                 container start.
+#   refresh       - pick up a freshly-pulled copy of this repo (nginx
+#                 config, service unit files) without touching the
+#                 installed Denodo software: just reapply config and
+#                 restart services. Triggered on demand via
+#                 `install.sh --refresh`.
+#   upgrade       - also checks whether DENODO_UPDATE changed and, if so,
+#                 re-runs the Denodo platform installer to apply it, and
+#                 always re-fetches the AI SDK and MCP server. Triggered
+#                 on demand via `install.sh --upgrade`.
+DENODO_ACTION="${DENODO_ACTION:-install}"
+
+if [ "$DENODO_ACTION" = "services-only" ]; then
   log_section "00" "Services-only start (install already completed previously)"
   restart_postgresql
   log_step "Restarting Nginx"
@@ -179,6 +232,30 @@ if [ "${DENODO_SERVICES_ONLY:-0}" = "1" ]; then
   start_denodo_services
   print_welcome_banner
   exit 0
+fi
+
+if [ "$DENODO_ACTION" = "refresh" ]; then
+  log_section "00" "Refresh (reapply config from the latest repo checkout, restart services)"
+  restart_postgresql
+  log_step "Reinstalling Nginx configuration file"
+  sudo cp -f "$SCRIPT_DIR/nginx-site.conf" /etc/nginx/sites-enabled/default
+  sudo service nginx restart
+  stop_denodo_services
+  start_denodo_services
+  print_welcome_banner
+  exit 0
+fi
+
+# "install" and "upgrade" both fall through to the full sequence below.
+# For "upgrade", stop services first - the Denodo platform installer
+# requires the servers to be stopped before it can apply an update - and
+# force the AI SDK/MCP sections further down to redo their work instead of
+# skipping because something is already there.
+FORCE_REFRESH=0
+if [ "$DENODO_ACTION" = "upgrade" ]; then
+  log_step "Upgrade requested - stopping services before touching the install"
+  stop_denodo_services
+  FORCE_REFRESH=1
 fi
 
 # Section 03:
@@ -377,14 +454,35 @@ sudo apt install -y zulu17-jdk
 # Get Denodo support CLI tool and pull Denodo binaries. On first install it is cloned;
 # on later runs it is refreshed so the workspace matches the remote branch.
 
+# On "upgrade", only touch the platform install if DENODO_UPDATE actually
+# changed since the last successful install - otherwise there is nothing to
+# apply and installer_cli.sh must not be re-run against an already-installed
+# platform. This mirrors the .staged_version check further down, checked
+# early so the whole section (including the multi-GB downloads) can be
+# skipped outright.
+# Defined here (not inside the NEED_PLATFORM_INSTALL block below) because
+# Section 15 (MCP server) also needs $TARGET_DIR regardless of whether the
+# platform itself gets reinstalled this run.
+TARGET_DIR="/home/denodo/"
+DENODO_INSTALL="/home/denodo/denodo-install-9"
+
+NEED_PLATFORM_INSTALL=1
+if [ "$DENODO_ACTION" = "upgrade" ]; then
+  EXISTING_STAGED_VERSION=$(cat "$DENODO_INSTALL/denodo-update/.staged_version" 2>/dev/null || true)
+  if [ "$EXISTING_STAGED_VERSION" = "$DENODO_UPDATE" ]; then
+    log_step "DENODO_UPDATE ($DENODO_UPDATE) unchanged since last install - skipping platform reinstall"
+    NEED_PLATFORM_INSTALL=0
+  fi
+fi
+
+if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
+
 log_section "11.5" "Install Denodo Support Tools"
 # denodo_config.env defines this as DENODO_UTILS_URL. The script previously
 # referenced $GITHUB_DENODO_UTILS, which was never set anywhere and crashed
 # here under `set -u`.
 DENODO_UTILS_URL=${DENODO_UTILS_URL:-"denodocommunity-resources/releases/download/v1.3.2/Denodo.Support.Utilities.v1.3.2.zip"}
 ZIP_URL="https://github.com/denodo/$DENODO_UTILS_URL"
-TARGET_DIR="/home/denodo/"
-DENODO_INSTALL="/home/denodo/denodo-install-9"
 
 # Section 11.5+12 involve multi-GB downloads (installer + update archives).
 # Everything below is guarded to skip work that a previous, failed run
@@ -533,6 +631,8 @@ log_step "JAVA Config: Change -Xmx in resources/apache-tomcat/conf/tomcat.proper
 change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/tomcat.properties" "1024m"
 
 /opt/denodo/denodo-platform/bin/regenerateFiles.sh
+
+fi # NEED_PLATFORM_INSTALL
 
 # Section 13:
 # The AI SDK lives in its own Git repository. On first install it is cloned;
@@ -835,6 +935,14 @@ log_section "15" "Configure Denodo MCP Services"
 
 log_step "Installing Denodo MCP Services"
 cd $TARGET_DIR/denodo-support-utils/bin/
+
+# "upgrade" always re-fetches and reinstalls the MCP server, rather than
+# skipping because a previous install already staged one.
+if [ "$FORCE_REFRESH" = "1" ]; then
+  log_step "Upgrade requested - forcing a fresh MCP server download/install"
+  rm -f "/home/denodo/Denodo MCP Server.zip"
+  sudo rm -rf "/opt/denodo/denodo-mcp-server"
+fi
 
 if [ -f "/home/denodo/Denodo MCP Server.zip" ]; then
   log_step "Installer archive already downloaded, skipping (remove /home/denodo/Denodo MCP Server.zip to force a re-download)"

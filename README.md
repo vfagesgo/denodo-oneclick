@@ -98,6 +98,22 @@ Just re-run the same command. It resumes the existing container rather than star
 
 If you do want a totally clean install, add `--reset` to remove the existing container and its data first.
 
+## Refreshing or upgrading an already-installed container
+
+These act on the existing `denodo-oneclick` container in place — they don't rebuild the image or touch your data volume. Under the hood they pull the latest `denodo-oneclick` repo into the container and re-run part of its install script (`docker exec`, not `docker run`), so the container keeps running throughout except for the services it restarts.
+
+```zsh
+./install.sh --refresh
+```
+- `--refresh` — pulls the latest `denodo-oneclick` repo (nginx config, service definitions) into the running container and reapplies it, then restarts the Denodo services. Does **not** touch the installed Denodo platform, AI SDK, or MCP server, and needs no other parameters.
+
+```zsh
+./install.sh --upgrade --DENODO_SUPPORT_CI <Support_CI> --DENODO_SUPPORT_SECRET <Support_Secret>
+```
+- `--upgrade` — does everything `--refresh` does, and also: re-runs the Denodo platform installer if `--DENODO_UPDATE` (or its default in `denodo_config.env`) has changed since the last install, and always re-fetches and reinstalls the AI SDK and the Denodo MCP server. Needs `--DENODO_SUPPORT_CI`/`--DENODO_SUPPORT_SECRET` (used to fetch the update/MCP archives); pass `--DENODO_UPDATE <value>` too if you're upgrading to a specific platform version. The Denodo services are stopped before the platform installer runs (required by the installer) and restarted afterwards.
+
+Both commands require a container from a previous install to already exist; they error out if none is found. Neither is currently available from `install.ps1` on Windows.
+
 ## Persistence
 
 Install progress and data live in a set of named Docker volumes, so they survive the container being removed and recreated (for example after rebuilding the image):

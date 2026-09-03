@@ -21,6 +21,7 @@ VOLUME_NAME="denodo-oneclick-data"
 
 MODE="docker"
 RESET=0
+ACTION=""
 
 # --- 0. Resolve a working directory that has docker/ + denodo_config.env ---
 # Local checkout (repo cloned, install.sh run in place): use it as-is.
@@ -68,6 +69,16 @@ Optional (CLI only):
   --mode <docker|local>          Default: docker (local not implemented yet)
   --reset                        Wipe any existing container + its volumes first,
                                   so the install starts truly from scratch
+
+Actions on an existing container (instead of building/running one):
+  --refresh                      Pull the latest denodo-oneclick repo into the
+                                  running container and reapply its nginx/
+                                  service config, then restart services. Does
+                                  not touch the installed Denodo software.
+  --upgrade                      Like --refresh, but also re-runs the Denodo
+                                  platform installer if --DENODO_UPDATE changed,
+                                  and always re-fetches the AI SDK and MCP
+                                  server. Needs --DENODO_SUPPORT_CI/--DENODO_SUPPORT_SECRET.
 EOF
 }
 
@@ -95,10 +106,75 @@ while [[ $# -gt 0 ]]; do
     --CLOUDFLARE_TUNNEL_KEY) CLOUDFLARE_TUNNEL_KEY="$2"; shift 2 ;;
     --mode) MODE="$2"; shift 2 ;;
     --reset) RESET=1; shift ;;
+    --refresh) ACTION="refresh"; shift ;;
+    --upgrade) ACTION="upgrade"; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage; exit 1 ;;
   esac
 done
+
+# --- 2.5. --refresh / --upgrade: act on an existing container, then exit ---
+# These don't build or run anything - they reach into an already-running
+# install via `docker exec` and ask linux/install.sh to do less than a full
+# install (see that script's DENODO_ACTION for what each one actually does).
+if [[ -n "$ACTION" ]]; then
+  if [[ "$RESET" -eq 1 ]]; then
+    echo "ERROR: --reset can't be combined with --refresh/--upgrade - reset starts a fresh install instead." >&2
+    exit 1
+  fi
+
+  if ! docker inspect "${IMAGE_NAME}" >/dev/null 2>&1; then
+    echo "ERROR: no existing '${IMAGE_NAME}' container found - run a normal install first." >&2
+    exit 1
+  fi
+
+  if [[ "$ACTION" == "upgrade" ]]; then
+    missing=()
+    [[ -z "${DENODO_SUPPORT_CI:-}" ]] && missing+=("--DENODO_SUPPORT_CI")
+    [[ -z "${DENODO_SUPPORT_SECRET:-}" ]] && missing+=("--DENODO_SUPPORT_SECRET")
+    if [[ ${#missing[@]} -gt 0 ]]; then
+      echo "ERROR: --upgrade needs ${missing[*]} (used to fetch the update/AI SDK/MCP archives)." >&2
+      exit 1
+    fi
+  fi
+
+  if [[ "$(docker inspect -f '{{.State.Running}}' "${IMAGE_NAME}")" != "true" ]]; then
+    echo "Container '${IMAGE_NAME}' is stopped - starting it first."
+    docker start "${IMAGE_NAME}" >/dev/null
+  fi
+
+  echo "== denodo-oneclick: ${ACTION} =="
+  echo "Pulling the latest denodo-oneclick repo into the container and running linux/install.sh --${ACTION}..."
+  docker exec \
+    -e DENODO_ACTION="${ACTION}" \
+    -e DENODO_SUPPORT_CI="${DENODO_SUPPORT_CI:-}" \
+    -e DENODO_SUPPORT_SECRET="${DENODO_SUPPORT_SECRET:-}" \
+    -e DENODO_LIC="${DENODO_LIC:-}" \
+    -e DENODO_UPDATE="${DENODO_UPDATE:-}" \
+    -e DENODO_PG_USER="${DENODO_PG_USER:-}" \
+    -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
+    -e DENODO_VDP_USER="${DENODO_VDP_USER:-}" \
+    -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
+    -u denodo \
+    "${IMAGE_NAME}" bash -c '
+      set -e
+      cd /opt/denodo-oneclick
+      git fetch origin
+      git reset --hard origin/main
+      git clean -fd
+      bash linux/install.sh
+    '
+  rc=$?
+
+  if [[ $rc -ne 0 ]]; then
+    echo "ERROR: --${ACTION} failed (exit ${rc}). Check the logs: docker logs -f ${IMAGE_NAME}" >&2
+    exit "$rc"
+  fi
+
+  echo ""
+  echo "--${ACTION} completed."
+  exit 0
+fi
 
 # --- 3. Validate mandatory parameters ---------------------------------------
 missing=()
