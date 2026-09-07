@@ -337,14 +337,15 @@ if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
   if [ -f /etc/systemd/system/cloudflared.service ]; then
     log_step "Removing existing cloudflared service"
 
-    sudo systemctl stop cloudflared || true
-    sudo cloudflared service uninstall || true
-    sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
+    #sudo systemctl stop cloudflared || true
+    #sudo cloudflared service uninstall || true
+    #sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
   fi
 
-  
-  sudo systemctl enable cloudflared
-  sudo systemctl restart cloudflared
+  cloudflared tunnel --no-autoupdate run \
+    --token "$CLOUDFLARE_TUNNEL_KEY" &
+  #sudo systemctl enable cloudflared
+  #sudo systemctl restart cloudflared
 fi
 
 # Section 03:
