@@ -527,9 +527,9 @@ sudo -u postgres psql -c "ALTER ROLE $DENODO_PG_USER CREATEDB"
 sudo -u postgres psql -d denodo -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Restore the sample DBs
-sudo -u postgres psql -c "DROP SCHEMA pharma CASCADE;"
+sudo -u postgres psql -c "DROP SCHEMA IF EXISTS pharma CASCADE;"
 su - postgres -c "pg_restore -d denodo /opt/denodo-oneclick/samples/dump-pharma"
-sudo -u postgres psql -c "DROP SCHEMA bank CASCADE;"
+sudo -u postgres psql -c "DROP SCHEMA IF EXISTS bank CASCADE;"
 su - postgres -c "pg_restore -d denodo /opt/denodo-oneclick/samples/dump-bank"
 
 # Section 11:
