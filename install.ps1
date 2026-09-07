@@ -75,7 +75,7 @@ if ($Help) {
 $RepoRawBase = if ($env:REPO_RAW_BASE) { $env:REPO_RAW_BASE } else { "https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main" }
 
 $ImageName = "denodo-oneclick"
-$ImageTag = "hello-world"
+$ImageTag = "beta"
 # Single volume: entrypoint.sh mounts everything that needs to persist
 # (repo checkout, downloads, Denodo install, AI SDK, Postgres data) as
 # symlinks into subdirectories of /data instead of one volume per path.
