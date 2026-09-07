@@ -396,6 +396,7 @@ sudo apt install nginx -y
 sudo apt install gettext -y
 sudo apt install git -y
 sudo apt install python3-gi gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly -y
+sudo apt install postgresql-15 postgresql-client-15 libpq-dev postgresql-15-pgvector -y 
 sudo apt install python3-pil -y
 sudo apt install python3-pip -y
 sudo apt install dnsmasq network-manager -y
@@ -520,6 +521,7 @@ if [ -z "$db_exists" ]; then
 fi
 
 sudo -u postgres psql -c "ALTER ROLE $DENODO_PG_USER CREATEDB"
+sudo -u postgres psql -d denodo -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Section 11:
 # Denodo 9 requires Java 17. This block registers the Azul repository and
