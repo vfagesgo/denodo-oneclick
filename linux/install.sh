@@ -331,7 +331,9 @@ log_step "install cloudflared"
 # install cloudflared
 sudo apt-get update && sudo apt-get install cloudflared
 
-if [ -n "${CLOUDFLARE_TUNNEL_KEY:-}" ]; then
+CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
+
+if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
   if [ -f /etc/systemd/system/cloudflared.service ]; then
     log_step "Removing existing cloudflared service"
 
