@@ -339,9 +339,10 @@ if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
 
     sudo systemctl stop cloudflared || true
     sudo cloudflared service uninstall || true
+    sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
   fi
 
-  sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
+  
   sudo systemctl enable cloudflared
   sudo systemctl restart cloudflared
 fi
