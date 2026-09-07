@@ -528,9 +528,9 @@ sudo -u postgres psql -d denodo -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Restore the sample DBs
 sudo -u postgres psql -c "DROP SCHEMA IF EXISTS pharma CASCADE;"
-su - postgres -c "pg_restore -d denodo /opt/denodo-oneclick/samples/dump-pharma"
+sudo -u postgres -c "pg_restore -d denodo /opt/denodo-oneclick/samples/dump-pharma"
 sudo -u postgres psql -c "DROP SCHEMA IF EXISTS bank CASCADE;"
-su - postgres -c "pg_restore -d denodo /opt/denodo-oneclick/samples/dump-bank"
+sudo -u postgres -c "pg_restore -d denodo /opt/denodo-oneclick/samples/dump-bank"
 
 # Section 11:
 # Denodo 9 requires Java 17. This block registers the Azul repository and
