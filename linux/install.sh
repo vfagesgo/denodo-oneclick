@@ -364,7 +364,7 @@ log_section "04" "Refresh apt metadata and install base dependencies"
 sudo apt update -y 
 sudo apt upgrade -y 
 
-sudo apt install -y libglib2.0-dev build-essential 
+sudo apt install -y vim libglib2.0-dev build-essential 
 sudo apt install -y python3 python3-venv python3-dev
 
 sudo apt install -y jq
@@ -393,12 +393,11 @@ echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.o
 log_section "06" "Install PostgreSQL and runtime packages"
 # Refresh package indexes after adding PostgreSQL and install runtime packages.
 sudo apt update
-sudo apt install -y postgresql-15 postgresql-client-15 libpq-dev
+sudo apt install -y postgresql-17 postgresql-client-17 libpq-dev postgresql-17-pgvector
 sudo apt install nginx -y
 sudo apt install gettext -y
 sudo apt install git -y
 sudo apt install python3-gi gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly -y
-sudo apt install postgresql-15 postgresql-client-15 libpq-dev postgresql-15-pgvector -y 
 sudo apt install python3-pil -y
 sudo apt install python3-pip -y
 sudo apt install dnsmasq network-manager -y
@@ -434,7 +433,7 @@ fi
 
 # Add a network rule for the application user if it is not already present.
 
-DENODO_SUBNET="192.168.0.0/16"
+DENODO_SUBNET="172.17.0.0/16"
 DENODO_USER=${DENODO_PG_USER:-"denodo"}
 
 remote_denodopi=$(sudo grep -cE \
@@ -524,6 +523,10 @@ fi
 
 sudo -u postgres psql -c "ALTER ROLE $DENODO_PG_USER CREATEDB"
 sudo -u postgres psql -d denodo -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+# Restore the sample DBs
+su - postgres -c "pg_restore -d denodo /opt/denodo-oneclick/samples/dump-pharma"
+su - postgres -c "pg_restore -d denodo /opt/denodo-oneclick/samples/dump-bank"
 
 # Section 11:
 # Denodo 9 requires Java 17. This block registers the Azul repository and
