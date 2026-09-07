@@ -325,6 +325,7 @@ else
   # Postgres) into subdirectories of it.
   docker run --name "${IMAGE_NAME}" -d \
     -p 80:80 \
+    -p 2345:5432 \
     -v "${VOLUME_NAME}":/data \
     -e DENODO_SUPPORT_CI="${DENODO_SUPPORT_CI}" \
     -e DENODO_SUPPORT_SECRET="${DENODO_SUPPORT_SECRET}" \
