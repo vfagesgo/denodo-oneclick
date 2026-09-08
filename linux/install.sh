@@ -353,7 +353,7 @@ if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
   # kind of restart-on-exit loop already used for the always-on services.
   (
     while true; do
-      cloudflared tunnel --no-autoupdate run --token "$CLOUDFLARE_TUNNEL_KEY" >>"$LOG" 2>&1
+      cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY >>"$LOG" 2>&1
       echo "cloudflared exited unexpectedly - restarting in 10s" | tee -a "$LOG"
       sleep 10
     done
