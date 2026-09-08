@@ -333,6 +333,8 @@ sudo apt-get update && sudo apt-get install cloudflared
 
 CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
 
+echo '$CLOUDFLARE_TUNNEL_KEY'
+
 if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
 
   log_step "Waiting for network before starting Cloudflare tunnel"
