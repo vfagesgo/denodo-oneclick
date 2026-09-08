@@ -341,9 +341,23 @@ if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
     sleep 3
   done
 
-  log_step "Starting Cloudflare tunnel"
+  log_step "Starting Cloudflare tunnel (supervised - restarts automatically if it exits)"
 
-  cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY &
+  # Previously just `cloudflared ... &` - a single unsupervised attempt with
+  # no error visible to this script (backgrounded, exit status never
+  # checked). If cloudflared itself failed to fully establish the tunnel
+  # (e.g. a transient DNS/connectivity hiccup right at this point in boot,
+  # even though the curl check above already passed - the tunnel protocol
+  # has different connectivity needs), it just silently stayed down with no
+  # tunnel ever showing as open, and nothing retried it. Wrap it in the same
+  # kind of restart-on-exit loop already used for the always-on services.
+  (
+    while true; do
+      cloudflared tunnel --no-autoupdate run --token "$CLOUDFLARE_TUNNEL_KEY" >>"$LOG" 2>&1
+      echo "cloudflared exited unexpectedly - restarting in 10s" | tee -a "$LOG"
+      sleep 10
+    done
+  ) &
 fi
 
 # Section 03:
