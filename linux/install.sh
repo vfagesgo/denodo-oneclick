@@ -333,10 +333,6 @@ sudo apt-get update && sudo apt-get install cloudflared
 
 CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
 
-echo 'VFG.................'
-echo $CLOUDFLARE_TUNNEL_KEY
-echo 'VFG.................'
-
 if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
 
   log_step "Waiting for network before starting Cloudflare tunnel"
@@ -1147,7 +1143,7 @@ log_step "Denodo VDP is listening on TCP port 9999"
 
 log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
-/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/sample.zip --server localhost:9999/admin?$DENODO_VDP_PWD@admin --metadata-password=password
+/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/samples.zip --server localhost:9999/admin?$DENODO_VDP_PWD@admin --metadata-password=password
 
 
 # Section 18:
