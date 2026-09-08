@@ -1124,11 +1124,23 @@ start_denodo_services
 # Section 17.5:
 # Import sample metadata in Denodo
 log_section "17.5" "Import sample metadata in Denodo"
+
 log_step "Waiting for Denodo VDP to start"
 
-until curl -s http://localhost:9999 >/dev/null 2>&1; do
+VDP_TIMEOUT=300
+VDP_WAITED=0
+
+until nc -z localhost 9999; do
+  if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
+    echo "ERROR: Denodo VDP did not start within ${VDP_TIMEOUT} seconds"
+    exit 1
+  fi
+
   sleep 2
+  VDP_WAITED=$((VDP_WAITED + 2))
 done
+
+log_step "Denodo VDP is running on TCP port 9999"
 
 log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
