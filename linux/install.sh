@@ -333,7 +333,9 @@ sudo apt-get update && sudo apt-get install cloudflared
 
 CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
 
+echo 'VFG.................'
 echo '$CLOUDFLARE_TUNNEL_KEY'
+echo 'VFG.................'
 
 if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
 
@@ -1128,9 +1130,20 @@ start_denodo_services
 log_section "17.5" "Import sample metadata in Denodo"
 log_step "Waiting for Denodo VDP to start"
 
-until curl -s http://localhost:9090 >/dev/null 2>&1; do
-  sleep 3
+VDP_TIMEOUT=300
+VDP_WAITED=0
+
+until (echo > /dev/tcp/localhost/9999) >/dev/null 2>&1; do
+  if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
+    echo "ERROR: Denodo VDP did not start within ${VDP_TIMEOUT} seconds"
+    exit 1
+  fi
+
+  sleep 2
+  VDP_WAITED=$((VDP_WAITED + 2))
 done
+
+log_step "Denodo VDP is listening on TCP port 9999"
 
 log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
