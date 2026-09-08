@@ -526,9 +526,9 @@ sudo -u postgres psql -c "ALTER ROLE $DENODO_PG_USER CREATEDB"
 sudo -u postgres psql -d denodo -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Restore the sample DBs
-sudo -u postgres psql -c "DROP SCHEMA IF EXISTS pharma CASCADE;"
+sudo -u postgres psql -c -d denodo "DROP SCHEMA IF EXISTS pharma CASCADE;"
 sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-pharma
-sudo -u postgres psql -c "DROP SCHEMA IF EXISTS bank CASCADE;"
+sudo -u postgres psql -c -d denodo "DROP SCHEMA IF EXISTS bank CASCADE;"
 sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-bank
 
 
@@ -1125,7 +1125,7 @@ start_denodo_services
 # Section 17.5:
 # Import sample metadata in Denodo
 log_section "17.5" "Import Denodo Metadata"
-/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/medixit.zip --server "localhost:9999/admin?$DENODO_VDP_PWD@admin" --metadata-password=password
+/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/medixit_model.zip --server "localhost:9999/admin?$DENODO_VDP_PWD@admin" --metadata-password=password
 
 
 # Section 18:
