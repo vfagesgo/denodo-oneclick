@@ -334,18 +334,9 @@ sudo apt-get update && sudo apt-get install cloudflared
 CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
 
 if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
-  if [ -f /etc/systemd/system/cloudflared.service ]; then
-    log_step "Removing existing cloudflared service"
+  log_step "Starting Cloudflare tunnel"
 
-    sudo systemctl stop cloudflared || true
-    sudo cloudflared service uninstall || true
-    sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
-  fi
-
-  #cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY &
-  sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
-  sudo systemctl enable cloudflared
-  sudo systemctl restart cloudflared
+  cloudflared tunnel --no-autoupdate run --token "$CLOUDFLARE_TUNNEL_KEY" &
 fi
 
 # Section 03:
