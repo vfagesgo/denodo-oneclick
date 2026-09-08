@@ -343,6 +343,7 @@ if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
   fi
 
   #cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY &
+  sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
   sudo systemctl enable cloudflared
   sudo systemctl restart cloudflared
 fi
