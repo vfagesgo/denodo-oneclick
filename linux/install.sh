@@ -262,6 +262,38 @@ print_welcome_banner() {
   echo ""
 }
 
+# Was previously only ever invoked inline, after the services-only/refresh
+# fast-path exits further down - meaning it only ran on the very first full
+# install and never again on any later container boot (including the
+# automatic restart the top-level install.sh's --upgrade/--reset now does).
+# The tunnel would register fine once, then silently never come back after
+# any restart. Defined as a function so every boot path (services-only,
+# refresh, and the full install below) can (re)start it.
+start_cloudflare_tunnel() {
+  CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
+  if [ -z "$CLOUDFLARE_TUNNEL_KEY" ]; then
+    return 0
+  fi
+  if ! command -v cloudflared >/dev/null 2>&1; then
+    log_step "CLOUDFLARE_TUNNEL_KEY is set but cloudflared isn't installed - skipping (it's installed during a full install)"
+    return 0
+  fi
+
+  log_step "Waiting for network before starting Cloudflare tunnel"
+  until curl -fs https://api.cloudflare.com >/dev/null 2>&1; do
+    sleep 3
+  done
+
+  log_step "Starting Cloudflare tunnel (supervised - restarts automatically if it exits)"
+  (
+    while true; do
+      cloudflared tunnel --no-autoupdate run --token "$CLOUDFLARE_TUNNEL_KEY" >>"$LOG" 2>&1
+      echo "cloudflared exited unexpectedly - restarting in 10s" | tee -a "$LOG"
+      sleep 10
+    done
+  ) &
+}
+
 # --- Action dispatch ---------------------------------------------------
 # DENODO_ACTION controls how much of this script runs:
 #   install       (default) - full install, top to bottom. Used the very
@@ -286,6 +318,7 @@ if [ "$DENODO_ACTION" = "services-only" ]; then
   restart_postgresql
   nginx_restart
   start_denodo_services
+  start_cloudflare_tunnel
   print_welcome_banner
   exit 0
 fi
@@ -298,6 +331,7 @@ if [ "$DENODO_ACTION" = "refresh" ]; then
   nginx_restart
   stop_denodo_services
   start_denodo_services
+  start_cloudflare_tunnel
   print_welcome_banner
   exit 0
 fi
@@ -331,34 +365,7 @@ log_step "install cloudflared"
 # install cloudflared
 sudo apt-get update && sudo apt-get install cloudflared
 
-CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
-
-if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
-
-  log_step "Waiting for network before starting Cloudflare tunnel"
-
-  until curl -fs https://api.cloudflare.com >/dev/null 2>&1; do
-    sleep 3
-  done
-
-  log_step "Starting Cloudflare tunnel (supervised - restarts automatically if it exits)"
-
-  # Previously just `cloudflared ... &` - a single unsupervised attempt with
-  # no error visible to this script (backgrounded, exit status never
-  # checked). If cloudflared itself failed to fully establish the tunnel
-  # (e.g. a transient DNS/connectivity hiccup right at this point in boot,
-  # even though the curl check above already passed - the tunnel protocol
-  # has different connectivity needs), it just silently stayed down with no
-  # tunnel ever showing as open, and nothing retried it. Wrap it in the same
-  # kind of restart-on-exit loop already used for the always-on services.
-  (
-    while true; do
-      cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY >>"$LOG" 2>&1
-      echo "cloudflared exited unexpectedly - restarting in 10s" | tee -a "$LOG"
-      sleep 10
-    done
-  ) &
-fi
+start_cloudflare_tunnel
 
 # Section 03:
 # Running directly as root would hide which user should own the installed
