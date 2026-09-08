@@ -334,6 +334,13 @@ sudo apt-get update && sudo apt-get install cloudflared
 CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
 
 if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
+
+  log_step "Waiting for network before starting Cloudflare tunnel"
+
+  until curl -fs https://api.cloudflare.com >/dev/null 2>&1; do
+    sleep 3
+  done
+
   log_step "Starting Cloudflare tunnel"
 
   cloudflared tunnel --no-autoupdate run --token "$CLOUDFLARE_TUNNEL_KEY" &
@@ -1116,6 +1123,14 @@ start_denodo_services
 
 # Section 17.5:
 # Import sample metadata in Denodo
+log_section "17.5" "Import sample metadata in Denodo"
+log_step "Waiting for Denodo VDP to start"
+
+until curl -s http://localhost:9999 >/dev/null 2>&1; do
+  sleep 2
+done
+
+log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
 /opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/sample.zip --server "localhost:9999/admin?$DENODO_VDP_PWD@admin" --metadata-password=password
 
