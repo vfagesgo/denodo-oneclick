@@ -334,7 +334,7 @@ sudo apt-get update && sudo apt-get install cloudflared
 CLOUDFLARE_TUNNEL_KEY=${CLOUDFLARE_TUNNEL_KEY:-}
 
 echo 'VFG.................'
-echo '$CLOUDFLARE_TUNNEL_KEY'
+echo $CLOUDFLARE_TUNNEL_KEY
 echo 'VFG.................'
 
 if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
@@ -347,7 +347,7 @@ if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
 
   log_step "Starting Cloudflare tunnel"
 
-  cloudflared tunnel --no-autoupdate run --token "$CLOUDFLARE_TUNNEL_KEY" &
+  cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY &
 fi
 
 # Section 03:
