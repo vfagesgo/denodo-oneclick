@@ -342,8 +342,7 @@ if [ -n "$CLOUDFLARE_TUNNEL_KEY" ]; then
     #sudo cloudflared service install $CLOUDFLARE_TUNNEL_KEY
   fi
 
-  cloudflared tunnel --no-autoupdate run \
-    --token "$CLOUDFLARE_TUNNEL_KEY" &
+  cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY &
   #sudo systemctl enable cloudflared
   #sudo systemctl restart cloudflared
 fi
@@ -531,6 +530,35 @@ sudo -u postgres psql -c "DROP SCHEMA IF EXISTS pharma CASCADE;"
 sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-pharma
 sudo -u postgres psql -c "DROP SCHEMA IF EXISTS bank CASCADE;"
 sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-bank
+
+
+sudo -u postgres psql -d denodo <<'SQL'
+GRANT ALL ON SCHEMA pharma TO denodo;
+GRANT ALL ON SCHEMA public TO denodo;
+GRANT ALL ON SCHEMA bank TO denodo;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA pharma TO denodo;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO denodo;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA bank TO denodo;
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA pharma TO denodo;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO denodo;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA bank TO denodo;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA pharma
+    GRANT ALL ON TABLES TO denodo;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL ON TABLES TO denodo;
+ALTER DEFAULT PRIVILEGES IN SCHEMA bank
+    GRANT ALL ON TABLES TO denodo;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA pharma
+    GRANT ALL ON SEQUENCES TO denodo;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL ON SEQUENCES TO denodo;
+ALTER DEFAULT PRIVILEGES IN SCHEMA bank
+    GRANT ALL ON SEQUENCES TO denodo;
+SQL
 
 # Section 11:
 # Denodo 9 requires Java 17. This block registers the Azul repository and
@@ -1093,6 +1121,12 @@ nginx_restart
 # services-only fast path can call the exact same logic.
 log_section "17" "Configuring the different services"
 start_denodo_services
+
+# Section 17.5:
+# Import sample metadata in Denodo
+log_section "17.5" "Import Denodo Metadata"
+/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/medixit.zip --server "localhost:9999/admin?$DENODO_VDP_PWD@admin" --metadata-password=password
+
 
 # Section 18:
 # Friendly, hard-to-miss confirmation once everything above succeeded

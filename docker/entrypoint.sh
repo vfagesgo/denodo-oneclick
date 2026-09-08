@@ -12,7 +12,6 @@ echo "  DENODO_LIC             = $( [ -f /denodo/license.lic ] && echo 'mounted 
 echo "  DENODO_UPDATE          = ${DENODO_UPDATE:-<unset>}"
 echo "  DENODO_PG_USER         = ${DENODO_PG_USER:-<unset>}"
 echo "  DENODO_PG_PWD          = ${DENODO_PG_PWD:+<set>}"
-echo "  DENODO_VDP_USER        = ${DENODO_VDP_USER:-<unset>}"
 echo "  DENODO_VDP_PWD         = ${DENODO_VDP_PWD:+<set>}"
 echo "  CLOUDFLARE_TUNNEL_KEY  = ${CLOUDFLARE_TUNNEL_KEY:+<set>}"
 
@@ -192,7 +191,7 @@ if [ -f "$INSTALL_DIR/linux/install.sh" ]; then
 
   set -o pipefail
   sudo -H -u denodo \
-    --preserve-env=DENODO_SUPPORT_CI,DENODO_SUPPORT_SECRET,DENODO_LIC,DENODO_UPDATE,DENODO_PG_USER,DENODO_PG_PWD,DENODO_VDP_USER,DENODO_VDP_PWD,DENODO_ACTION \
+    --preserve-env=DENODO_SUPPORT_CI,DENODO_SUPPORT_SECRET,DENODO_LIC,DENODO_UPDATE,DENODO_PG_USER,DENODO_PG_PWD,DENODO_VDP_PWD,CLOUDFLARE_TUNNEL_KEY,DENODO_ACTION \
     bash "$INSTALL_DIR/linux/install.sh" 2>&1 | tee -a "$LOG"
   rc=$?
 

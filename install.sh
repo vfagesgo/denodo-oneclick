@@ -98,7 +98,6 @@ Overrides (default comes from denodo_config.env):
   --DENODO_UPDATE <value>
   --DENODO_PG_USER <value>
   --DENODO_PG_PWD <value>
-  --DENODO_VDP_USER <value>
   --DENODO_VDP_PWD <value>
 
 Optional (CLI only):
@@ -138,7 +137,6 @@ while [[ $# -gt 0 ]]; do
     --DENODO_UPDATE) DENODO_UPDATE="$2"; shift 2 ;;
     --DENODO_PG_USER) DENODO_PG_USER="$2"; shift 2 ;;
     --DENODO_PG_PWD) DENODO_PG_PWD="$2"; shift 2 ;;
-    --DENODO_VDP_USER) DENODO_VDP_USER="$2"; shift 2 ;;
     --DENODO_VDP_PWD) DENODO_VDP_PWD="$2"; shift 2 ;;
     --CLOUDFLARE_TUNNEL_KEY) CLOUDFLARE_TUNNEL_KEY="$2"; shift 2 ;;
     --mode) MODE="$2"; shift 2 ;;
@@ -224,7 +222,6 @@ if [[ -n "$ACTION" ]]; then
     -e DENODO_UPDATE="${DENODO_UPDATE:-}" \
     -e DENODO_PG_USER="${DENODO_PG_USER:-}" \
     -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
-    -e DENODO_VDP_USER="${DENODO_VDP_USER:-}" \
     -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
     -u denodo \
     "${IMAGE_NAME}" bash -c '
@@ -332,7 +329,6 @@ else
     -e DENODO_UPDATE="${DENODO_UPDATE:-}" \
     -e DENODO_PG_USER="${DENODO_PG_USER:-}" \
     -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
-    -e DENODO_VDP_USER="${DENODO_VDP_USER:-}" \
     -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
     -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY:-}" \
     -v "$(cd "$(dirname "$DENODO_LIC")" && pwd)/$(basename "$DENODO_LIC")":/denodo/license.lic:ro \

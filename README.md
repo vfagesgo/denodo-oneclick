@@ -86,7 +86,6 @@ Defaults come from `denodo_config.env`; pass any of these to override them:
 - `--DENODO_UPDATE <value>` (default: `denodo-update-9.5.0`)
 - `--DENODO_PG_USER <value>` (default: `denodo`)
 - `--DENODO_PG_PWD <value>` (default: `password`)
-- `--DENODO_VDP_USER <value>` (default: `admin`)
 - `--DENODO_VDP_PWD <value>` (default: `admin`)
 
 ### Optional (CLI only)

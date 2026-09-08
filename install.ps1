@@ -22,7 +22,6 @@ param(
   [string]$DENODO_UPDATE,
   [string]$DENODO_PG_USER,
   [string]$DENODO_PG_PWD,
-  [string]$DENODO_VDP_USER,
   [string]$DENODO_VDP_PWD,
   [string]$CLOUDFLARE_TUNNEL_KEY,
   [string]$Mode = "docker",
@@ -52,7 +51,6 @@ Overrides (default comes from denodo_config.env):
   -DENODO_UPDATE <value>
   -DENODO_PG_USER <value>
   -DENODO_PG_PWD <value>
-  -DENODO_VDP_USER <value>
   -DENODO_VDP_PWD <value>
 
 Optional:
@@ -129,7 +127,6 @@ function Get-WithDefault([string]$CliValue, [string]$Key) {
 $DENODO_UPDATE = Get-WithDefault $DENODO_UPDATE "DENODO_UPDATE"
 $DENODO_PG_USER = Get-WithDefault $DENODO_PG_USER "DENODO_PG_USER"
 $DENODO_PG_PWD = Get-WithDefault $DENODO_PG_PWD "DENODO_PG_PWD"
-$DENODO_VDP_USER = Get-WithDefault $DENODO_VDP_USER "DENODO_VDP_USER"
 $DENODO_VDP_PWD = Get-WithDefault $DENODO_VDP_PWD "DENODO_VDP_PWD"
 
 # --- 3. Validate mandatory parameters ---------------------------------------
@@ -216,7 +213,6 @@ if ($containerExists) {
     -e "DENODO_UPDATE=$DENODO_UPDATE" `
     -e "DENODO_PG_USER=$DENODO_PG_USER" `
     -e "DENODO_PG_PWD=$DENODO_PG_PWD" `
-    -e "DENODO_VDP_USER=$DENODO_VDP_USER" `
     -e "DENODO_VDP_PWD=$DENODO_VDP_PWD" `
     -e "CLOUDFLARE_TUNNEL_KEY=$CLOUDFLARE_TUNNEL_KEY" `
     -v "${DENODO_LIC}:/denodo/license.lic:ro" `
