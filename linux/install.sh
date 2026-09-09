@@ -365,7 +365,8 @@ log_step "install cloudflared"
 # install cloudflared
 sudo apt-get update && sudo apt-get install cloudflared
 
-start_cloudflare_tunnel
+# Only installing the binary here, not starting the tunnel yet - see the
+# start_cloudflare_tunnel call at the very end of this script for why.
 
 # Section 03:
 # Running directly as root would hide which user should own the installed
@@ -1166,6 +1167,22 @@ log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
 /opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/samples.zip --server localhost:9999/admin?$DENODO_VDP_PWD@admin --metadata-password=password
 
+
+# Started here, at the very end, rather than back in Section 03 right after
+# cloudflared is installed: a full install still has a lot of network-
+# affecting work left to do after that point (Section 06 installs
+# network-manager/dnsmasq, still a leftover from this script's Raspberry Pi
+# origins - installing NetworkManager inside a container can make it think
+# it should manage the container's network interface, resetting/renegotiating
+# it and dropping any connection already established through it). A tunnel
+# started that early would come up fine, then get silently cut once that
+# happened - matching "it registers, then the dashboard shows it unhealthy
+# again" and "starting it manually after full startup completes always
+# works". Starting it only once nothing else in this script will touch
+# networking avoids the whole class of problem instead of chasing down
+# whether network-manager (or something else later in the script) is the
+# specific culprit.
+start_cloudflare_tunnel
 
 # Section 18:
 # Friendly, hard-to-miss confirmation once everything above succeeded
