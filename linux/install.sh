@@ -287,7 +287,8 @@ start_cloudflare_tunnel() {
   log_step "Starting Cloudflare tunnel (supervised - restarts automatically if it exits)"
   (
     while true; do
-      cloudflared tunnel --no-autoupdate run --token "$CLOUDFLARE_TUNNEL_KEY" >>"$LOG" 2>&1
+      cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY >>"$LOG" 2>&1
+      echo $CLOUDFLARE_TUNNEL_KEY
       echo "cloudflared exited unexpectedly - restarting in 10s" | tee -a "$LOG"
       sleep 10
     done
