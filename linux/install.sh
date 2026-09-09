@@ -287,11 +287,15 @@ start_cloudflare_tunnel() {
   log_step "Starting Cloudflare tunnel (supervised - restarts automatically if it exits)"
   (
     while true; do
-      #cloudflared tunnel --no-autoupdate run --token $CLOUDFLARE_TUNNEL_KEY >>"$LOG" 2>&1
-      echo "cloudflare hello"
-      echo $CLOUDFLARE_TUNNEL_KEY
-      cloudflared tunnel --no-autoupdate run --token eyJhIjoiNTdhNjUxMDY0ZTI1YjIyZGUwZDU4MmE4ZDRhMDU1OTQiLCJ0IjoiOGUwMTUwYWUtN2QzNi00YjQyLWJmMzgtZDUzNjA3ZGFlZTNhIiwicyI6Ik5UWTVOMk14WVdFdE9HSTFZUzAwT1dVekxXSXhZMll0Wm1Rd1pqbG1Zamc0TjJJMyJ9 >>"$LOG" 2>&1
-      
+      # --protocol http2: cloudflared defaults to QUIC (UDP), which is very
+      # sensitive to the same MTU/packet-loss network issue that broke git's
+      # HTTP/2 clones earlier (see the http.version=HTTP/1.1 fix elsewhere in
+      # this repo) - except QUIC just retries silently forever instead of
+      # erroring, so the tunnel can take up to an hour to register (observed:
+      # 53 minutes of "Retrying connection" before it finally connected)
+      # while looking unhealthy on the dashboard the whole time. Forcing
+      # HTTP/2 (a normal TCP connection) avoids that failure mode entirely.
+      cloudflared tunnel --no-autoupdate --protocol http2 run --token "$CLOUDFLARE_TUNNEL_KEY" >>"$LOG" 2>&1
       echo "cloudflared exited unexpectedly - restarting in 10s" | tee -a "$LOG"
       sleep 10
     done
