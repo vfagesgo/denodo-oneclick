@@ -1215,6 +1215,20 @@ log_section "17.5" "Import Denodo Metadata"
 # specific culprit.
 start_cloudflare_tunnel
 
+# entrypoint.sh writes /data/.denodo_install_complete after a successful
+# *boot-time* run of this script (DENODO_ACTION=install) - but --upgrade
+# reaches this same point via `docker exec`, entirely bypassing
+# entrypoint.sh, so that marker never got written for an upgrade that
+# completed successfully. The next plain `docker stop`/`docker start` then
+# found no marker (even though nginx/pg_ctlcluster were both intact) and
+# reran a full install from scratch. Write it here instead, in the one
+# place guaranteed to run whichever way this script was invoked, whenever
+# the full sequence - initial install or upgrade - actually completes.
+if [ "$DENODO_ACTION" = "install" ] || [ "$DENODO_ACTION" = "upgrade" ]; then
+  sudo mkdir -p /data
+  date -u +%Y-%m-%dT%H:%M:%SZ | sudo tee /data/.denodo_install_complete >/dev/null
+fi
+
 # Section 18:
 # Friendly, hard-to-miss confirmation once everything above succeeded
 # (reaching this point means every prior command exited 0, since `set -e`
