@@ -284,6 +284,28 @@ start_cloudflare_tunnel() {
     sleep 3
   done
 
+  # This function can run more than once over a single container's lifetime
+  # (services-only boot, --refresh, --upgrade), and none of those stop an
+  # already-running tunnel first (it isn't part of stop_denodo_services -
+  # it's not one of the SERVICE_ORDER-managed services). Without this, every
+  # call stacks another `cloudflared tunnel run` on top of whatever was
+  # already running with the same token - multiple connectors registering
+  # for one tunnel ID, which is its own source of instability independent of
+  # the protocol/MTU issue below. Track the supervising loop's pid (same
+  # pattern as $RUN_DIR/*.pid for the regular services) so a later call can
+  # kill that specific loop, not just its current cloudflared child - killing
+  # only the child would just have the old loop immediately relaunch a new
+  # one after its 10s backoff.
+  sudo mkdir -p "$RUN_DIR"
+  CLOUDFLARED_PID_FILE="$RUN_DIR/cloudflared-tunnel.pid"
+  if [ -f "$CLOUDFLARED_PID_FILE" ]; then
+    log_step "Stopping previously running cloudflared tunnel before starting a new one"
+    old_pid=$(cat "$CLOUDFLARED_PID_FILE" 2>/dev/null || true)
+    [ -n "$old_pid" ] && sudo kill -- "-$old_pid" 2>/dev/null || true
+    sudo pkill -f 'cloudflared tunnel' 2>/dev/null || true
+    sleep 2
+  fi
+
   log_step "Starting Cloudflare tunnel (supervised - restarts automatically if it exits)"
   (
     while true; do
@@ -300,6 +322,7 @@ start_cloudflare_tunnel() {
       sleep 10
     done
   ) &
+  echo $! | sudo tee "$CLOUDFLARED_PID_FILE" >/dev/null
 }
 
 # --- Action dispatch ---------------------------------------------------
