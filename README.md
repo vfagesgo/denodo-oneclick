@@ -83,15 +83,15 @@ The install runs in the background; the script automatically follows its logs in
 
 ### Optional overrides
 Defaults come from `denodo_config.env`; pass any of these to override them:
-- `--DENODO_UPDATE <value>` (default: `denodo-update-9.5.0`)
+- `--DENODO_UPDATE <value>` (default: `denodo-update-9.5.1`)
 - `--DENODO_PG_USER <value>` (default: `denodo`)
 - `--DENODO_PG_PWD <value>` (default: `password`)
 - `--DENODO_VDP_PWD <value>` (default: `admin`)
 
 ### Optional (CLI only)
-- `--CLOUDFLARE_TUNNEL_KEY <value>` — optional Cloudflare Tunnel token, if you want to expose the instance publicly
+- `--CLOUDFLARE_TUNNEL_KEY <value>` — optional Cloudflare Tunnel token, if you want to expose the instance publicly. Each Cloudflare Tunnel has its own unique token; reusing one tunnel's token elsewhere just adds another connector to that same tunnel rather than creating a new one.
 - `--mode <docker|local>` — default `docker`; `local` is not implemented yet
-- `--reset` — remove any existing container and its volumes first, so the install starts truly from scratch instead of resuming. Use this when you need to change a value like `--DENODO_UPDATE`, since those can't be changed on a container that already exists.
+- `--reset` — remove any existing container and its volumes first, so the install starts truly from scratch instead of resuming. Use this when you need to change a value like `--DENODO_UPDATE` or `--CLOUDFLARE_TUNNEL_KEY`, since these are baked into the container when it's first created and aren't picked up again by a plain restart — only `--reset` (or `--upgrade` for `--DENODO_UPDATE`) applies a new value.
 
 ## Retrying a failed or interrupted install
 
@@ -115,13 +115,32 @@ These act on the existing `denodo-oneclick` container in place — they don't re
 
 Both commands require a container from a previous install to already exist; they error out if none is found. Neither is currently available from `install.ps1` on Windows.
 
+## Stopping and starting the container
+
+The container is a normal Docker container, so the usual commands work directly:
+
+```zsh
+docker stop denodo-oneclick
+docker start denodo-oneclick
+```
+
+`docker start` does **not** redo the install. On boot, the container checks for a marker left behind by the last successful install/upgrade; if it's there (and the underlying OS packages still look intact), it skips straight to just (re)starting PostgreSQL, nginx, the Denodo services, and the Cloudflare tunnel (if configured) — this is usually done within well under a minute. A full reinstall only happens automatically if that marker is missing, e.g. the very first start, or after `--reset`.
+
+To watch it come back up:
+
+```zsh
+docker logs -f denodo-oneclick
+```
+
+`docker restart denodo-oneclick` is equivalent to a stop followed by a start, and is what `--upgrade`/`--refresh` use internally as part of their startup-race workaround (see above) — so seeing the container restart itself once after one of those commands is expected, not an error.
+
 ## Persistence
 
-Install progress and data live in a set of named Docker volumes, so they survive the container being removed and recreated (for example after rebuilding the image):
-- `denodo-oneclick-data` — this conatians the repository's, Denodo install, PostgreSQL database
+Install progress and data live in a single named Docker volume, so they survive the container being removed and recreated (for example after rebuilding the image):
+- `denodo-oneclick-data` — mounted at `/data`; contains the repository checkout, the installed Denodo platform (including the AI SDK and MCP server), and the PostgreSQL database.
 
-`--reset` removes all of these along with the container.
+`--reset` removes both this volume and the container.
 
 ## Current status
 
-The Docker install mode is fully working: it builds a Debian-based image, installs PostgreSQL, Java, the Denodo platform, the Denodo AI SDK, and nginx, then starts the Denodo services and serves the application on port 80. Local (non-Docker) install mode is not implemented yet.
+The Docker install mode is fully working: it builds a Debian-based image, installs PostgreSQL, Java, the Denodo platform, the Denodo AI SDK, the Denodo MCP server, and nginx, then starts the Denodo services (and, if `--CLOUDFLARE_TUNNEL_KEY` is set, a Cloudflare Tunnel) and serves the application on port 80. Local (non-Docker) install mode is not implemented yet.
