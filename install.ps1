@@ -24,6 +24,7 @@ param(
   [string]$DENODO_PG_PWD,
   [string]$DENODO_VDP_PWD,
   [string]$CLOUDFLARE_TUNNEL_KEY,
+  [string]$OPENAI_API_KEY,
   [string]$Mode = "docker",
   [switch]$Reset,
   [switch]$Refresh,
@@ -57,6 +58,9 @@ Overrides (default comes from denodo_config.env):
 
 Optional:
   -CLOUDFLARE_TUNNEL_KEY <value>
+  -OPENAI_API_KEY <value>        Used to pre-fill the AI SDK/chatbot config
+                                  (sdk_config.env, chatbot_config.env); can
+                                  also be added/changed later via -Upgrade
   -Mode <docker|local>           Default: docker (local not implemented yet)
   -Reset                         Wipe any existing container + its volume first,
                                   so the install starts truly from scratch
@@ -257,6 +261,7 @@ if ($Action) {
     -e "DENODO_PG_PWD=$DENODO_PG_PWD" `
     -e "DENODO_VDP_PWD=$DENODO_VDP_PWD" `
     -e "CLOUDFLARE_TUNNEL_KEY=$CLOUDFLARE_TUNNEL_KEY" `
+    -e "OPENAI_API_KEY=$OPENAI_API_KEY" `
     -u denodo `
     $ImageName bash -c '
       set -e
@@ -387,6 +392,7 @@ if ($containerExists) {
     -e "DENODO_PG_PWD=$DENODO_PG_PWD" `
     -e "DENODO_VDP_PWD=$DENODO_VDP_PWD" `
     -e "CLOUDFLARE_TUNNEL_KEY=$CLOUDFLARE_TUNNEL_KEY" `
+    -e "OPENAI_API_KEY=$OPENAI_API_KEY" `
     -v "${DENODO_LIC}:/denodo/license.lic:ro" `
     "${ImageName}:${ImageTag}"
   if ($LASTEXITCODE -ne 0) {

@@ -90,8 +90,9 @@ Defaults come from `denodo_config.env`; pass any of these to override them:
 
 ### Optional (CLI only)
 - `--CLOUDFLARE_TUNNEL_KEY <value>` — optional Cloudflare Tunnel token, if you want to expose the instance publicly. Each Cloudflare Tunnel has its own unique token; reusing one tunnel's token elsewhere just adds another connector to that same tunnel rather than creating a new one.
+- `--OPENAI_API_KEY <value>` — optional OpenAI API key, used to pre-fill the AI SDK's and sample chatbot's config files (`sdk_config.env`, `chatbot_config.env`).
 - `--mode <docker|local>` — default `docker`; `local` is not implemented yet
-- `--reset` — remove any existing container and its volumes first, so the install starts truly from scratch instead of resuming. Use this when you need to change a value like `--DENODO_UPDATE` or `--CLOUDFLARE_TUNNEL_KEY`, since these are baked into the container when it's first created and aren't picked up again by a plain restart — only `--reset` (or `--upgrade` for `--DENODO_UPDATE`) applies a new value.
+- `--reset` — remove any existing container and its volumes first, so the install starts truly from scratch instead of resuming. Use this when you need to change a value like `--DENODO_UPDATE`, `--CLOUDFLARE_TUNNEL_KEY`, or `--OPENAI_API_KEY`, since these are baked into the container when it's first created and aren't picked up again by a plain restart — only `--reset` (or `--upgrade`, for `--DENODO_UPDATE`/`--CLOUDFLARE_TUNNEL_KEY`/`--OPENAI_API_KEY`) applies a new value.
 
 ## Retrying a failed or interrupted install
 

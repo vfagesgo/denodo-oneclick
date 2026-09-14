@@ -102,6 +102,9 @@ Overrides (default comes from denodo_config.env):
 
 Optional (CLI only):
   --CLOUDFLARE_TUNNEL_KEY <value>
+  --OPENAI_API_KEY <value>       Used to pre-fill the AI SDK/chatbot config
+                                  (sdk_config.env, chatbot_config.env); can
+                                  also be added/changed later via --upgrade
   --mode <docker|local>          Default: docker (local not implemented yet)
   --reset                        Wipe any existing container + its volumes first,
                                   so the install starts truly from scratch
@@ -139,6 +142,7 @@ while [[ $# -gt 0 ]]; do
     --DENODO_PG_PWD) DENODO_PG_PWD="$2"; shift 2 ;;
     --DENODO_VDP_PWD) DENODO_VDP_PWD="$2"; shift 2 ;;
     --CLOUDFLARE_TUNNEL_KEY) CLOUDFLARE_TUNNEL_KEY="$2"; shift 2 ;;
+    --OPENAI_API_KEY) OPENAI_API_KEY="$2"; shift 2 ;;
     --mode) MODE="$2"; shift 2 ;;
     --reset) RESET=1; shift ;;
     --refresh) ACTION="refresh"; shift ;;
@@ -224,6 +228,7 @@ if [[ -n "$ACTION" ]]; then
     -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
     -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
     -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY:-}" \
+    -e OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
     -u denodo \
     "${IMAGE_NAME}" bash -c '
       set -e
@@ -352,6 +357,7 @@ else
     -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
     -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
     -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY:-}" \
+    -e OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
     -v "$(cd "$(dirname "$DENODO_LIC")" && pwd)/$(basename "$DENODO_LIC")":/denodo/license.lic:ro \
     "${IMAGE_NAME}:${IMAGE_TAG}"
 fi

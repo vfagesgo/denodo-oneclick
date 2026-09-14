@@ -836,6 +836,9 @@ GITHUB_REPO_URL="https://github.com/denodo/denodo-ai-sdk.git"
 # by the same persisted-data symlink as the rest of the Denodo install.
 # Must match denodo-aisdk.service's WorkingDirectory.
 AISDK_INSTALL_DIR=${AISDK_INSTALL_DIR:-"/opt/denodo/denodo-aisdk"}
+# Optional - referenced further down (sdk_config.env/chatbot_config.env) with
+# `set -u` active, so it must be defaulted here even when not provided.
+OPENAI_API_KEY=${OPENAI_API_KEY:-}
 
 log_step "Repository: denodo-ai-sdk"
 log_step "Install directory: $AISDK_INSTALL_DIR"
@@ -1105,20 +1108,24 @@ sed -i 's/^pysqlite3-binary==/pysqlite3==/' requirements.txt
 /home/denodo/$VENV_DIR/bin/python -m pip install --no-cache-dir --prefer-binary -r requirements.txt
 
 
+# Configure the AISDK & Chatbot 
 
-if [ -f "/boot/firmware/denodo/chatbot_config.env" ]; then
-  log_step "Copy chatbot config file chatbot_config.env "
-    
-  sudo cp /boot/firmware/denodo/chatbot_config.env $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
-  sudo chown denodo:denodo $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
-fi
+log_step "Copy AISDK config file sdk_config.env "
+  
+sudo cp $AISDK_INSTALL_DIR/api/utils/sdk_config.env.example $AISDK_INSTALL_DIR/api/utils/sdk_config.env
+sudo chown denodo:denodo $AISDK_INSTALL_DIR/api/utils/sdk_config.env
 
-if [ -f "/boot/firmware/denodo/sdk_config.env" ]; then
-  log_step "Copy AISDK config file sdk_config.env "
-    
-  sudo cp /boot/firmware/denodo/sdk_config.env $AISDK_INSTALL_DIR/api/utils/sdk_config.env
-  sudo chown denodo:denodo $AISDK_INSTALL_DIR/api/utils/sdk_config.env
-fi
+
+sed -i "s|^#OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
+
+
+log_step "Copy chatbot config file chatbot_config.env "
+  
+sudo cp $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env.example $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
+sudo chown denodo:denodo $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
+
+sed -i "s|^#OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env"
+
 
 
 
