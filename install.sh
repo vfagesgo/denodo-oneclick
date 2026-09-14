@@ -223,6 +223,7 @@ if [[ -n "$ACTION" ]]; then
     -e DENODO_PG_USER="${DENODO_PG_USER:-}" \
     -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
     -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
+    -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY:-}" \
     -u denodo \
     "${IMAGE_NAME}" bash -c '
       set -e
