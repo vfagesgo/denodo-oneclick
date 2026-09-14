@@ -149,28 +149,17 @@ start_service() {
 # Docker container). Both paths read the same *.service files under
 # $SCRIPT_DIR/services so there is one source of truth for what each
 # service runs.
-start_denodo_services() {
+# Shared by start_denodo_services() and start_denodo_ai_services() below -
+# same systemd/background-process logic, just a different service list.
+_start_services() {
   local SERVICE_DIR="$SCRIPT_DIR/services"
-  sudo mkdir -p "$RUN_DIR"
-  sudo chown denodo:denodo "$RUN_DIR"
-
-  # Fixed start order: vdp-server first, then the two that depend on it,
-  # then aisdk which depends on data-marketplace. House-keeping has no
-  # dependents.
-  local SERVICE_ORDER=(
-    denodo_house_keeping
-    denodo-vdp-server
-    denodo-design_studio
-    denodo-data-marketplace
-    denodo-aisdk
-    denodo-mcp
-  )
+  local -n _order=$1
   local name service_file
 
   if [ -d /run/systemd/system ]; then
     log_step "systemd detected - installing and starting services via systemctl"
 
-    for name in "${SERVICE_ORDER[@]}"; do
+    for name in "${_order[@]}"; do
       service_file="$SERVICE_DIR/${name}.service"
       [ -f "$service_file" ] || continue
       echo "Installing service ${name}.service"
@@ -183,7 +172,7 @@ start_denodo_services() {
 
     sudo systemctl daemon-reload
 
-    for name in "${SERVICE_ORDER[@]}"; do
+    for name in "${_order[@]}"; do
       [ -f "$SERVICE_DIR/${name}.service" ] || continue
       sudo systemctl unmask "${name}.service"
       sudo systemctl enable "${name}.service"
@@ -192,7 +181,7 @@ start_denodo_services() {
   else
     log_step "No systemd detected - starting services directly as background processes"
 
-    for name in "${SERVICE_ORDER[@]}"; do
+    for name in "${_order[@]}"; do
       service_file="$SERVICE_DIR/${name}.service"
       [ -f "$service_file" ] && start_service "$service_file"
     done
@@ -200,6 +189,39 @@ start_denodo_services() {
     log_step "Services started in the background. PIDs/stop commands are under $RUN_DIR"
     log_step "Note: keeping the container itself alive (e.g. a foreground wait loop) is the entrypoint's responsibility, not this script's"
   fi
+}
+
+start_denodo_services() {
+  sudo mkdir -p "$RUN_DIR"
+  sudo chown denodo:denodo "$RUN_DIR"
+
+  # Fixed start order: vdp-server first, then the two that depend on it.
+  # House-keeping has no dependents. AI SDK and MCP are started separately,
+  # after this, by start_denodo_ai_services() - see that function for why.
+  local SERVICE_ORDER=(
+    denodo_house_keeping
+    denodo-vdp-server
+    denodo-design_studio
+    denodo-data-marketplace
+  )
+  _start_services SERVICE_ORDER
+}
+
+# Split out from start_denodo_services() so callers can start the AI SDK/MCP
+# server as a separate step after it - e.g. once Denodo VDP is confirmed up
+# and the sample metadata import has run, rather than racing that import.
+start_denodo_ai_services() {
+  sudo mkdir -p "$RUN_DIR"
+  sudo chown denodo:denodo "$RUN_DIR"
+
+  # aisdk depends on data-marketplace; mcp depends on vdp-server. Both are
+  # started by start_denodo_services() already, so order between these two
+  # doesn't matter relative to each other, only relative to that call.
+  local SERVICE_ORDER=(
+    denodo-aisdk
+    denodo-mcp
+  )
+  _start_services SERVICE_ORDER
 }
 
 # Symmetric counterpart to start_denodo_services(), needed before an
@@ -364,6 +386,7 @@ if [ "$DENODO_ACTION" = "services-only" ]; then
   restart_postgresql
   nginx_restart
   start_denodo_services
+  start_denodo_ai_services
   start_cloudflare_tunnel
   print_welcome_banner
   exit 0
@@ -377,6 +400,7 @@ if [ "$DENODO_ACTION" = "refresh" ]; then
   nginx_restart
   stop_denodo_services
   start_denodo_services
+  start_denodo_ai_services
   start_cloudflare_tunnel
   print_welcome_banner
   exit 0
@@ -1195,6 +1219,7 @@ nginx_restart
 # services-only fast path can call the exact same logic.
 log_section "17" "Configuring the different services"
 start_denodo_services
+start_denodo_ai_services
 
 # Section 17.5:
 # Import sample metadata in Denodo
@@ -1220,6 +1245,27 @@ log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
 /opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/samples.zip --server localhost:9999/admin?$DENODO_VDP_PWD@admin --metadata-password=password
 
+
+log_step "Waiting for Denodo DM to start"
+until curl -fsS "http://localhost:9090/denodo-data-catalog/#/" >/dev/null 2>&1; do
+  if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
+    echo "ERROR: Denodo Data Marketplace did not start within ${VDP_TIMEOUT} seconds"
+    exit 1
+  fi
+
+  sleep 2
+  VDP_WAITED=$((VDP_WAITED + 2))
+done
+log_step "Denodo Data Marketplace is running"
+log_section "17.6" "Synchronizing Denodo Metadata"
+curl --request POST \
+  --user "admin:$DENODO_VDP_PWD" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "allServers": "true",
+    "priority": "server_with_local_changes"
+  }' \
+  "http://localhost:9090/denodo-data-catalog/apirest/synchronize"
 
 # Started here, at the very end, rather than back in Section 03 right after
 # cloudflared is installed: a full install still has a lot of network-
