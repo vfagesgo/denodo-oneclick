@@ -113,7 +113,7 @@ These act on the existing `denodo-oneclick` container in place — they don't re
 ```
 - `--upgrade` — does everything `--refresh` does, and also: re-runs the Denodo platform installer if `--DENODO_UPDATE` (or its default in `denodo_config.env`) has changed since the last install, and always re-fetches and reinstalls the AI SDK and the Denodo MCP server. Needs `--DENODO_SUPPORT_CI`/`--DENODO_SUPPORT_SECRET` (used to fetch the update/MCP archives); pass `--DENODO_UPDATE <value>` too if you're upgrading to a specific platform version. The Denodo services are stopped before the platform installer runs (required by the installer) and restarted afterwards.
 
-Both commands require a container from a previous install to already exist; they error out if none is found. Neither is currently available from `install.ps1` on Windows.
+Both commands require a container from a previous install to already exist; they error out if none is found. On Windows, use `-Refresh`/`-Upgrade` with `install.ps1` instead — same behavior, same requirements.
 
 ## Stopping and starting the container
 

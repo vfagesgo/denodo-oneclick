@@ -342,7 +342,22 @@ start_cloudflare_tunnel() {
 #                 re-runs the Denodo platform installer to apply it, and
 #                 always re-fetches the AI SDK and MCP server. Triggered
 #                 on demand via `install.sh --upgrade`.
+#   cloudflare-refresh - restarts *only* the Cloudflare tunnel, nothing
+#                 else. Needed because a plain `docker restart` (which
+#                 install.sh's --refresh/--upgrade trigger once, as a
+#                 workaround for an unrelated service-startup race) re-runs
+#                 this script with DENODO_ACTION=services-only, using
+#                 CLOUDFLARE_TUNNEL_KEY from the container's *original*
+#                 `docker run` env - undoing a key just applied via
+#                 --refresh/--upgrade's `docker exec`. install.sh calls this
+#                 right after that restart to make the fresh key win again.
 DENODO_ACTION="${DENODO_ACTION:-install}"
+
+if [ "$DENODO_ACTION" = "cloudflare-refresh" ]; then
+  log_section "00" "Cloudflare-refresh (restart only the tunnel, with the key just passed in)"
+  start_cloudflare_tunnel
+  exit 0
+fi
 
 if [ "$DENODO_ACTION" = "services-only" ]; then
   log_section "00" "Services-only start (install already completed previously)"

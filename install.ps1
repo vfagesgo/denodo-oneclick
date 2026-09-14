@@ -26,6 +26,8 @@ param(
   [string]$CLOUDFLARE_TUNNEL_KEY,
   [string]$Mode = "docker",
   [switch]$Reset,
+  [switch]$Refresh,
+  [switch]$Upgrade,
   [switch]$Help
 )
 
@@ -59,12 +61,63 @@ Optional:
   -Reset                         Wipe any existing container + its volume first,
                                   so the install starts truly from scratch
   -Help                          Show this message
+
+Actions on an existing container (instead of building/running one):
+  -Refresh                       Pull the latest denodo-oneclick repo into the
+                                  running container and reapply its nginx/
+                                  service config, then restart services. Does
+                                  not touch the installed Denodo software.
+  -Upgrade                       Like -Refresh, but also re-runs the Denodo
+                                  platform installer if -DENODO_UPDATE changed,
+                                  and always re-fetches the AI SDK and MCP
+                                  server. Needs -DENODO_SUPPORT_CI/-DENODO_SUPPORT_SECRET.
 "@ | Write-Host
 }
 
 if ($Help) {
   Show-Usage
   exit 0
+}
+
+# WORKAROUND: some services (design_studio, data-marketplace) can lose a
+# startup race against denodo-vdp-server on their very first boot right
+# after a fresh install/upgrade, when the host is busiest - resulting in a
+# 502 from nginx for those. A plain `docker restart` reliably fixes it (the
+# later "services-only" boot has none of that contention), so do it
+# automatically once install/upgrade genuinely finishes, until the
+# underlying race in linux/install.sh's service startup is fully solved.
+function Invoke-StartupRaceWorkaroundRestart {
+  Write-Host ""
+  Write-Host "Restarting the container once as a workaround for a known service-startup"
+  Write-Host "race (some services can fail their very first start right after a fresh"
+  Write-Host "install/upgrade; a restart reliably fixes it)."
+  docker restart $ImageName | Out-Null
+}
+
+# Only meaningful for a fresh install/-Reset, where "finished" can be
+# minutes away and restarting mid-install would corrupt it. Polls the
+# container's logs for the line install.sh prints on completion.
+function Wait-ForInstallThenRestartWorkaround {
+  $timeoutSec = 2400
+  $intervalSec = 15
+  $elapsed = 0
+  Write-Host "Waiting for the install to finish, to then apply the startup-race workaround above..."
+  while ($elapsed -lt $timeoutSec) {
+    $logs = docker logs $ImageName 2>&1 | Out-String
+    if ($logs -match '\[SECTION 18\] Installation complete' -or $logs -match 'Services-only start \(install already completed previously\)') {
+      Invoke-StartupRaceWorkaroundRestart
+      return $true
+    }
+    $running = docker inspect -f '{{.State.Running}}' $ImageName 2>$null
+    if ($running -ne "true") {
+      Write-Host "Container isn't running - install may have failed; skipping the workaround restart. Check the logs." -ForegroundColor Yellow
+      return $false
+    }
+    Start-Sleep -Seconds $intervalSec
+    $elapsed += $intervalSec
+  }
+  Write-Host "WARNING: timed out waiting for the install to finish - skipping the automatic workaround restart. Check the logs and restart manually if needed." -ForegroundColor Yellow
+  return $false
 }
 
 # Raw-file base used to fetch install artifacts when this script is run
@@ -128,6 +181,124 @@ $DENODO_UPDATE = Get-WithDefault $DENODO_UPDATE "DENODO_UPDATE"
 $DENODO_PG_USER = Get-WithDefault $DENODO_PG_USER "DENODO_PG_USER"
 $DENODO_PG_PWD = Get-WithDefault $DENODO_PG_PWD "DENODO_PG_PWD"
 $DENODO_VDP_PWD = Get-WithDefault $DENODO_VDP_PWD "DENODO_VDP_PWD"
+
+# --- 2.5. -Refresh / -Upgrade: act on an existing container, then exit ------
+# These don't build or run anything - they reach into an already-running
+# install via `docker exec` and ask linux/install.sh to do less than a full
+# install (see that script's DENODO_ACTION for what each one actually does).
+$Action = ""
+if ($Refresh) { $Action = "refresh" }
+if ($Upgrade) { $Action = "upgrade" }
+
+if ($Action) {
+  if ($Reset) {
+    Write-Host "ERROR: -Reset can't be combined with -Refresh/-Upgrade - reset starts a fresh install instead." -ForegroundColor Red
+    exit 1
+  }
+
+  docker inspect $ImageName *> $null
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "ERROR: no existing '$ImageName' container found - run a normal install first." -ForegroundColor Red
+    exit 1
+  }
+
+  if ($Action -eq "upgrade") {
+    $missingUpgrade = @()
+    if (-not $DENODO_SUPPORT_CI) { $missingUpgrade += "-DENODO_SUPPORT_CI" }
+    if (-not $DENODO_SUPPORT_SECRET) { $missingUpgrade += "-DENODO_SUPPORT_SECRET" }
+    if ($missingUpgrade.Count -gt 0) {
+      Write-Host "ERROR: -Upgrade needs $($missingUpgrade -join ', ') (used to fetch the update/AI SDK/MCP archives)." -ForegroundColor Red
+      exit 1
+    }
+  }
+
+  $running = docker inspect -f '{{.State.Running}}' $ImageName
+  if ($running -ne "true") {
+    Write-Host "Container '$ImageName' is stopped - starting it first."
+    docker start $ImageName | Out-Null
+    # entrypoint.sh runs its own git fetch/reset + chown on every boot,
+    # racing the exec-based refresh below if it starts immediately -
+    # `docker start` returns as soon as the container's process launches,
+    # not once entrypoint.sh's own repo sync/services-only pass has
+    # finished. Give it a head start so the two don't touch the repo
+    # directory at the same time (which can leave ownership in a state
+    # that trips git's "dubious ownership" check right back up).
+    Write-Host "Waiting for the container's own startup sequence to settle..."
+    Start-Sleep -Seconds 20
+  }
+
+  Write-Host "== denodo-oneclick: $Action =="
+
+  # Repo ownership inside the container can drift back to root between
+  # restarts (a bug in an older entrypoint.sh - now fixed there too, but
+  # already-running containers won't pick that fix up until their next full
+  # restart). git then refuses to touch the directory as "denodo" with a
+  # "dubious ownership" error. Reassert ownership + mark it safe for git
+  # unconditionally here so -Refresh/-Upgrade work regardless of whether the
+  # container has been restarted since that fix landed.
+  docker exec -u root $ImageName bash -c '
+    chown -R -H denodo:denodo /opt/denodo-oneclick
+    if [ -d /opt/denodo-oneclick/www ]; then
+      chgrp -R www-data /opt/denodo-oneclick/www
+      chmod -R 750 /opt/denodo-oneclick/www
+    fi
+    sudo -H -u denodo git config --global --get-all safe.directory 2>/dev/null | grep -qx "*" \
+      || sudo -H -u denodo git config --global --add safe.directory "*"
+  '
+
+  Write-Host "Pulling the latest denodo-oneclick repo into the container and running linux/install.sh --$Action..."
+  docker exec `
+    -e "DENODO_ACTION=$Action" `
+    -e "DENODO_SUPPORT_CI=$DENODO_SUPPORT_CI" `
+    -e "DENODO_SUPPORT_SECRET=$DENODO_SUPPORT_SECRET" `
+    -e "DENODO_LIC=$DENODO_LIC" `
+    -e "DENODO_UPDATE=$DENODO_UPDATE" `
+    -e "DENODO_PG_USER=$DENODO_PG_USER" `
+    -e "DENODO_PG_PWD=$DENODO_PG_PWD" `
+    -e "DENODO_VDP_PWD=$DENODO_VDP_PWD" `
+    -e "CLOUDFLARE_TUNNEL_KEY=$CLOUDFLARE_TUNNEL_KEY" `
+    -u denodo `
+    $ImageName bash -c '
+      set -e
+      cd /opt/denodo-oneclick
+      git fetch origin
+      git reset --hard origin/main
+      git clean -fd
+      bash linux/install.sh
+    '
+  $rc = $LASTEXITCODE
+
+  if ($rc -ne 0) {
+    Write-Host "ERROR: -$Action failed (exit $rc). Check the logs: docker logs -f $ImageName" -ForegroundColor Red
+    exit $rc
+  }
+
+  Invoke-StartupRaceWorkaroundRestart
+
+  # The restart above goes through entrypoint.sh's normal boot path
+  # (DENODO_ACTION=services-only), which reads CLOUDFLARE_TUNNEL_KEY from
+  # the value baked into the container at its *original* `docker run` - not
+  # the one just passed to this -$Action call - so it silently re-starts the
+  # tunnel with the old key right after the exec above correctly applied the
+  # new one. Give the restart a moment to settle, then re-apply the tunnel
+  # one more time, explicitly, so the key you just passed is the one left
+  # running.
+  if ($CLOUDFLARE_TUNNEL_KEY) {
+    Write-Host "Waiting for the restart above to settle, then re-applying the Cloudflare tunnel with the key just passed in..."
+    Start-Sleep -Seconds 10
+    docker exec `
+      -e "CLOUDFLARE_TUNNEL_KEY=$CLOUDFLARE_TUNNEL_KEY" `
+      -u denodo `
+      $ImageName bash -c '
+        cd /opt/denodo-oneclick
+        DENODO_ACTION=cloudflare-refresh bash linux/install.sh
+      '
+  }
+
+  Write-Host ""
+  Write-Host "-$Action completed."
+  exit 0
+}
 
 # --- 3. Validate mandatory parameters ---------------------------------------
 $missing = @()
@@ -207,6 +378,7 @@ if ($containerExists) {
   # Postgres) into subdirectories of it.
   docker run --name $ImageName -d `
     -p 80:80 `
+    -p 2345:5432 `
     -v "${VolumeName}:/data" `
     -e "DENODO_SUPPORT_CI=$DENODO_SUPPORT_CI" `
     -e "DENODO_SUPPORT_SECRET=$DENODO_SUPPORT_SECRET" `
@@ -226,6 +398,20 @@ if ($containerExists) {
 Write-Host ""
 Write-Host "Container is running in the background. Once install completes, the app is at http://localhost"
 Write-Host "Following its logs now (Ctrl-C stops watching - the container keeps running):"
+Write-Host ""
+# Start-Process (not a background job) so the child's console output streams
+# straight through to this console in real time, the same way the bash
+# version's backgrounded `docker logs -f &` does.
+$logsProc = Start-Process -FilePath "docker" -ArgumentList @("logs", "-f", $ImageName) -NoNewWindow -PassThru
+try {
+  Wait-ForInstallThenRestartWorkaround | Out-Null
+} finally {
+  if (-not $logsProc.HasExited) {
+    Stop-Process -Id $logsProc.Id -Force -ErrorAction SilentlyContinue
+  }
+}
+Write-Host ""
+Write-Host "Reattaching to logs after the workaround restart above (Ctrl-C stops watching - the container keeps running):"
 Write-Host ""
 docker logs -f $ImageName
 

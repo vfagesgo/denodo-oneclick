@@ -242,6 +242,26 @@ if [[ -n "$ACTION" ]]; then
 
   workaround_restart_for_startup_race
 
+  # The restart above goes through entrypoint.sh's normal boot path
+  # (DENODO_ACTION=services-only), which reads CLOUDFLARE_TUNNEL_KEY from
+  # the value baked into the container at its *original* `docker run` -
+  # not the one just passed to this --${ACTION} call - so it silently
+  # re-starts the tunnel with the old key right after the exec above
+  # correctly applied the new one. Give the restart a moment to settle,
+  # then re-apply the tunnel one more time, explicitly, so the key you
+  # just passed is the one left running.
+  if [[ -n "${CLOUDFLARE_TUNNEL_KEY:-}" ]]; then
+    echo "Waiting for the restart above to settle, then re-applying the Cloudflare tunnel with the key just passed in..."
+    sleep 10
+    docker exec \
+      -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY}" \
+      -u denodo \
+      "${IMAGE_NAME}" bash -c '
+        cd /opt/denodo-oneclick
+        DENODO_ACTION=cloudflare-refresh bash linux/install.sh
+      '
+  fi
+
   echo ""
   echo "--${ACTION} completed."
   exit 0
