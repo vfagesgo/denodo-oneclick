@@ -30,6 +30,13 @@ log_step() {
 # without duplicating the logic.
 RUN_DIR="/var/run/denodo-oneclick"
 
+# Optional - normally arrives already exported via docker (docker run/exec's
+# -e OPENAI_API_KEY=... and entrypoint.sh's --preserve-env), but default it
+# up front, before any DENODO_ACTION gate below reads it, in case this script
+# is ever invoked directly without going through that layer. Under `set -u`
+# an unset (not just empty) OPENAI_API_KEY would otherwise crash here.
+OPENAI_API_KEY="${OPENAI_API_KEY:-}"
+
 # `service nginx restart` only ever reports a generic "nginx failed!" on
 # error - unhelpful for actually debugging what's wrong. Run `nginx -t`
 # first so the real config/state error lands in the log before that.
@@ -210,16 +217,31 @@ start_denodo_services() {
 # Split out from start_denodo_services() so callers can start the AI SDK/MCP
 # server as a separate step after it - e.g. once Denodo VDP is confirmed up
 # and the sample metadata import has run, rather than racing that import.
+#
+# denodo-aisdk and denodo-mcp are kept as two separate functions (rather
+# than one call starting both) because they have different preconditions:
+# denodo-mcp (the Denodo VDP MCP server) only depends on denodo-vdp-server
+# and always starts fine, while denodo-aisdk needs a valid OPENAI_API_KEY
+# (baked into sdk_config.env/chatbot_config.env in Section 13) or it just
+# crashes on start - callers should only call start_denodo_ai_services when
+# OPENAI_API_KEY is actually set, but must still call start_denodo_mcp_service
+# unconditionally.
+start_denodo_mcp_service() {
+  sudo mkdir -p "$RUN_DIR"
+  sudo chown denodo:denodo "$RUN_DIR"
+
+  local SERVICE_ORDER=(
+    denodo-mcp
+  )
+  _start_services SERVICE_ORDER
+}
+
 start_denodo_ai_services() {
   sudo mkdir -p "$RUN_DIR"
   sudo chown denodo:denodo "$RUN_DIR"
 
-  # aisdk depends on data-marketplace; mcp depends on vdp-server. Both are
-  # started by start_denodo_services() already, so order between these two
-  # doesn't matter relative to each other, only relative to that call.
   local SERVICE_ORDER=(
     denodo-aisdk
-    denodo-mcp
   )
   _start_services SERVICE_ORDER
 }
@@ -386,7 +408,14 @@ if [ "$DENODO_ACTION" = "services-only" ]; then
   restart_postgresql
   nginx_restart
   start_denodo_services
-  start_denodo_ai_services
+  start_denodo_mcp_service
+  # denodo-aisdk needs a valid OPENAI_API_KEY to start at all - see the
+  # comment on start_denodo_ai_services()/start_denodo_mcp_service().
+  if [ -n "$OPENAI_API_KEY" ]; then
+    start_denodo_ai_services
+  else
+    log_step "OPENAI_API_KEY not set - skipping AISDK start"
+  fi
   start_cloudflare_tunnel
   print_welcome_banner
   exit 0
@@ -400,7 +429,12 @@ if [ "$DENODO_ACTION" = "refresh" ]; then
   nginx_restart
   stop_denodo_services
   start_denodo_services
-  start_denodo_ai_services
+  start_denodo_mcp_service
+  if [ -n "$OPENAI_API_KEY" ]; then
+    start_denodo_ai_services
+  else
+    log_step "OPENAI_API_KEY not set - skipping AISDK start"
+  fi
   start_cloudflare_tunnel
   print_welcome_banner
   exit 0
@@ -1219,6 +1253,10 @@ nginx_restart
 # services-only fast path can call the exact same logic.
 log_section "17" "Configuring the different services"
 start_denodo_services
+# denodo-mcp (Denodo VDP MCP server) only depends on denodo-vdp-server, not
+# on OPENAI_API_KEY, so it always starts here. denodo-aisdk is started
+# further down, conditionally, in the "Load AISDK Metadata" section.
+start_denodo_mcp_service
 
 # Section 17.5:
 # Import sample metadata in Denodo
@@ -1286,24 +1324,34 @@ curl --request 'POST' \
 "http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize"
 
 # Load AISDK Metadata in Vector DB
-start_denodo_ai_services
-log_step "Waiting for AISDK to start"
-until curl -fsS "http://localhost:8008/docs" >/dev/null 2>&1; do
-  if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
-    echo "ERROR: Denodo AISDK did not start within ${VDP_TIMEOUT} seconds"
-    exit 1
-  fi
+# AISDK needs a valid OPENAI_API_KEY to start at all (it's written into
+# sdk_config.env/chatbot_config.env in Section 13) - without one it would
+# just crash on start, and the "Waiting for AISDK to start" loop below would
+# spend the full timeout waiting for something that's never coming up
+# before failing the whole script. Skip this section entirely when no key
+# was provided; --upgrade with --OPENAI_API_KEY set will pick it up later.
+if [ -n "${OPENAI_API_KEY:-}" ]; then
+  start_denodo_ai_services
+  log_step "Waiting for AISDK to start"
+  until curl -fsS "http://localhost:8008/docs" >/dev/null 2>&1; do
+    if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
+      echo "ERROR: Denodo AISDK did not start within ${VDP_TIMEOUT} seconds"
+      exit 1
+    fi
 
-  sleep 2
-  VDP_WAITED=$((VDP_WAITED + 2))
-done
-log_step "Denodo AISDK is running"
-log_section "17.6" "Synchronizing AISDK Metadata"
-curl --request 'GET' \
-  --header 'accept: */*' \
-  --user "admin:$DENODO_VDP_PWD" \
-  --header 'Content-Type: application/json' \
-"http://localhost:8008/getMetadata?vdp_tag_names=ai_ready"
+    sleep 2
+    VDP_WAITED=$((VDP_WAITED + 2))
+  done
+  log_step "Denodo AISDK is running"
+  log_section "17.6" "Synchronizing AISDK Metadata"
+  curl --request 'GET' \
+    --header 'accept: */*' \
+    --user "admin:$DENODO_VDP_PWD" \
+    --header 'Content-Type: application/json' \
+  "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready"
+else
+  log_step "OPENAI_API_KEY not set - skipping AISDK start and vector DB metadata sync"
+fi
 
 
 
