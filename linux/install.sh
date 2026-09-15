@@ -1219,7 +1219,6 @@ nginx_restart
 # services-only fast path can call the exact same logic.
 log_section "17" "Configuring the different services"
 start_denodo_services
-start_denodo_ai_services
 
 # Section 17.5:
 # Import sample metadata in Denodo
@@ -1258,14 +1257,18 @@ until curl -fsS "http://localhost:9090/denodo-data-catalog/#/" >/dev/null 2>&1; 
 done
 log_step "Denodo Data Marketplace is running"
 log_section "17.6" "Synchronizing Denodo Metadata"
-curl --request POST \
+
+curl --request 'POST' \
+  --header 'accept: */*' \
   --user "admin:$DENODO_VDP_PWD" \
-  --header "Content-Type: application/json" \
+  --header 'Content-Type: application/json' \
+  --header 'uri: //localhost:9999/admin' \
+  --header 'serverId: 1' \
   --data '{
     "allServers": "true",
-    "priority": "server_with_local_changes"
+    "priority": "server"
   }' \
-  "http://localhost:9090/denodo-data-catalog/apirest/synchronize"
+"http://localhost:9090/denodo-data-catalog/public/api/element-management/all/synchronize/all-servers"
 
 # Started here, at the very end, rather than back in Section 03 right after
 # cloudflared is installed: a full install still has a lot of network-
