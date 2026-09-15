@@ -1316,7 +1316,8 @@ done
 log_step "Denodo Data Marketplace is running"
 log_section "17.6" "Synchronizing Denodo Metadata"
 
-curl --request 'POST' \
+response=$(curl --silent --show-error --fail  \
+  --request 'POST' \
   --header 'accept: */*' \
   --user "admin:$DENODO_VDP_PWD" \
   --header 'Content-Type: application/json' \
@@ -1326,9 +1327,16 @@ curl --request 'POST' \
     "allServers": "true",
     "priority": "server"
   }' \
-"http://localhost:9090/denodo-data-catalog/public/api/element-management/all/synchronize/all-servers"
+"http://localhost:9090/denodo-data-catalog/public/api/element-management/all/synchronize/all-servers")
+if [ $? -eq 0 ]; then
+      echo "synchronize/all-servers: SUCCESS"
+  else
+      echo "synchronize/all-servers: FAILED"
+      echo "$response"
+  fi
 
-curl --request 'POST' \
+response=$(curl --silent --show-error --fail  \
+  --request 'POST' \
   --header 'accept: */*' \
   --user "admin:$DENODO_VDP_PWD" \
   --header 'Content-Type: application/json' \
@@ -1339,7 +1347,14 @@ curl --request 'POST' \
     "ai_ready"
   ]
 }' \
-"http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize"
+"http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize")
+if [ $? -eq 0 ]; then
+      echo "synchronize/tags: SUCCESS"
+  else
+      echo "synchronize/tags: FAILED"
+      echo "$response"
+  fi
+
 
 # Load AISDK Metadata in Vector DB
 # AISDK needs a valid OPENAI_API_KEY to start at all (Section 13 just wrote
@@ -1365,11 +1380,19 @@ if aisdk_has_openai_key; then
   done
   log_step "Denodo AISDK is running"
   log_section "17.6" "Synchronizing AISDK Metadata"
-  curl --request 'GET' \
+  response=$(curl --silent --show-error --fail \
+    --request GET \
     --header 'accept: */*' \
     --user "admin:$DENODO_VDP_PWD" \
     --header 'Content-Type: application/json' \
-  "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready"
+    "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready")
+
+  if [ $? -eq 0 ]; then
+      echo "getMetadata: SUCCESS"
+  else
+      echo "getMetadata: FAILED"
+      echo "$response"
+  fi
 else
   log_step "No OPENAI_API_KEY configured for AISDK - skipping its start and vector DB metadata sync"
 fi
