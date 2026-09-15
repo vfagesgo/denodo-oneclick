@@ -30,12 +30,30 @@ log_step() {
 # without duplicating the logic.
 RUN_DIR="/var/run/denodo-oneclick"
 
-# Optional - normally arrives already exported via docker (docker run/exec's
-# -e OPENAI_API_KEY=... and entrypoint.sh's --preserve-env), but default it
-# up front, before any DENODO_ACTION gate below reads it, in case this script
-# is ever invoked directly without going through that layer. Under `set -u`
-# an unset (not just empty) OPENAI_API_KEY would otherwise crash here.
+# Optional - only used directly (as an env var) by Section 13, to write a
+# freshly-passed value into AISDK's config files during install/upgrade.
+# Default it here so `set -u` doesn't crash on it in the gates below, which
+# run before Section 13 and don't need the raw value at all - see
+# aisdk_has_openai_key() just below for why.
 OPENAI_API_KEY="${OPENAI_API_KEY:-}"
+
+# Whether AISDK should be (re)started is decided by looking at whether it
+# actually has a real key configured on disk - not by whether OPENAI_API_KEY
+# happens to be set on this particular invocation. Docker has no way to
+# persist an updated env var into an already-created container, so a plain
+# `docker start`/`docker restart` (the services-only fast path below) never
+# sees a value added later via `--upgrade --OPENAI_API_KEY ...` - but
+# sdk_config.env itself (written by Section 13, and part of the persisted
+# /data volume via the /opt/denodo symlink) reliably reflects whatever the
+# last successful install/upgrade actually configured, regardless of how -
+# or whether - OPENAI_API_KEY was passed to this specific run.
+AISDK_SDK_CONFIG="/opt/denodo/denodo-aisdk/api/utils/sdk_config.env"
+aisdk_has_openai_key() {
+  [ -f "$AISDK_SDK_CONFIG" ] || return 1
+  local value
+  value=$(grep -E '^OPENAI_API_KEY=' "$AISDK_SDK_CONFIG" 2>/dev/null | tail -n1 | cut -d= -f2-)
+  [ -n "$value" ]
+}
 
 # `service nginx restart` only ever reports a generic "nginx failed!" on
 # error - unhelpful for actually debugging what's wrong. Run `nginx -t`
@@ -409,12 +427,12 @@ if [ "$DENODO_ACTION" = "services-only" ]; then
   nginx_restart
   start_denodo_services
   start_denodo_mcp_service
-  # denodo-aisdk needs a valid OPENAI_API_KEY to start at all - see the
-  # comment on start_denodo_ai_services()/start_denodo_mcp_service().
-  if [ -n "$OPENAI_API_KEY" ]; then
+  # denodo-aisdk needs a valid OPENAI_API_KEY to start at all - see
+  # aisdk_has_openai_key() for why this checks the config file, not the env.
+  if aisdk_has_openai_key; then
     start_denodo_ai_services
   else
-    log_step "OPENAI_API_KEY not set - skipping AISDK start"
+    log_step "No OPENAI_API_KEY configured for AISDK - skipping its start"
   fi
   start_cloudflare_tunnel
   print_welcome_banner
@@ -430,10 +448,10 @@ if [ "$DENODO_ACTION" = "refresh" ]; then
   stop_denodo_services
   start_denodo_services
   start_denodo_mcp_service
-  if [ -n "$OPENAI_API_KEY" ]; then
+  if aisdk_has_openai_key; then
     start_denodo_ai_services
   else
-    log_step "OPENAI_API_KEY not set - skipping AISDK start"
+    log_step "No OPENAI_API_KEY configured for AISDK - skipping its start"
   fi
   start_cloudflare_tunnel
   print_welcome_banner
@@ -894,9 +912,9 @@ GITHUB_REPO_URL="https://github.com/denodo/denodo-ai-sdk.git"
 # by the same persisted-data symlink as the rest of the Denodo install.
 # Must match denodo-aisdk.service's WorkingDirectory.
 AISDK_INSTALL_DIR=${AISDK_INSTALL_DIR:-"/opt/denodo/denodo-aisdk"}
-# Optional - referenced further down (sdk_config.env/chatbot_config.env) with
-# `set -u` active, so it must be defaulted here even when not provided.
-OPENAI_API_KEY=${OPENAI_API_KEY:-}
+# OPENAI_API_KEY is already defaulted near the top of this script -
+# referenced further down as-is, to write it into sdk_config.env/
+# chatbot_config.env.
 
 log_step "Repository: denodo-ai-sdk"
 log_step "Install directory: $AISDK_INSTALL_DIR"
@@ -1324,13 +1342,16 @@ curl --request 'POST' \
 "http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize"
 
 # Load AISDK Metadata in Vector DB
-# AISDK needs a valid OPENAI_API_KEY to start at all (it's written into
-# sdk_config.env/chatbot_config.env in Section 13) - without one it would
-# just crash on start, and the "Waiting for AISDK to start" loop below would
-# spend the full timeout waiting for something that's never coming up
-# before failing the whole script. Skip this section entirely when no key
-# was provided; --upgrade with --OPENAI_API_KEY set will pick it up later.
-if [ -n "${OPENAI_API_KEY:-}" ]; then
+# AISDK needs a valid OPENAI_API_KEY to start at all (Section 13 just wrote
+# whatever was passed on this run into sdk_config.env/chatbot_config.env) -
+# without one it would just crash on start, and the "Waiting for AISDK to
+# start" loop below would spend the full timeout waiting for something
+# that's never coming up before failing the whole script. Check the config
+# file itself (aisdk_has_openai_key(), defined near the top) rather than the
+# OPENAI_API_KEY env var directly, so an --upgrade that doesn't repeat
+# --OPENAI_API_KEY still correctly starts AISDK if a key was configured on
+# an earlier run.
+if aisdk_has_openai_key; then
   start_denodo_ai_services
   log_step "Waiting for AISDK to start"
   until curl -fsS "http://localhost:8008/docs" >/dev/null 2>&1; do
@@ -1350,7 +1371,7 @@ if [ -n "${OPENAI_API_KEY:-}" ]; then
     --header 'Content-Type: application/json' \
   "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready"
 else
-  log_step "OPENAI_API_KEY not set - skipping AISDK start and vector DB metadata sync"
+  log_step "No OPENAI_API_KEY configured for AISDK - skipping its start and vector DB metadata sync"
 fi
 
 

@@ -15,6 +15,13 @@ echo "  DENODO_PG_PWD          = ${DENODO_PG_PWD:+<set>}"
 echo "  DENODO_VDP_PWD         = ${DENODO_VDP_PWD:+<set>}"
 echo "  CLOUDFLARE_TUNNEL_KEY  = ${CLOUDFLARE_TUNNEL_KEY:+<set>}"
 echo "  OPENAI_API_KEY         = ${OPENAI_API_KEY:+<set>}"
+# Whether AISDK actually starts on any given boot is decided in
+# linux/install.sh by checking sdk_config.env on disk (aisdk_has_openai_key()
+# there), not by whether this env var happens to be set on this particular
+# invocation - see that script for why. --preserve-env below still forwards
+# it so a value passed here (first install, or --DENODO_OPENAI_API_KEY on a
+# plain restart, if ever supported) reaches Section 13 to write into that
+# config file in the first place.
 
 
 ## Single persistent volume: install.sh mounts one named volume at /data
