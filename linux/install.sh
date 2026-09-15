@@ -1140,7 +1140,7 @@ sudo cp $AISDK_INSTALL_DIR/api/utils/sdk_config.env.example $AISDK_INSTALL_DIR/a
 sudo chown denodo:denodo $AISDK_INSTALL_DIR/api/utils/sdk_config.env
 
 
-sed -i "s|^#OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
+sed -i "s|^#\?OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
 
 
 log_step "Copy chatbot config file chatbot_config.env "
@@ -1148,7 +1148,7 @@ log_step "Copy chatbot config file chatbot_config.env "
 sudo cp $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env.example $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
 sudo chown denodo:denodo $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
 
-sed -i "s|^#OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env"
+sed -i "s|^#\?OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env"
 
 
 
@@ -1255,6 +1255,8 @@ until curl -fsS "http://localhost:9090/denodo-data-catalog/#/" >/dev/null 2>&1; 
   sleep 2
   VDP_WAITED=$((VDP_WAITED + 2))
 done
+
+# Synchronize the Data Market Place
 log_step "Denodo Data Marketplace is running"
 log_section "17.6" "Synchronizing Denodo Metadata"
 
@@ -1269,6 +1271,42 @@ curl --request 'POST' \
     "priority": "server"
   }' \
 "http://localhost:9090/denodo-data-catalog/public/api/element-management/all/synchronize/all-servers"
+
+curl --request 'POST' \
+  --header 'accept: */*' \
+  --user "admin:$DENODO_VDP_PWD" \
+  --header 'Content-Type: application/json' \
+  --header 'uri: //localhost:9999/admin' \
+  --header 'serverId: 1' \
+  --data '{
+  "vdpTags": [
+    "ai_ready"
+  ]
+}' \
+"http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize"
+
+# Load AISDK Metadata in Vector DB
+start_denodo_ai_services
+log_step "Waiting for AISDK to start"
+until curl -fsS "http://localhost:8008/docs" >/dev/null 2>&1; do
+  if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
+    echo "ERROR: Denodo AISDK did not start within ${VDP_TIMEOUT} seconds"
+    exit 1
+  fi
+
+  sleep 2
+  VDP_WAITED=$((VDP_WAITED + 2))
+done
+log_step "Denodo AISDK is running"
+log_section "17.6" "Synchronizing AISDK Metadata"
+curl --request 'GET' \
+  --header 'accept: */*' \
+  --user "admin:$DENODO_VDP_PWD" \
+  --header 'Content-Type: application/json' \
+"http://localhost:8008/getMetadata?vdp_tag_names=ai_ready"
+
+
+
 
 # Started here, at the very end, rather than back in Section 03 right after
 # cloudflared is installed: a full install still has a lot of network-
