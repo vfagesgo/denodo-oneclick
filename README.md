@@ -1,38 +1,54 @@
 # denodo-oneclick
-Denodo developer one click install for Docker on Windows and Linux.
+Denodo Platform Developer Edition One-Click install for Docker on Windows and Linux.
 
-This package automatically deploys the following Denodo components:
+This package provide a fully automated deployment and install of the following Denodo Platform components:
 * Denodo Virtual Data Port
 * Design Studio
 * Data Marketplace
 * AI-SDK API and Chatbot
 * AI-SDK MCP Server
 * Denodo VDP MCP Server
+* Sample Logical Models
+  * Retail Bank  
+  * Medical Pharma & X-Ray
 * Other components:
   * PostgreSQL DB
   * Nginx HTTP Server
   
-Following a successful deployment you have access to a landing webpage with link to all the install components.
+Following a successful deployment you will get access to a landing webpage with link to all the install components.
+
 
 ![landing page](./landing.png)
 
 
 
-## Usage
+## Getting Started
 
-To install Denodo Developper you just need to follow those steaps
-* Regirster with Denodo Support
+### Preparation
+
+To install Denodo Platform Developper Edition you just need to follow those steaps
+* Regirster with [Denodo](https://auth.denodo.com/user-management/denodo-platform-developer-tier-previous-register)
 * Obtain your Denodo Support Client ID
 * Obtain your Denodo Support Secret
-* Download your Denodo License
-
-You can then run the following command to install your own local container image of Denodo Developper by running the following command (change the parameters first)
+* Download your Free Denodo Developper License
 
 > **_NOTE:_**  You must have Docker priorly installed on your machine
 
-> **_NOTE:_** Give Docker at least 6 GB of memory (8 GB recommended). VDP Server, Design Studio, Data Marketplace, and the MCP server all run as separate concurrent Java processes, and running them under too little memory causes them to crash shortly after starting (often showing as a 502 from nginx) rather than a clean out-of-memory error. This is especially easy to hit with [Colima](https://github.com/abiosoft/colima), whose default profile only allocates 2 GB - increase it with `colima stop && colima start --memory 8 --cpu 4`, or by setting `memory: 8` in `~/.colima/default/colima.yaml`. On Docker Desktop, adjust it under Settings → Resources → Memory.
+> **_NOTE:_** Give **Docker** at least **6 GB** of memory (8 GB recommended). 
+> VDP Server, Design Studio, Data Marketplace, AISDK Sample Chatbot and the MCP servers all run as separate concurrent Java processes. Running them under too little memory would causes them to crash shortly after starting (often showing as a 502 from nginx) rather than a clean out-of-memory error. 
+
+> This is especially easy to hit if you are using [**Colima**](https://github.com/abiosoft/colima), lightweight container runtime tool for macOS and Linux, whose default profile only allocates only 2 GB.
+
+* Increase it with `colima stop && colima start --memory 8 --cpu 4`, or by setting `memory: 8` in `~/.colima/default/colima.yaml`. 
+* On Docker Desktop, adjust it under Settings → Resources → Memory.
+
+ You arenow nearly done have can then run the following command to install your own local container image of Denodo Developper by running the following command (change the parameters first)
+
+
 
 ### Linux / MacOS
+
+> **_NOTE:_** Before to run the script rebiew the additional optional parameters that are avaialbale. You might want to provide your **OPENAI_API_KEY** to enable the AISDK. The script will run for about 30 minutes depending on your hardware and internet speed. 
 
 ```zsh
 curl -fsSL https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.sh | bash  -s -- \
@@ -52,17 +68,21 @@ If you already have this repository checked out locally, you can run the script 
 
 ### Windows
 
-On Windows, use `install.ps1` from a PowerShell prompt. Docker Desktop's Linux container backend builds/runs the exact same image as the bash version.
+On Windows, use `install.ps1` from a PowerShell prompt. Docker Desktop's Linux container backend builds/runs the exact same image as the Linux / MacOS version.
 
-> **_NOTE:_** Start Docker Desktop before running the script — it calls `docker` directly and fails immediately if the Docker engine isn't running.
+> **_NOTE:_** Start **Docker** Desktop before running the script as it calls `docker` directly and would fail immediately if the Docker engine isn't running.
 
-PowerShell doesn't support piping a script straight into execution the way `curl | bash` does, so download it first, then run it. PowerShell also blocks running downloaded `.ps1` scripts by default, so bypass that for the current session with `Set-ExecutionPolicy`:
+> **_NOTE:_** **PowerShell** doesn't support piping a script straight into execution the way `curl | bash` does, so download it first, then run it. PowerShell also blocks running downloaded `.ps1` scripts by default, so bypass that for the current session with `Set-ExecutionPolicy`:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
 
+```powershell
 iwr -useb https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.ps1 -OutFile install.ps1
+```
 
+```powershell
 .\install.ps1 -DENODO_SUPPORT_CI <Support_CI> -DENODO_SUPPORT_SECRET <Support_Secret> -DENODO_LIC <Path to your Denodo license file>
 ```
 
@@ -70,9 +90,11 @@ iwr -useb https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/instal
 
 If you already have this repository checked out locally, run `.\install.ps1 ...` directly instead (still preceded by the `Set-ExecutionPolicy` line above if needed).
 
-### Next Steps 
+### Final Step 
 
-The install runs in the background; the script automatically follows its logs in your terminal until you Ctrl-C (the container keeps running either way). Once it completes, Denodo is available at http://localhost. To reattach to the logs later:
+The install runs in the background. The script automatically follows its logs in your terminal until you Ctrl-C (the container keeps running either way).
+
+Once it completes, you will wait for about 30 min for the initial install, Denodo is available at http://localhost.
 
 ## Options
 
@@ -89,10 +111,17 @@ Defaults come from `denodo_config.env`; pass any of these to override them:
 - `--DENODO_VDP_PWD <value>` (default: `admin`)
 
 ### Optional (CLI only)
-- `--CLOUDFLARE_TUNNEL_KEY <value>` — optional Cloudflare Tunnel token, if you want to expose the instance publicly. Each Cloudflare Tunnel has its own unique token; reusing one tunnel's token elsewhere just adds another connector to that same tunnel rather than creating a new one.
+- `--CLOUDFLARE_TUNNEL_KEY <value>` — optional Cloudflare Tunnel token, if you want to expose the instance publicly. Each Cloudflare Tunnel has its own unique token.
 - `--OPENAI_API_KEY <value>` — optional OpenAI API key, used to pre-fill the AI SDK's and sample chatbot's config files (`sdk_config.env`, `chatbot_config.env`).
-- `--mode <docker|local>` — default `docker`; `local` is not implemented yet
-- `--reset` — remove any existing container and its volumes first, so the install starts truly from scratch instead of resuming. Use this when you need to change a value like `--DENODO_UPDATE`, `--CLOUDFLARE_TUNNEL_KEY`, or `--OPENAI_API_KEY`, since these are baked into the container when it's first created and aren't picked up again by a plain restart — only `--reset` (or `--upgrade`, for `--DENODO_UPDATE`/`--CLOUDFLARE_TUNNEL_KEY`/`--OPENAI_API_KEY`) applies a new value.
+- `--mode <docker|local>` — default `docker`; `local` is not implemented yet. The objective in the future would be to also support local automatic installation in linux environment
+- Script bahavior:
+  - `--install` - **(default)** - full install. Used the very first time, and whenever entrypoint.sh's marker/OS sanity check says a full install is still needed.
+  - `--reset` - Remove any existing container and its volumes first, so the install starts truly from scratch instead of resuming. 
+  - `--upgrade` - If you have already build an image, check whether DENODO_UPDATE changed and, if so, pull the Denodo platform update installer to apply it and always re-fetches the AI SDK and MCP server.
+  - `--refresh` - Pull a fresh copy of this repository (nginxvconfig, service unit files without touching the installed Denodo software: **just reapply config and restart services.**
+  - `--services-only` On install already completed, just (re)start everything. Set automatically by entrypoint.sh on every later container start.
+
+Use `--refresh` /`--upgrade`  when you need to change a value like `--DENODO_UPDATE`, `--CLOUDFLARE_TUNNEL_KEY`, or `--OPENAI_API_KEY`, since these are baked into the container when it's first created and aren't picked up again by a plain restart — only `--reset` (or `--upgrade`, for `--DENODO_UPDATE`/`--CLOUDFLARE_TUNNEL_KEY`/`--OPENAI_API_KEY`) applies a new value.
 
 ## Retrying a failed or interrupted install
 
@@ -102,7 +131,7 @@ If you do want a totally clean install, add `--reset` to remove the existing con
 
 ## Refreshing or upgrading an already-installed container
 
-These act on the existing `denodo-oneclick` container in place — they don't rebuild the image or touch your data volume. Under the hood they pull the latest `denodo-oneclick` repo into the container and re-run part of its install script (`docker exec`, not `docker run`), so the container keeps running throughout except for the services it restarts.
+These act on the existing `denodo-oneclick` container in place, it does not rebuild the image or touch your data volume. Under the hood it pulls the latest `denodo-oneclick` repo into the container and re-run part of its install script (`docker exec`, not `docker run`), so the container keeps running throughout except for the services it restarts.
 
 ```zsh
 ./install.sh --refresh
@@ -127,7 +156,7 @@ docker start denodo-oneclick
 
 `docker start` does **not** redo the install. On boot, the container checks for a marker left behind by the last successful install/upgrade; if it's there (and the underlying OS packages still look intact), it skips straight to just (re)starting PostgreSQL, nginx, the Denodo services, and the Cloudflare tunnel (if configured) — this is usually done within well under a minute. A full reinstall only happens automatically if that marker is missing, e.g. the very first start, or after `--reset`.
 
-To watch it come back up:
+To check it comes back up:
 
 ```zsh
 docker logs -f denodo-oneclick
@@ -144,4 +173,4 @@ Install progress and data live in a single named Docker volume, so they survive 
 
 ## Current status
 
-The Docker install mode is fully working: it builds a Debian-based image, installs PostgreSQL, Java, the Denodo platform, the Denodo AI SDK, the Denodo MCP server, and nginx, then starts the Denodo services (and, if `--CLOUDFLARE_TUNNEL_KEY` is set, a Cloudflare Tunnel) and serves the application on port 80. Local (non-Docker) install mode is not implemented yet.
+The Docker install mode is fully working: it builds a Debian-based image, installs PostgreSQL, Java, the Denodo platform, the Denodo AI SDK, the Denodo MCP server, Sample Data Model and nginx, then starts the Denodo services. **Local (non-Docker) install mode is not implemented yet.**
