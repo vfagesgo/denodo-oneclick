@@ -48,7 +48,7 @@ To install Denodo Platform Developper Edition you just need to follow those stea
 
 ### Linux / MacOS
 
-> **_NOTE:_** Before to run the script rebiew the additional optional parameters that are avaialbale. You might want to provide your **OPENAI_API_KEY** to enable the AISDK. The script will run for about 30 minutes depending on your hardware and internet speed. 
+> **_NOTE:_** Before to run the script review the additional optional parameters that are avaialbale. You might want to provide your **OPENAI_API_KEY** to enable the AISDK. The script will run for about 30 minutes depending on your hardware and internet speed. 
 
 ```zsh
 curl -fsSL https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.sh | bash  -s -- \
