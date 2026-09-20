@@ -119,8 +119,7 @@ Defaults come from `denodo_config.env`; pass any of these to override them:
   - `--reset` - Remove any existing container and its volumes first, so the install starts truly from scratch instead of resuming. 
   - `--upgrade` - If you have already build an image, check whether DENODO_UPDATE changed and, if so, pull the Denodo platform update installer to apply it and always re-fetches the AI SDK and MCP server.
   - `--refresh` - Pull a fresh copy of this repository (nginxvconfig, service unit files without touching the installed Denodo software: **just reapply config and restart services.**
-  - `--services-only` On install already completed, just (re)start everything. Set automatically by entrypoint.sh on every later container start.
-
+ 
 Use `--refresh` /`--upgrade`  when you need to change a value like `--DENODO_UPDATE`, `--CLOUDFLARE_TUNNEL_KEY`, or `--OPENAI_API_KEY`, since these are baked into the container when it's first created and aren't picked up again by a plain restart — only `--reset` (or `--upgrade`, for `--DENODO_UPDATE`/`--CLOUDFLARE_TUNNEL_KEY`/`--OPENAI_API_KEY`) applies a new value.
 
 ## Retrying a failed or interrupted install
