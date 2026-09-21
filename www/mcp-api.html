@@ -1,80 +1,327 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="css/button.css">
-    <link rel="stylesheet" href="css/fonts.css">
-    <link rel="stylesheet" href="css/input.css">
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/Common.css">
-    <link rel="stylesheet" href="css/Login.css">
-    <link rel="stylesheet" href="css/express.css">
-    <link rel="shortcut icon" href="images/favicon.ico">
-    <title>Denodo Express V8 Documentation</title>
-    <style>
-     
-      .icon-laptop2:before {
-    		content: "\e7a9";
-			}
-    </style>
-  </head>
-  <body>
-    <div class="section  nomargin ">
-      <div class="heading-block center">
-        <h2>Denodo MCP Services</h2>
-        <span>Interested in learning more about Denodo Developer? There is a
-          wealth of information on Denodo Community site for you to get started:</span></div>
-      <div class="container clearfix">
-        <div class="col_half center topmargin"><img class="img-responsive lazyloaded"
-            src="images/community.png"></div>
-        <div class="col_half col_last">
-          <ul class="iconlist uppercase" style="line-height: 40px;">
-            <li><i class="icon-laptop2 red"></i> 
-              <a href="https://community.denodo.com/denodo-platform-developer-tier/"
-              target="_blank"
-              rel="noopener noreferrer">
-              Getting started with Denodo Developer</a>
-            </li>
-            
-            <li><i class="icon-laptop2 red"></i> 
-              <a href="https://community.denodo.com/tutorials/browse/basics/index"
-                target="_blank"
-                rel="noopener noreferrer">
-                Basics Tutorials</a>
-            </li>
-            <li><i class="icon-laptop2 red"></i>
-              <a href="https://community.denodo.com/tutorials/browse/datadiscovery/index"
-                target="_blank"
-                rel="noopener noreferrer">
-                Using the Data Marketplace</a>
-            </li>
-            <li><i class="icon-laptop2 red"></i>
-              <a href="https://community.denodo.com/tutorials/browse/chatbot/index"
-                target="_blank"
-                rel="noopener noreferrer">
-                Building an AI Chatbot with Denodo in Minutes</a>
-              </li>
-            <li><i class="icon-laptop2 red"></i><a href="/aisdk/docs"
-                target="_blank"
-                rel="noopener noreferrer">
-                Denodo AI SDK Swagger Documentation</a></li>
-            <li><i class="icon-laptop2 red"></i><a href="https://community.denodo.com/kb/view/document/Getting%20the%20SQL%20query%20delegated%20by%20a%20derived%20view?category=Combining+Data"
-                target="_blank"
-                rel="noopener noreferrer">Getting
-                the SQL query delegated by a derived view </a></li>
-            <li><i class="icon-laptop2 red"></i><a href="https://community.denodo.com/videos/details/Data%20Combination/Denodo%205.5/Denodo%20VDP:%20Joining%20Views%20from%20Disparate%20Sources"
-                target="_blank"
-                rel="noopener noreferrer">Joining
-                views from disparate data sources</a></li>
-            <li><i class="icon-laptop2 red"></i><a href="https://community.denodo.com/kb/view/document/Getting%20the%20SQL%20query%20delegated%20by%20a%20derived%20view?category=Combining+Data"
-                target="_blank"
-                rel="noopener noreferrer">Replace
-                a data source without affecting the views</a></li>
-          </ul>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="css/button.css">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/input.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/Common.css">
+  <link rel="stylesheet" href="css/Login.css">
+  <link rel="shortcut icon" href="images/favicon.ico">
+  <title>Denodo Developer Tier V9 - MCP &amp; API Services</title>
+  <style>
+    /* Option 3: same dark background + centered form-signin container as
+       index.html (closest visual match to the landing page), with the
+       three top-level sections from mcp-api.md as switchable tabs instead
+       of a long scroll or a grid of cards. */
+    body {
+      overflow-y: auto;
+    }
+
+    .full-page-container {
+      position: relative;
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+    }
+
+    .api-shell {
+      max-width: 760px;
+      margin: 0 auto;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 30px 36px;
+    }
+
+    .api-shell h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .api-shell > p {
+      color: var(--light-blue);
+      font-size: 14px;
+      margin-top: 0;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: var(--white);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--light-blue);
+      border-radius: var(--border-radius);
+      padding: 6px 14px;
+    }
+
+    .back-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin: 24px 0 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .tab-button {
+      background: none;
+      border: none;
+      color: var(--light-blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab-button.active {
+      color: var(--white);
+      border-bottom-color: var(--peacock-blue);
+    }
+
+    .tab-button:hover {
+      color: var(--white);
+    }
+
+    .tab-panel {
+      display: none;
+      padding-top: 22px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .tab-panel h2 {
+      font-size: 16px;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-top: 26px;
+      margin-bottom: 8px;
+    }
+
+    .tab-panel h2:first-child {
+      margin-top: 0;
+    }
+
+    .tab-panel h3 {
+      font-size: 13px;
+      color: var(--light-blue);
+      text-transform: uppercase;
+      margin: 16px 0 6px;
+    }
+
+    .tab-panel p,
+    .tab-panel li {
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .tab-panel ul {
+      padding-left: 18px;
+      margin: 0 0 6px;
+    }
+
+    a.endpoint-pill,
+    span.endpoint-pill {
+      display: inline-block;
+      background-color: rgba(0, 0, 0, 0.35);
+      color: #9fe3c7;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 20px;
+      margin: 4px 0 10px;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    a.endpoint-pill:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .tab-panel pre {
+      background-color: rgba(0, 0, 0, 0.35);
+      color: #dbe9f0;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      overflow-x: auto;
+      margin: 6px 0 12px;
+    }
+
+    .example-item {
+      border-left: 3px solid var(--peacock-blue);
+      padding-left: 12px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    footer {
+      position: static;
+      margin-top: 30px;
+      padding-bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="full-page-container">
+    <div class="api-shell">
+      <a class="back-link" href="index.html">&larr; Back to home</a>
+      <h1><img src="images/denodo_logo.svg" alt="Denodo logo" class="denodo-logo" style="height: 28px; bottom: 6px;">
+        MCP &amp; API Services</h1>
+      <p>Denodo Platform also provides a large number of additional data access services.</p>
+
+      <div class="tabs">
+        <button class="tab-button active" data-tab="mcp" onclick="showTab('mcp')">MCP Services</button>
+        <button class="tab-button" data-tab="rest" onclick="showTab('rest')">REST-APIs</button>
+        <button class="tab-button" data-tab="sql" onclick="showTab('sql')">SQL Query</button>
+      </div>
+
+      <div id="tab-mcp" class="tab-panel active">
+        <h2>VDP MCP</h2>
+        <p><strong>The Denodo MCP Server provides:</strong></p>
+        <ul>
+          <li>Read-only access to Denodo databases</li>
+          <li>MCP resources: a resource describing the complete metadata of the database, and individual resources
+            for each view</li>
+          <li>MCP tools: semantic search for metadata retrieval, listing available views, retrieving view schemas,
+            executing/validating VQL queries, dedicated query tools for tagged views (deprecated), and tag-based
+            metadata visibility across databases</li>
+        </ul>
+        <h3>MCP Endpoint</h3>
+        <a class="endpoint-pill" href="/mcp/admin/mcp" target="_blank" rel="noopener noreferrer">/mcp/admin/mcp</a>
+
+        <h2>AI-SDK MCP</h2>
+        <p>Connect the AI-SDK as an MCP server (i.e. as tools) with your MCP-compatible client (Visual Studio Code,
+          Claude Desktop, Cursor&hellip;) via remote MCP (HTTP).</p>
+        <h3>AI-SDK MCP Endpoint</h3>
+        <a class="endpoint-pill" href="/aisdk/mcp" target="_blank" rel="noopener noreferrer">/aisdk/mcp</a>
+
+        <h3>Sample Dynamic Client Registration (DCR)</h3>
+        <pre>{
+  "servers": {
+    "Denodo_AI_SDK_Remote": {
+      "url": "&lt;mcp_endpoint&gt;",
+      "headers": {
+        "Authorization": "Basic YWRtaW46YWRtaW4="
+      }
+    }
+  }
+}</pre>
+        <h3>VS Code configuration with DCR enabled</h3>
+        <pre>{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "denodo_oauth_token",
+      "description": "Denodo OAuth 2.0 Token",
+      "password": true
+    }
+  ],
+  "servers": {
+    "Denodo_AI_SDK_Remote": {
+      "url": "&lt;mcp_endpoint&gt;",
+      "type": "http",
+      "headers": {
+        "Authorization": "Bearer ${input:denodo_oauth_token}"
+      }
+    }
+  }
+}</pre>
+      </div>
+
+      <div id="tab-rest" class="tab-panel">
+        <h2>AI-SDK REST-API</h2>
+        <h3>Key features</h3>
+        <ul>
+          <li><strong>Text-to-VQL:</strong> translates natural language questions into VQL, so AI agents can query
+            Denodo directly without manual SQL/VQL coding.</li>
+          <li><strong>Metadata Search (RAG):</strong> vectorizes and searches your technical/business metadata for
+            instant semantic discovery of data assets.</li>
+          <li><strong>DeepQuery Agent:</strong> a research agent that plans and executes multi-step tasks combining
+            metadata discovery with live VQL data extraction.</li>
+          <li><strong>Model &amp; Vector Store Agnostic:</strong> configure and switch between LLMs and Vector
+            Databases depending on performance/privacy needs.</li>
+        </ul>
+        <h3>Swagger documentation</h3>
+        <a class="endpoint-pill" href="/aisdk/docs" target="_blank" rel="noopener noreferrer">/aisdk/docs</a>
+
+        <h2>Data Marketplace</h2>
+        <p>The Data Marketplace provides a REST API to perform programmatically all the tasks available in the GUI.
+        </p>
+        <h3>Swagger documentation</h3>
+        <a class="endpoint-pill" href="/denodo-data-catalog/swagger-ui/index.html" target="_blank"
+          rel="noopener noreferrer">/denodo-data-catalog/swagger-ui/index.html</a>
+
+        <h2>GraphQL</h2>
+        <p>Enables the execution of GraphQL queries against the Denodo virtual data model, allowing GraphQL-like
+          queries on top of any data source.</p>
+        <h3>Endpoint</h3>
+        <span class="endpoint-pill">/denodo-graphql-service/graphql/&lt;database&gt;/schema.json</span>
+
+        <h2>VDP RESTful</h2>
+        <p>An HTTP service that publishes the contents of the entire Virtual DataPort server.</p>
+        <h3>Endpoint</h3>
+        <span class="endpoint-pill">/denodo-restfulws/&lt;database&gt;/schema.json</span>
+        <h3>Examples</h3>
+        <div class="example-item"><code>/denodo-restfulws/admin</code> &mdash; list of views of database admin.</div>
+        <div class="example-item"><code>/denodo-restfulws/admin/views/customer</code> &mdash; content of view
+          customer of database admin.</div>
+        <div class="example-item"><code>/denodo-restfulws/admin/views/customer/1/orders</code> &mdash; browses the
+          mapping orders of the customer row whose primary key is 1.</div>
+        <div class="example-item"><code>/denodo-restfulws/OpenAPIv3/openapi.json</code> &mdash; OpenAPI 3 document
+          in JSON format.</div>
+        <div class="example-item">
+          <code>/denodo-restfulws/OpenAPIv3/openapi.yaml?database=db1&amp;database=db2&amp;tag=tag1&amp;tag=tag2</code>
+          &mdash; OpenAPI 3 document in YAML for views in db1/db2 tagged tag1/tag2.
         </div>
       </div>
+
+      <div id="tab-sql" class="tab-panel">
+        <h2>Access Through JDBC</h2>
+        <p>Denodo provides a JDBC Type 4 driver implementing the main characteristics of the JDBC 4.1 API - platform
+          independent.</p>
+        <p>Get the driver from <a href="https://community.denodo.com/drivers/jdbc/" target="_blank"
+            rel="noopener noreferrer" style="color:#9fe3c7;">The Denodo Community</a> (free registration required),
+          or from the Denodo Platform installation
+          (<code>&lt;DENODO_HOME&gt;/tools/client-drivers/jdbc/vdp-jdbcdriver-core/denodo-vdp-jdbcdriver.jar</code>).
+        </p>
+        <h3>Driver Class Name</h3>
+        <span class="endpoint-pill">com.denodo.vdp.jdbc.Driver</span>
+        <h3>Connection URL</h3>
+        <span class="endpoint-pill">jdbc:denodo://&lt;hostname&gt;[:&lt;port&gt;]/[&lt;database&gt;][?&lt;paramName&gt;=&lt;paramValue&gt;[&amp;&lt;paramName&gt;=&lt;paramValue&gt;]*]</span>
+
+        <h2>Access Through ODBC</h2>
+        <p>Denodo provides an ODBC driver for Windows and Linux (source code available for other platforms), based
+          on the ODBC PostgreSQL driver version 16.00.</p>
+        <p>Refer to the Denodo documentation for more information.</p>
+      </div>
+
+      <footer>Property of Denodo. &copy; Copyright Denodo <span>2026</span></footer>
     </div>
-  </body>
+  </div>
+
+  <script>
+    function showTab(name) {
+      document.querySelectorAll('.tab-panel').forEach(function (panel) {
+        panel.classList.toggle('active', panel.id === 'tab-' + name);
+      });
+      document.querySelectorAll('.tab-button').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === name);
+      });
+    }
+  </script>
+</body>
+
 </html>

@@ -3,3 +3,6 @@
 *.md
 !README.md
 .DS_Store
+www/mcp-api-v2-docs.html
+www/mcp-api-v1-dashboard.html
+www/mcp-api-v3-tabs.html

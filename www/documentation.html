@@ -1,80 +1,226 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="css/button.css">
-    <link rel="stylesheet" href="css/fonts.css">
-    <link rel="stylesheet" href="css/input.css">
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/Common.css">
-    <link rel="stylesheet" href="css/Login.css">
-    <link rel="stylesheet" href="css/express.css">
-    <link rel="shortcut icon" href="images/favicon.ico">
-    <title>Denodo Express V8 Documentation</title>
-    <style>
-     
-      .icon-laptop2:before {
-    		content: "\e7a9";
-			}
-    </style>
-  </head>
-  <body>
-    <div class="section  nomargin ">
-      <div class="heading-block center">
-        <h2>Learn About Denodo 9 Developer Tier </h2>
-        <span>Interested in learning more about Denodo Developer? There is a
-          wealth of information on Denodo Community site for you to get started:</span></div>
-      <div class="container clearfix">
-        <div class="col_half center topmargin"><img class="img-responsive lazyloaded"
-            src="images/community.png"></div>
-        <div class="col_half col_last">
-          <ul class="iconlist uppercase" style="line-height: 40px;">
-            <li><i class="icon-laptop2 red"></i> 
-              <a href="https://community.denodo.com/denodo-platform-developer-tier/"
-              target="_blank"
-              rel="noopener noreferrer">
-              Getting started with Denodo Developer</a>
-            </li>
-            
-            <li><i class="icon-laptop2 red"></i> 
-              <a href="https://community.denodo.com/tutorials/browse/basics/index"
-                target="_blank"
-                rel="noopener noreferrer">
-                Basics Tutorials</a>
-            </li>
-            <li><i class="icon-laptop2 red"></i>
-              <a href="https://community.denodo.com/tutorials/browse/datadiscovery/index"
-                target="_blank"
-                rel="noopener noreferrer">
-                Using the Data Marketplace</a>
-            </li>
-            <li><i class="icon-laptop2 red"></i>
-              <a href="https://community.denodo.com/tutorials/browse/chatbot/index"
-                target="_blank"
-                rel="noopener noreferrer">
-                Building an AI Chatbot with Denodo in Minutes</a>
-              </li>
-            <li><i class="icon-laptop2 red"></i><a href="/aisdk/docs"
-                target="_blank"
-                rel="noopener noreferrer">
-                Denodo AI SDK Swagger Documentation</a></li>
-            <li><i class="icon-laptop2 red"></i><a href="https://community.denodo.com/kb/view/document/Getting%20the%20SQL%20query%20delegated%20by%20a%20derived%20view?category=Combining+Data"
-                target="_blank"
-                rel="noopener noreferrer">Getting
-                the SQL query delegated by a derived view </a></li>
-            <li><i class="icon-laptop2 red"></i><a href="https://community.denodo.com/videos/details/Data%20Combination/Denodo%205.5/Denodo%20VDP:%20Joining%20Views%20from%20Disparate%20Sources"
-                target="_blank"
-                rel="noopener noreferrer">Joining
-                views from disparate data sources</a></li>
-            <li><i class="icon-laptop2 red"></i><a href="https://community.denodo.com/kb/view/document/Getting%20the%20SQL%20query%20delegated%20by%20a%20derived%20view?category=Combining+Data"
-                target="_blank"
-                rel="noopener noreferrer">Replace
-                a data source without affecting the views</a></li>
-          </ul>
-        </div>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="css/button.css">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/input.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/Common.css">
+  <link rel="stylesheet" href="css/Login.css">
+  <link rel="shortcut icon" href="images/favicon.ico">
+  <title>Denodo Developer Tier V9 - Documentation</title>
+  <style>
+    /* Same dark background + centered "shell" container as index.html and
+       mcp-api.html, with the resource links grouped into the same
+       switchable-tabs pattern used on mcp-api.html, for a consistent look
+       and feel across all three pages. */
+    body {
+      overflow-y: auto;
+    }
+
+    .full-page-container {
+      position: relative;
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+    }
+
+    .api-shell {
+      max-width: 760px;
+      margin: 0 auto;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 30px 36px;
+    }
+
+    .api-shell h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .api-shell > p {
+      color: var(--light-blue);
+      font-size: 14px;
+      margin-top: 0;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: var(--white);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--light-blue);
+      border-radius: var(--border-radius);
+      padding: 6px 14px;
+    }
+
+    .back-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin: 24px 0 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .tab-button {
+      background: none;
+      border: none;
+      color: var(--light-blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab-button.active {
+      color: var(--white);
+      border-bottom-color: var(--peacock-blue);
+    }
+
+    .tab-button:hover {
+      color: var(--white);
+    }
+
+    .tab-panel {
+      display: none;
+      padding-top: 22px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .tab-panel h2 {
+      font-size: 16px;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-top: 26px;
+      margin-bottom: 8px;
+    }
+
+    .tab-panel h2:first-child {
+      margin-top: 0;
+    }
+
+    .tab-panel p {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--light-blue);
+    }
+
+    /* Resource links - same left-accent-border language as the example
+       items on mcp-api.html, but as clickable rows instead of static text. */
+    a.resource-link {
+      display: block;
+      border-left: 3px solid var(--peacock-blue);
+      background-color: rgba(255, 255, 255, 0.04);
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      border-radius: 0 6px 6px 0;
+      color: var(--white);
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    a.resource-link:hover {
+      background-color: rgba(255, 255, 255, 0.09);
+    }
+
+    a.resource-link .resource-arrow {
+      color: #9fe3c7;
+      margin-right: 8px;
+    }
+
+    footer {
+      position: static;
+      margin-top: 30px;
+      padding-bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="full-page-container">
+    <div class="api-shell">
+      <a class="back-link" href="index.html">&larr; Back to home</a>
+      <h1><img src="images/denodo_logo.svg" alt="Denodo logo" class="denodo-logo" style="height: 28px; bottom: 6px;">
+        Documentation</h1>
+      <p>Interested in learning more about Denodo Developer? There is a wealth of information on the Denodo
+        Community site for you to get started.</p>
+
+      <div class="tabs">
+        <button class="tab-button active" data-tab="start" onclick="showTab('start')">Getting Started</button>
+        <button class="tab-button" data-tab="tutorials" onclick="showTab('tutorials')">Tutorials</button>
+        <button class="tab-button" data-tab="advanced" onclick="showTab('advanced')">Advanced Topics</button>
       </div>
+
+      <div id="tab-start" class="tab-panel active">
+        <h2>Getting Started</h2>
+        <p>The essentials for getting up and running with Denodo Developer.</p>
+        <a class="resource-link" href="https://community.denodo.com/denodo-platform-developer-tier/" target="_blank"
+          rel="noopener noreferrer"><span class="resource-arrow">&rarr;</span>Getting started with Denodo
+          Developer</a>
+        <a class="resource-link" href="https://community.denodo.com/tutorials/browse/basics/index" target="_blank"
+          rel="noopener noreferrer"><span class="resource-arrow">&rarr;</span>Basics Tutorials</a>
+        <a class="resource-link" href="/aisdk/docs" target="_blank" rel="noopener noreferrer"><span
+            class="resource-arrow">&rarr;</span>Denodo AI SDK Swagger Documentation</a>
+      </div>
+
+      <div id="tab-tutorials" class="tab-panel">
+        <h2>Tutorials</h2>
+        <p>Hands-on guides covering the Data Marketplace, the AI Chatbot, and combining data from multiple sources.
+        </p>
+        <a class="resource-link" href="https://community.denodo.com/tutorials/browse/datadiscovery/index"
+          target="_blank" rel="noopener noreferrer"><span class="resource-arrow">&rarr;</span>Using the Data
+          Marketplace</a>
+        <a class="resource-link" href="https://community.denodo.com/tutorials/browse/chatbot/index" target="_blank"
+          rel="noopener noreferrer"><span class="resource-arrow">&rarr;</span>Building an AI Chatbot with Denodo in
+          Minutes</a>
+        <a class="resource-link"
+          href="https://community.denodo.com/videos/details/Data%20Combination/Denodo%205.5/Denodo%20VDP:%20Joining%20Views%20from%20Disparate%20Sources"
+          target="_blank" rel="noopener noreferrer"><span class="resource-arrow">&rarr;</span>Joining views from
+          disparate data sources</a>
+      </div>
+
+      <div id="tab-advanced" class="tab-panel">
+        <h2>Advanced Topics</h2>
+        <p>Deeper dives into query delegation and swapping out data sources without breaking your views.</p>
+        <a class="resource-link"
+          href="https://community.denodo.com/kb/view/document/Getting%20the%20SQL%20query%20delegated%20by%20a%20derived%20view?category=Combining+Data"
+          target="_blank" rel="noopener noreferrer"><span class="resource-arrow">&rarr;</span>Getting the SQL query
+          delegated by a derived view</a>
+        <a class="resource-link"
+          href="https://community.denodo.com/kb/view/document/Getting%20the%20SQL%20query%20delegated%20by%20a%20derived%20view?category=Combining+Data"
+          target="_blank" rel="noopener noreferrer"><span class="resource-arrow">&rarr;</span>Replace a data source
+          without affecting the views</a>
+      </div>
+
+      <footer>Property of Denodo. &copy; Copyright Denodo <span>2026</span></footer>
     </div>
-  </body>
+  </div>
+
+  <script>
+    function showTab(name) {
+      document.querySelectorAll('.tab-panel').forEach(function (panel) {
+        panel.classList.toggle('active', panel.id === 'tab-' + name);
+      });
+      document.querySelectorAll('.tab-button').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === name);
+      });
+    }
+  </script>
+</body>
+
 </html>

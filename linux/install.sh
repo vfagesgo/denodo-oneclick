@@ -670,9 +670,11 @@ sudo -u postgres psql -d denodo -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Restore the sample DBs
 sudo -u postgres psql -d denodo -c "DROP SCHEMA IF EXISTS pharma CASCADE;"
-sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-pharma
+sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-pharma.dump
 sudo -u postgres psql -d denodo -c "DROP SCHEMA IF EXISTS bank CASCADE;"
-sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-bank
+sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-bank.dump
+
+sudo -u postgres pg_restore --no-owner --clean --if-exists -d denodo /opt/denodo-oneclick/samples/c_api_gp_details_service.dump
 
 
 sudo -u postgres psql -d denodo <<'SQL'
@@ -1298,7 +1300,7 @@ log_step "Denodo VDP is listening on TCP port 9999"
 
 log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
-/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/samples.zip --server localhost:9999/admin?$DENODO_VDP_PWD@admin --metadata-password=password
+/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/sample_model.zip --server localhost:9999/admin?$DENODO_VDP_PWD@admin --metadata-password=password
 
 
 log_step "Waiting for Denodo DM to start"
