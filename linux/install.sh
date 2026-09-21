@@ -1382,12 +1382,12 @@ if aisdk_has_openai_key; then
   done
   log_step "Denodo AISDK is running"
   log_section "17.6" "Synchronizing AISDK Metadata"
-  response=$(curl --silent --show-error --fail \
-    --request GET \
-    --header 'accept: */*' \
-    --user "admin:$DENODO_VDP_PWD" \
-    --header 'Content-Type: application/json' \
-    "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready")
+  # response=$(curl --silent --show-error --fail \
+  #   --request GET \
+  #   --header 'accept: */*' \
+  #   --user "admin:$DENODO_VDP_PWD" \
+  #   --header 'Content-Type: application/json' \
+  #   "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready")
 
   if [ $? -eq 0 ]; then
       echo "getMetadata: SUCCESS"
