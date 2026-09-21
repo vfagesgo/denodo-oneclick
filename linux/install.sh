@@ -1301,7 +1301,7 @@ log_step "Denodo VDP is listening on TCP port 9999"
 log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
 
-exit 1
+exit 0
 /opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/sample_model.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
 
 
