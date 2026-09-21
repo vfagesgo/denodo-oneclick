@@ -31,13 +31,13 @@ log_step() {
 RUN_DIR="/var/run/denodo-oneclick"
 
 # Optional - only used directly (as an env var) by Section 13, to write a
-# freshly-passed value into AISDK's config files during install/upgrade.
+# freshly-passed value into the AI SDK's config files during install/upgrade.
 # Default it here so `set -u` doesn't crash on it in the gates below, which
 # run before Section 13 and don't need the raw value at all - see
 # aisdk_has_openai_key() just below for why.
 OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 
-# Whether AISDK should be (re)started is decided by looking at whether it
+# Whether the AI SDK should be (re)started is decided by looking at whether it
 # actually has a real key configured on disk - not by whether OPENAI_API_KEY
 # happens to be set on this particular invocation. Docker has no way to
 # persist an updated env var into an already-created container, so a plain
@@ -62,7 +62,7 @@ nginx_restart() {
   log_step "Checking nginx configuration"
   sudo nginx -t
 
-  log_step "Restarting Nginx"
+  log_step "Restarting nginx"
   if sudo service nginx restart; then
     return 0
   fi
@@ -432,7 +432,7 @@ if [ "$DENODO_ACTION" = "services-only" ]; then
   if aisdk_has_openai_key; then
     start_denodo_ai_services
   else
-    log_step "No OPENAI_API_KEY configured for AISDK - skipping its start"
+    log_step "No OPENAI_API_KEY configured for the AI SDK - skipping its start"
   fi
   start_cloudflare_tunnel
   print_welcome_banner
@@ -442,7 +442,7 @@ fi
 if [ "$DENODO_ACTION" = "refresh" ]; then
   log_section "00" "Refresh (reapply config from the latest repo checkout, restart services)"
   restart_postgresql
-  log_step "Reinstalling Nginx configuration file"
+  log_step "Reinstalling nginx configuration file"
   sudo cp -f "$SCRIPT_DIR/nginx-site.conf" /etc/nginx/sites-enabled/default
   nginx_restart
   stop_denodo_services
@@ -451,7 +451,7 @@ if [ "$DENODO_ACTION" = "refresh" ]; then
   if aisdk_has_openai_key; then
     start_denodo_ai_services
   else
-    log_step "No OPENAI_API_KEY configured for AISDK - skipping its start"
+    log_step "No OPENAI_API_KEY configured for the AI SDK - skipping its start"
   fi
   start_cloudflare_tunnel
   print_welcome_banner
@@ -723,9 +723,9 @@ sudo apt update -y
 sudo apt install -y zulu17-jdk
 
 # Section 11.5:
-# Get Denodo support CLI tool and pull Denodo binaries. On first install it is cloned;
-# on later runs it is refreshed so the workspace matches the remote branch.
-
+# Fetch the Denodo Support CLI tool, then use it to download the Denodo
+# platform installer and update archives needed by Section 12.
+#
 # On "upgrade", only touch the platform install if DENODO_UPDATE actually
 # changed since the last successful install - otherwise there is nothing to
 # apply and installer_cli.sh must not be re-run against an already-installed
@@ -784,18 +784,18 @@ if [ "$DENODO_ACTION" = "upgrade" ]; then
 elif [ -f "/home/denodo/denodo-install-9-ga.zip" ]; then
   log_step "Installer archive already downloaded, skipping (remove /home/denodo/denodo-install-9-ga.zip to force a re-download)"
 else
-  log_step "Download Installer"
+  log_step "Downloading the Denodo installer archive"
   ./denodo-support -t installer -n denodo-install-9-ga -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
 fi
 
 if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
   log_step "Update archive already downloaded, skipping (remove /home/denodo/$DENODO_UPDATE.zip to force a re-download)"
 else
-  log_step "Download Update$DENODO_UPDATE"
+  log_step "Downloading update archive $DENODO_UPDATE"
   ./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
 fi
 
-log_step "Prepare install folder"
+log_step "Preparing the install folder"
 cd /home/denodo
 
 if [ -d "$DENODO_INSTALL" ]; then
@@ -834,7 +834,7 @@ log_section "12" "Install Denodo 9"
 unset DISPLAY
 cd "$DENODO_INSTALL"
 
-log_step "Get JAVA_HOME"
+log_step "Resolving JAVA_HOME"
 JAVA_BIN=$(readlink -f $(which java) || true)
 JAVA_HOME=$(dirname $(dirname "$JAVA_BIN"))
 
@@ -849,7 +849,7 @@ chmod +x installer_cli.sh
 # the caller didn't set it (e.g. the Docker flow, which only mounts the
 # license file and never sets this env var).
 DENODO_LIC=${DENODO_LIC:-"denodo-developer-lic-9.lic"}
-log_step "Copy Denodo License: $DENODO_LIC"
+log_step "Copying Denodo license: $DENODO_LIC"
 
 # Check the unambiguous absolute-path locations (Docker mount, Pi boot
 # partition) before the bare $DENODO_LIC filename: cwd is $DENODO_INSTALL
@@ -884,7 +884,7 @@ sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 sudo mkdir -p /opt/denodo
 sudo chown -R denodo:denodo /opt/denodo
 
-log_step "Faking JAVA JRE in Denodo Home"
+log_step "Faking the Java JRE in Denodo Home"
 # -f/-n so re-running after a failed install doesn't crash on "File exists".
 ln -sfn "$JAVA_HOME" jre
 cd denodo-update
@@ -907,12 +907,12 @@ if [ "$DENODO_ACTION" = "upgrade" ]; then
   log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
   java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
 else
-  log_step "Start Denodo Install"
+  log_step "Starting the Denodo platform installer"
   ./installer_cli.sh install --autoinstaller "$SCRIPT_DIR/response_file_9_0.xml" | tee -a $LOG
 fi
 
-## Change Java memory parameters to be able to run on a Raspeberry PI
-log_step "Change Java Config"
+## Change Java memory parameters to be able to run on a Raspberry Pi
+log_step "Adjusting Java memory configuration"
 change_config() {
   local PARAM="$1"
   local CONF_FILE="$2"
@@ -923,11 +923,11 @@ change_config() {
       '/^java\.env\.DENODO_OPTS_START[[:space:]]*=/ s/-Xmx[0-9]+[mMgG]/-Xmx'"$NEW_XMX"'/g' \
       "$CONF_FILE"
 }
-log_step "JAVA Config: Change -Xmx in VDBConfiguration.properties"
+log_step "Java config: adjusting -Xmx in VDBConfiguration.properties"
 change_config "-Xmx" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "2048m"
-log_step "JAVA Config: Change -XX:ReservedCodeCacheSize= in VDBConfiguration.properties"
+log_step "Java config: adjusting -XX:ReservedCodeCacheSize= in VDBConfiguration.properties"
 change_config "-XX:ReservedCodeCacheSize=" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "256m"
-log_step "JAVA Config: Change -Xmx in resources/apache-tomcat/conf/tomcat.properties"
+log_step "Java config: adjusting -Xmx in resources/apache-tomcat/conf/tomcat.properties"
 change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/tomcat.properties" "1024m"
 
 /opt/denodo/denodo-platform/bin/regenerateFiles.sh
@@ -1216,19 +1216,18 @@ sed -i 's/^pysqlite3-binary==/pysqlite3==/' requirements.txt
 /home/denodo/$VENV_DIR/bin/python -m pip install --no-cache-dir --prefer-binary -r requirements.txt
 
 
-# Configure the AISDK & Chatbot 
+# Configure the AI SDK and the sample chatbot's config files, including
+# writing in OPENAI_API_KEY (if one was passed).
 
-log_step "Copy AISDK config file sdk_config.env "
-  
+log_step "Copying AI SDK config file sdk_config.env"
+
 sudo cp $AISDK_INSTALL_DIR/api/utils/sdk_config.env.example $AISDK_INSTALL_DIR/api/utils/sdk_config.env
 sudo chown denodo:denodo $AISDK_INSTALL_DIR/api/utils/sdk_config.env
 
-
 sed -i "s|^#\?OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
 
+log_step "Copying chatbot config file chatbot_config.env"
 
-log_step "Copy chatbot config file chatbot_config.env "
-  
 sudo cp $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env.example $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
 sudo chown denodo:denodo $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
 
@@ -1238,6 +1237,8 @@ sed -i "s|^#\?OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL
 
 
 # Section 15:
+# Download and install the Denodo VDP MCP server (a separate component from
+# the AI SDK's own MCP endpoint - see www/mcp-api.md for the difference).
 log_section "15" "Configure Denodo MCP Services"
 
 log_step "Installing Denodo MCP Services"
@@ -1254,11 +1255,11 @@ fi
 if [ -f "/home/denodo/Denodo MCP Server.zip" ]; then
   log_step "Installer archive already downloaded, skipping (remove /home/denodo/Denodo MCP Server.zip to force a re-download)"
 else
-  log_step "Download Denodo MCP Installer"
+  log_step "Downloading the Denodo MCP server archive"
   ./denodo-support -t denodoconnect-enterprise -n 'Denodo MCP Server' -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
 fi
 
-log_step "Prepare mcp folder"
+log_step "Preparing the MCP server folder"
 
 if [ -d "/opt/denodo/denodo-mcp-server" ]; then
   log_step "denodo-mcp-server already extracted, skipping unzip"
@@ -1305,7 +1306,7 @@ log_section "17" "Configuring the different services"
 start_denodo_services
 # denodo-mcp (Denodo VDP MCP server) only depends on denodo-vdp-server, not
 # on OPENAI_API_KEY, so it always starts here. denodo-aisdk is started
-# further down, conditionally, in the "Load AISDK Metadata" section.
+# further down, conditionally, in the AI SDK metadata section of Section 17.5.
 start_denodo_mcp_service
 
 log_step "Waiting for Denodo VDP to start"
@@ -1392,19 +1393,20 @@ else
 fi
 
 
-# Load AISDK Metadata in Vector DB
-# AISDK needs a valid OPENAI_API_KEY to start at all (Section 13 just wrote
-# whatever was passed on this run into sdk_config.env/chatbot_config.env) -
-# without one it would just crash on start, and the "Waiting for AISDK to
-# start" loop below would spend the full timeout waiting for something
-# that's never coming up before failing the whole script. Check the config
-# file itself (aisdk_has_openai_key(), defined near the top) rather than the
+# Load the AI SDK's metadata into its vector DB, so it can answer natural-
+# language questions about the sample data. The AI SDK needs a valid
+# OPENAI_API_KEY to start at all (Section 13 just wrote whatever was passed
+# on this run into sdk_config.env/chatbot_config.env) - without one it would
+# just crash on start, and the "Waiting for AI SDK to start" loop below
+# would spend the full timeout waiting for something that's never coming up
+# before failing the whole script. Check the config file itself
+# (aisdk_has_openai_key(), defined near the top) rather than the
 # OPENAI_API_KEY env var directly, so an --upgrade that doesn't repeat
-# --OPENAI_API_KEY still correctly starts AISDK if a key was configured on
-# an earlier run.
+# --OPENAI_API_KEY still correctly starts the AI SDK if a key was configured
+# on an earlier run.
 if aisdk_has_openai_key; then
   start_denodo_ai_services
-  log_step "Waiting for AISDK to start"
+  log_step "Waiting for AI SDK to start"
   until curl -fsS "http://localhost:8008/docs" >/dev/null 2>&1; do
     if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
       log_step "ERROR: Denodo AI SDK did not start within ${VDP_TIMEOUT} seconds"
@@ -1424,13 +1426,13 @@ if aisdk_has_openai_key; then
     "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready")
 
   if [ $? -eq 0 ]; then
-      echo "getMetadata: SUCCESS"
+    log_step "AI SDK metadata sync: SUCCESS"
   else
-      echo "getMetadata: FAILED"
-      echo "$response"
+    log_step "AI SDK metadata sync: FAILED"
+    echo "$response" | tee -a "$LOG"
   fi
 else
-  log_step "No OPENAI_API_KEY configured for AISDK - skipping its start and vector DB metadata sync"
+  log_step "No OPENAI_API_KEY configured for the AI SDK - skipping its start and vector DB metadata sync"
 fi
 
 
