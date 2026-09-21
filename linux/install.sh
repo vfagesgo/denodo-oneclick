@@ -821,6 +821,19 @@ if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ] \
   && [ "$(cat "$DENODO_UPDATE_MARKER" 2>/dev/null)" = "$DENODO_UPDATE" ]; then
   log_step "Update $DENODO_UPDATE already staged, skipping unzip"
 else
+  # A previously staged update (a different $DENODO_UPDATE version, or the
+  # jre/jre-linux symlink tree Section 12 creates inside this same folder)
+  # can leave behind files/dirs that clash with what the new zip wants to
+  # extract - `unzip -o` overwrites individual files but can't reconcile a
+  # symlink or directory sitting where the new archive expects something
+  # else, and fails outright ("cannot create ... File exists"). Wipe the
+  # folder first whenever it already exists, so every extraction starts
+  # from a clean, empty directory.
+  if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ]; then
+    log_step "Clearing previously staged update files before extracting $DENODO_UPDATE"
+    rm -rf "$DENODO_INSTALL/denodo-update"
+    mkdir -p "$DENODO_INSTALL/denodo-update"
+  fi
   unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
   mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
   echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
