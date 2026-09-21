@@ -1345,7 +1345,10 @@ until curl -fsS "http://localhost:9090/denodo-data-catalog/#/" >/dev/null 2>&1; 
   VDP_WAITED=$((VDP_WAITED + 2))
 done
 
-# Synchronize the Data Market Place
+# Section 17.6:
+# Now that Denodo Data Marketplace is confirmed up, tell it to synchronize
+# with VDP - both the full metadata sync and the ai_ready tag sync that the
+# AI SDK relies on later.
 log_step "Denodo Data Marketplace is running"
 log_section "17.6" "Synchronizing Denodo Metadata"
 
