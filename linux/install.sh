@@ -187,7 +187,7 @@ _start_services() {
     for name in "${_order[@]}"; do
       service_file="$SERVICE_DIR/${name}.service"
       [ -f "$service_file" ] || continue
-      echo "Installing service ${name}.service"
+      log_step "Installing service ${name}.service"
       # denodo_house_keeping.service still hardcodes /opt/denodo-pi (stale);
       # normalize it to wherever this script actually lives instead of
       # editing the checked-in unit file.
@@ -471,29 +471,27 @@ if [ "$DENODO_ACTION" = "upgrade" ]; then
 fi
 
 # Section 03:
-# Install Cloudflare tunnel if env variable is set
-# Add cloudflare gpg key
-
+# Install the cloudflared package if it isn't already, so a Cloudflare
+# Tunnel can be started later if CLOUDFLARE_TUNNEL_KEY is set. Only the
+# binary is installed here - the tunnel itself is started at the very end
+# of this script by start_cloudflare_tunnel(), see the comment on that call
+# for why it can't start this early.
 log_section "03" "Install Cloudflare"
-log_step "Add cloudflare gpg key"
+
+log_step "Adding the Cloudflare GPG key"
 sudo mkdir -p --mode=0755 /usr/share/keyrings
 curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
 
-log_step "Add this repo to your apt repositories"
-# Add this repo to your apt repositories
+log_step "Adding the cloudflared apt repository"
 echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
 
-log_step "install cloudflared"
-# install cloudflared
+log_step "Installing cloudflared"
 sudo apt-get update && sudo apt-get install cloudflared
 
-# Only installing the binary here, not starting the tunnel yet - see the
-# start_cloudflare_tunnel call at the very end of this script for why.
-
-# Section 03:
+# Section 03.5:
 # Running directly as root would hide which user should own the installed
 # files. This check enforces the expected pattern: regular user + sudo.
-log_section "03" "Validate the install user"
+log_section "03.5" "Validate the install user"
 user="${USER:-$(id -un 2>/dev/null || echo "#$(id -u)")}"
 if [ "$user" = "root" ] || [ "$user" = "#0" ]; then
   log_step "This script must be run as a regular user with sudo privileges"
@@ -547,6 +545,10 @@ sudo apt install python3-pip -y
 sudo apt install dnsmasq network-manager -y
 
 # Section 09:
+# (Sections 07-08 no longer exist - consolidated into earlier sections over
+# time. Numbering intentionally jumps 06 -> 09 rather than being renumbered,
+# so section numbers already seen in old logs/notes keep meaning the same
+# thing.)
 # PostgreSQL needs two kinds of access for this deployment:
 # 1. Local trusted access for the bootstrap steps.
 # 2. Remote access for the Denodo application user on the project subnet.
@@ -770,7 +772,16 @@ fi
 cd $TARGET_DIR/denodo-support-utils/bin/
 chmod +x denodo-support
 
-if [ -f "/home/denodo/denodo-install-9-ga.zip" ]; then
+# An "upgrade" only ever applies denodo-update.jar (via `java -jar ... -c`,
+# see Section 12 below) against the platform that's already installed - it
+# never re-runs the full installer, so the multi-GB base installer archive
+# isn't needed at all in that case. Skip downloading it outright rather
+# than relying on the "already downloaded" check below, which would still
+# trigger a full download if that archive was ever cleaned up to save disk
+# space after the original install.
+if [ "$DENODO_ACTION" = "upgrade" ]; then
+  log_step "Upgrade: skipping the base installer archive download - only the update package is needed"
+elif [ -f "/home/denodo/denodo-install-9-ga.zip" ]; then
   log_step "Installer archive already downloaded, skipping (remove /home/denodo/denodo-install-9-ga.zip to force a re-download)"
 else
   log_step "Download Installer"
@@ -789,6 +800,12 @@ cd /home/denodo
 
 if [ -d "$DENODO_INSTALL" ]; then
   log_step "$DENODO_INSTALL already extracted, skipping unzip"
+elif [ "$DENODO_ACTION" = "upgrade" ]; then
+  # The base installer archive was intentionally not downloaded above for
+  # an upgrade - so if $DENODO_INSTALL isn't already there either, this
+  # container was never fully installed and an --upgrade can't proceed.
+  log_step "ERROR: $DENODO_INSTALL not found and --upgrade skips downloading the base installer - run a normal install first"
+  exit 1
 else
   unzip -o denodo-install-9-ga.zip
 fi
@@ -864,7 +881,6 @@ else
   sudo cp -f "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
 fi
 sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
-#./installer_cli.sh install
 sudo mkdir -p /opt/denodo
 sudo chown -R denodo:denodo /opt/denodo
 
@@ -878,8 +894,22 @@ cd jre
 ln -sfn "$JAVA_HOME" jre-linux
 cd "$DENODO_INSTALL"
 
-log_step "Start Denodo Install"
-./installer_cli.sh install --autoinstaller "$SCRIPT_DIR/response_file_9_0.xml" | tee -a $LOG
+if [ "$DENODO_ACTION" = "upgrade" ]; then
+  # Applying an update patches the already-installed platform in place - it
+  # must not be run against live services (the updater requires them fully
+  # stopped), and it must not go through installer_cli.sh's full install,
+  # which would instead try to reinstall the base platform from scratch.
+  # Services were already stopped earlier in this script when the upgrade
+  # was requested (see "Upgrade requested - stopping services..." above);
+  # stopping again here is just cheap insurance in case that ever changes.
+  log_step "Upgrade: stopping Denodo services before applying the update"
+  stop_denodo_services
+  log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
+  java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
+else
+  log_step "Start Denodo Install"
+  ./installer_cli.sh install --autoinstaller "$SCRIPT_DIR/response_file_9_0.xml" | tee -a $LOG
+fi
 
 ## Change Java memory parameters to be able to run on a Raspeberry PI
 log_step "Change Java Config"
@@ -1128,7 +1158,7 @@ python --version
 # Try to find any python3 version
 py_cmd=$(command -v python3 || true)
 if [ -z "$py_cmd" ]; then
-    echo "💩 - Python 3 is not installed" | tee -a $LOG
+    log_step "ERROR: Python 3 is not installed"
     exit 1
 fi
 # Get the version number
@@ -1244,11 +1274,11 @@ fi
 
 
 # Section 16:
-# nginx wiring is still commented out, but the placeholder remains so the
-# script structure matches the intended install phases.
+# Install this repo's nginx site config, then make sure nginx (running as
+# www-data) can actually read the files it's proxying/serving.
 log_section "16" "Configure nginx"
 
-log_step "Installing Nginx configuration file"
+log_step "Installing nginx configuration file"
 
 sudo cp -f "$SCRIPT_DIR/nginx-site.conf" /etc/nginx/sites-enabled/default
 
@@ -1278,9 +1308,6 @@ start_denodo_services
 # further down, conditionally, in the "Load AISDK Metadata" section.
 start_denodo_mcp_service
 
-# Section 17.5:
-# Import sample metadata in Denodo
-log_section "17.5" "Import sample metadata in Denodo"
 log_step "Waiting for Denodo VDP to start"
 
 VDP_TIMEOUT=300
@@ -1288,7 +1315,7 @@ VDP_WAITED=0
 
 until (echo > /dev/tcp/localhost/9999) >/dev/null 2>&1; do
   if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
-    echo "ERROR: Denodo VDP did not start within ${VDP_TIMEOUT} seconds"
+    log_step "ERROR: Denodo VDP did not start within ${VDP_TIMEOUT} seconds"
     exit 1
   fi
 
@@ -1298,6 +1325,9 @@ done
 
 log_step "Denodo VDP is listening on TCP port 9999"
 
+# Section 17.5:
+# Import the sample metadata (the pharma/bank/etc. demo databases) into
+# Denodo VDP now that it's confirmed up.
 log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
 
@@ -1307,7 +1337,7 @@ log_section "17.5" "Import Denodo Metadata"
 log_step "Waiting for Denodo DM to start"
 until curl -fsS "http://localhost:9090/denodo-data-catalog/#/" >/dev/null 2>&1; do
   if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
-    echo "ERROR: Denodo Data Marketplace did not start within ${VDP_TIMEOUT} seconds"
+    log_step "ERROR: Denodo Data Marketplace did not start within ${VDP_TIMEOUT} seconds"
     exit 1
   fi
 
@@ -1332,11 +1362,11 @@ response=$(curl --silent --show-error --fail  \
   }' \
 "http://localhost:9090/denodo-data-catalog/public/api/element-management/all/synchronize/all-servers")
 if [ $? -eq 0 ]; then
-      echo "synchronize/all-servers: SUCCESS"
-  else
-      echo "synchronize/all-servers: FAILED"
-      echo "$response"
-  fi
+  log_step "Data Marketplace sync (all-servers): SUCCESS"
+else
+  log_step "Data Marketplace sync (all-servers): FAILED"
+  echo "$response" | tee -a "$LOG"
+fi
 
 response=$(curl --silent --show-error --fail  \
   --request 'POST' \
@@ -1352,11 +1382,11 @@ response=$(curl --silent --show-error --fail  \
 }' \
 "http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize")
 if [ $? -eq 0 ]; then
-      echo "synchronize/tags: SUCCESS"
-  else
-      echo "synchronize/tags: FAILED"
-      echo "$response"
-  fi
+  log_step "Data Marketplace sync (tags): SUCCESS"
+else
+  log_step "Data Marketplace sync (tags): FAILED"
+  echo "$response" | tee -a "$LOG"
+fi
 
 
 # Load AISDK Metadata in Vector DB
@@ -1374,15 +1404,15 @@ if aisdk_has_openai_key; then
   log_step "Waiting for AISDK to start"
   until curl -fsS "http://localhost:8008/docs" >/dev/null 2>&1; do
     if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
-      echo "ERROR: Denodo AISDK did not start within ${VDP_TIMEOUT} seconds"
+      log_step "ERROR: Denodo AI SDK did not start within ${VDP_TIMEOUT} seconds"
       exit 1
     fi
 
     sleep 2
     VDP_WAITED=$((VDP_WAITED + 2))
   done
-  log_step "Denodo AISDK is running"
-  log_section "17.6" "Synchronizing AISDK Metadata"
+  log_step "Denodo AI SDK is running"
+  log_section "17.7" "Synchronizing AI SDK Metadata"
   response=$(curl --silent --show-error --fail \
     --request GET \
     --header 'accept: */*' \
