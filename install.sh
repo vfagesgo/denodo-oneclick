@@ -110,6 +110,7 @@ Optional (CLI only):
                                   so the install starts truly from scratch
 
 Actions on an existing container (instead of building/running one):
+  --services-only - install already completed; just (re)start everything.
   --refresh                      Pull the latest denodo-oneclick repo into the
                                   running container and reapply its nginx/
                                   service config, then restart services. Does
@@ -147,6 +148,7 @@ while [[ $# -gt 0 ]]; do
     --reset) RESET=1; shift ;;
     --refresh) ACTION="refresh"; shift ;;
     --upgrade) ACTION="upgrade"; shift ;;
+    --services-only) ACTION="services-only"; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage; exit 1 ;;
   esac

@@ -980,7 +980,7 @@ fi # NEED_PLATFORM_INSTALL
 # upgrade was requested (see "Upgrade requested - stopping services..."
 # above); stop_denodo_services is called again right before applying the
 # update below as cheap insurance in case that ever changes.
-if [ "$NEED_PLATFORM_UPGRADE" = "1" ]; then
+if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; then
   log_section "12.5" "Apply Denodo update"
 
   # Downloaded while cwd is still $TARGET_DIR/denodo-support-utils/bin (set
