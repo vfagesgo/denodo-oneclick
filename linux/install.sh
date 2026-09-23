@@ -55,6 +55,18 @@ aisdk_has_openai_key() {
   [ -n "$value" ]
 }
 
+# Used to compare $DENODO_UPDATE against the applied/staged version markers
+# below. DENODO_UPDATE can be sourced from denodo_config.env, which - if that
+# file was ever saved/edited on Windows (e.g. via install.ps1's workflow) -
+# may be CRLF-terminated, giving it a trailing \r that's invisible when
+# printed/logged but makes a plain `[ "$a" = "$b" ]` comparison fail even
+# though both sides look identical. Strips that plus any surrounding
+# whitespace so the markers (written with a plain `echo` on Linux, so never
+# CRLF) still compare equal to whichever form $DENODO_UPDATE came in as.
+normalize_version() {
+  printf '%s' "$1" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+}
+
 # `service nginx restart` only ever reports a generic "nginx failed!" on
 # error - unhelpful for actually debugging what's wrong. Run `nginx -t`
 # first so the real config/state error lands in the log before that.
@@ -767,7 +779,7 @@ fi
 NEED_PLATFORM_UPGRADE=0
 if [ "$DENODO_ACTION" = "upgrade" ]; then
   EXISTING_APPLIED_VERSION=$(cat "$DENODO_APPLIED_UPDATE_FILE" 2>/dev/null || true)
-  if [ "$EXISTING_APPLIED_VERSION" != "$DENODO_UPDATE" ]; then
+  if [ "$(normalize_version "$EXISTING_APPLIED_VERSION")" != "$(normalize_version "$DENODO_UPDATE")" ]; then
     log_step "DENODO_UPDATE ($DENODO_UPDATE) differs from the applied version (${EXISTING_APPLIED_VERSION:-none}) - upgrade needed"
     NEED_PLATFORM_UPGRADE=1
   else
