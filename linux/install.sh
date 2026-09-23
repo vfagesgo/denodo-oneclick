@@ -738,11 +738,21 @@ sudo apt install -y zulu17-jdk
 TARGET_DIR="/home/denodo/"
 DENODO_INSTALL="/home/denodo/denodo-install-9"
 
+# The install/update archives and the staged denodo-update.jar are deleted
+# once this section finishes (to save disk space - see the cleanup at the
+# end of this block), so this decision can't depend on any of them still
+# being present on disk. Instead it depends on a single small marker file,
+# outside $DENODO_INSTALL/denodo-update (so it survives that directory
+# being wiped/recreated by the staging logic further down), written only
+# once a version has been *fully and successfully applied* - not merely
+# downloaded or staged.
+DENODO_APPLIED_UPDATE_FILE="$DENODO_INSTALL/.applied_update_version"
+
 NEED_PLATFORM_INSTALL=1
 if [ "$DENODO_ACTION" = "upgrade" ]; then
-  EXISTING_STAGED_VERSION=$(cat "$DENODO_INSTALL/denodo-update/.staged_version" 2>/dev/null || true)
-  if [ "$EXISTING_STAGED_VERSION" = "$DENODO_UPDATE" ]; then
-    log_step "DENODO_UPDATE ($DENODO_UPDATE) unchanged since last install - skipping platform reinstall"
+  EXISTING_APPLIED_VERSION=$(cat "$DENODO_APPLIED_UPDATE_FILE" 2>/dev/null || true)
+  if [ "$EXISTING_APPLIED_VERSION" = "$DENODO_UPDATE" ]; then
+    log_step "DENODO_UPDATE ($DENODO_UPDATE) already applied - skipping platform reinstall/re-download"
     NEED_PLATFORM_INSTALL=0
   fi
 fi
@@ -782,7 +792,7 @@ chmod +x denodo-support
 if [ "$DENODO_ACTION" = "upgrade" ]; then
   log_step "Upgrade: skipping the base installer archive download - only the update package is needed"
 elif [ -d "$DENODO_INSTALL" ]; then
-  log_step "Installer archive already downloaded, skipping (remove /home/denodo/denodo-install-9-ga.zip to force a re-download)"
+  log_step "$DENODO_INSTALL already extracted - no need to (re)download the installer archive"
 else
   log_step "Downloading the Denodo installer archive"
   ./denodo-support -t installer -n denodo-install-9-ga -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
@@ -812,11 +822,16 @@ else
 fi
 
 mkdir -p "$DENODO_INSTALL/denodo-update"
-# The jar gets renamed to a fixed "denodo-update.jar" below, so its mere
-# presence can't tell two different $DENODO_UPDATE versions apart - a stale
-# jar from a previous version would wrongly look "already staged" on a
-# rerun with a newer DENODO_UPDATE. Track which version was actually staged
-# alongside it instead.
+# Getting here means DENODO_APPLIED_UPDATE_FILE (checked at the top of this
+# section) did NOT match $DENODO_UPDATE, so this is either a genuinely new
+# version or a previous attempt that crashed before finishing. The check
+# below only guards against the latter - resuming a run that already staged
+# (unzipped) this exact version but didn't reach the "fully applied" marker
+# yet - so re-downloading/re-staging isn't repeated needlessly on retry.
+# The jar gets renamed to a fixed "denodo-update.jar", so its mere presence
+# can't tell two different $DENODO_UPDATE versions apart - a stale jar left
+# over from a previous, different version would otherwise wrongly look
+# "already staged". Track which version was actually staged alongside it.
 DENODO_UPDATE_MARKER="$DENODO_INSTALL/denodo-update/.staged_version"
 if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ] \
   && [ "$(cat "$DENODO_UPDATE_MARKER" 2>/dev/null)" = "$DENODO_UPDATE" ]; then
@@ -947,9 +962,18 @@ change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/t
 
 /opt/denodo/denodo-platform/bin/regenerateFiles.sh
 
-# Clean Install files
+# Clean Install files (saves disk space - safe to delete now that the
+# install/update has been fully applied above; nothing below needs them).
 sudo rm -f "/home/denodo/denodo-install-9/denodo-install-9.dat"
-sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar" 
+sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
+
+# Record that $DENODO_UPDATE was fully and successfully applied, so a later
+# run (e.g. after a container restart) can skip re-downloading/re-applying
+# it via the DENODO_APPLIED_UPDATE_FILE check at the top of this section -
+# written only here, after everything above has succeeded, and to a path
+# outside $DENODO_INSTALL/denodo-update so it survives that folder's own
+# staging files being deleted just above.
+echo "$DENODO_UPDATE" > "$DENODO_APPLIED_UPDATE_FILE"
 
 fi # NEED_PLATFORM_INSTALL
 
