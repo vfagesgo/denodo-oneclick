@@ -748,16 +748,21 @@ DENODO_INSTALL="/home/denodo/denodo-install-9"
 # downloaded or staged.
 DENODO_APPLIED_UPDATE_FILE="$DENODO_INSTALL/.applied_update_version"
 
-NEED_PLATFORM_INSTALL=1
-if [ "$DENODO_ACTION" = "upgrade" ]; then
-  EXISTING_APPLIED_VERSION=$(cat "$DENODO_APPLIED_UPDATE_FILE" 2>/dev/null || true)
-  if [ "$EXISTING_APPLIED_VERSION" = "$DENODO_UPDATE" ]; then
-    log_step "DENODO_UPDATE ($DENODO_UPDATE) already applied - skipping platform reinstall/re-download"
-    NEED_PLATFORM_INSTALL=0
-  fi
+NEED_PLATFORM_INSTALL=0
+if [ "$DENODO_ACTION" = "install" ]; then
+  NEED_PLATFORM_INSTALL=1
 fi
 
-if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
+NEED_PLATFORM_UPGRADE=0
+if [ "$DENODO_ACTION" = "upgrade" ]; then
+  EXISTING_APPLIED_VERSION=$(cat "$DENODO_APPLIED_UPDATE_FILE" 2>/dev/null || true)
+  if [ "$EXISTING_APPLIED_VERSION" != "$DENODO_UPDATE" ]; then
+    log_step "DENODO_UPDATE ($DENODO_UPDATE) differs from the applied version (${EXISTING_APPLIED_VERSION:-none}) - upgrade needed"
+    NEED_PLATFORM_UPGRADE=1
+  else
+    log_step "DENODO_UPDATE ($DENODO_UPDATE) already applied - skipping"
+  fi
+fi
 
 log_section "11.5" "Install Denodo Support Tools"
 # denodo_config.env defines this as DENODO_UTILS_URL. The script previously
@@ -766,11 +771,11 @@ log_section "11.5" "Install Denodo Support Tools"
 DENODO_UTILS_URL=${DENODO_UTILS_URL:-"denodocommunity-resources/releases/download/v1.3.2/Denodo.Support.Utilities.v1.3.2.zip"}
 ZIP_URL="https://github.com/denodo/$DENODO_UTILS_URL"
 
-# Section 11.5+12 involve multi-GB downloads (installer + update archives).
-# Everything below is guarded to skip work that a previous, failed run
-# already completed, so re-running install.sh after a crash doesn't
-# re-download or re-extract from scratch.
-
+# Both a fresh install and an upgrade need the denodo-support CLI below (to
+# download the installer/update archives), so this runs unconditionally
+# rather than nested inside either gate. Staying here also means both gates'
+# "./denodo-support ..." calls run with $TARGET_DIR/denodo-support-utils/bin
+# as the working directory, which that relative path depends on.
 if [ -x "$TARGET_DIR/denodo-support-utils/bin/denodo-support" ]; then
   log_step "denodo-support already installed, skipping"
 else
@@ -782,200 +787,251 @@ fi
 cd $TARGET_DIR/denodo-support-utils/bin/
 chmod +x denodo-support
 
-# An "upgrade" only ever applies denodo-update.jar (via `java -jar ... -c`,
-# see Section 12 below) against the platform that's already installed - it
-# never re-runs the full installer, so the multi-GB base installer archive
-# isn't needed at all in that case. Skip downloading it outright rather
-# than relying on the "already downloaded" check below, which would still
-# trigger a full download if that archive was ever cleaned up to save disk
-# space after the original install.
-if [ "$DENODO_ACTION" = "upgrade" ]; then
-  log_step "Upgrade: skipping the base installer archive download - only the update package is needed"
-elif [ -d "$DENODO_INSTALL" ]; then
-  log_step "$DENODO_INSTALL already extracted - no need to (re)download the installer archive"
-else
-  log_step "Downloading the Denodo installer archive"
-  ./denodo-support -t installer -n denodo-install-9-ga -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
-fi
+if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
 
-if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
-  log_step "Update archive already downloaded, skipping (remove /home/denodo/$DENODO_UPDATE.zip to force a re-download)"
-else
-  log_step "Downloading update archive $DENODO_UPDATE"
-  ./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
-fi
+  # Section 11.5+12 involve multi-GB downloads (installer + update archives).
+  # Everything below is guarded to skip work that a previous, failed run
+  # already completed, so re-running install.sh after a crash doesn't
+  # re-download or re-extract from scratch.
 
-log_step "Preparing the install folder"
-cd /home/denodo
-
-if [ -d "$DENODO_INSTALL" ]; then
-  log_step "$DENODO_INSTALL already extracted, skipping unzip"
-elif [ "$DENODO_ACTION" = "upgrade" ]; then
-  # The base installer archive was intentionally not downloaded above for
-  # an upgrade - so if $DENODO_INSTALL isn't already there either, this
-  # container was never fully installed and an --upgrade can't proceed.
-  log_step "ERROR: $DENODO_INSTALL not found and --upgrade skips downloading the base installer - run a normal install first"
-  exit 1
-else
-  unzip -o denodo-install-9-ga.zip
-  sudo rm -f denodo-install-9-ga.zip
-fi
-
-mkdir -p "$DENODO_INSTALL/denodo-update"
-# Getting here means DENODO_APPLIED_UPDATE_FILE (checked at the top of this
-# section) did NOT match $DENODO_UPDATE, so this is either a genuinely new
-# version or a previous attempt that crashed before finishing. The check
-# below only guards against the latter - resuming a run that already staged
-# (unzipped) this exact version but didn't reach the "fully applied" marker
-# yet - so re-downloading/re-staging isn't repeated needlessly on retry.
-# The jar gets renamed to a fixed "denodo-update.jar", so its mere presence
-# can't tell two different $DENODO_UPDATE versions apart - a stale jar left
-# over from a previous, different version would otherwise wrongly look
-# "already staged". Track which version was actually staged alongside it.
-DENODO_UPDATE_MARKER="$DENODO_INSTALL/denodo-update/.staged_version"
-if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ] \
-  && [ "$(cat "$DENODO_UPDATE_MARKER" 2>/dev/null)" = "$DENODO_UPDATE" ]; then
-  log_step "Update $DENODO_UPDATE already staged, skipping unzip"
-else
-  # A previously staged update (a different $DENODO_UPDATE version, or the
-  # jre/jre-linux symlink tree Section 12 creates inside this same folder)
-  # can leave behind files/dirs that clash with what the new zip wants to
-  # extract - `unzip -o` overwrites individual files but can't reconcile a
-  # symlink or directory sitting where the new archive expects something
-  # else, and fails outright ("cannot create ... File exists"). Wipe the
-  # folder first whenever it already exists, so every extraction starts
-  # from a clean, empty directory.
-  if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ]; then
-    log_step "Clearing previously staged update files before extracting $DENODO_UPDATE"
-    rm -rf "$DENODO_INSTALL/denodo-update"
-    mkdir -p "$DENODO_INSTALL/denodo-update"
+  # An upgrade never re-runs the base installer (see the NEED_PLATFORM_UPGRADE
+  # block below instead), so that multi-GB archive is only needed here, on a
+  # genuinely fresh install.
+  if [ -d "$DENODO_INSTALL" ]; then
+    log_step "$DENODO_INSTALL already extracted - no need to (re)download the installer archive"
+  else
+    log_step "Downloading the Denodo installer archive"
+    ./denodo-support -t installer -n denodo-install-9-ga -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
   fi
-  unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
-  sudo rm -f "$DENODO_UPDATE.zip"
-  mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
-  echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
-fi
 
-# Section 12:
-# Prepare the Denodo installer directory, link the detected JVM, place the
-# license file, and run the unattended platform installation.
-log_section "12" "Install Denodo 9"
+  if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
+    log_step "Update archive already downloaded, skipping (remove /home/denodo/$DENODO_UPDATE.zip to force a re-download)"
+  else
+    log_step "Downloading update archive $DENODO_UPDATE"
+    ./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+  fi
 
-unset DISPLAY
-cd "$DENODO_INSTALL"
+  log_step "Preparing the install folder"
+  cd /home/denodo
 
-log_step "Resolving JAVA_HOME"
-JAVA_BIN=$(readlink -f $(which java) || true)
-JAVA_HOME=$(dirname $(dirname "$JAVA_BIN"))
+  if [ -d "$DENODO_INSTALL" ]; then
+    log_step "$DENODO_INSTALL already extracted, skipping unzip"
+  else
+    unzip -o denodo-install-9-ga.zip
+    sudo rm -f denodo-install-9-ga.zip
+  fi
 
-# Configure for current session
-export JAVA_HOME="$JAVA_HOME"
-export PATH="$JAVA_HOME/bin:$PATH"
+  mkdir -p "$DENODO_INSTALL/denodo-update"
+  # Getting here means DENODO_APPLIED_UPDATE_FILE (checked at the top of this
+  # section) did NOT match $DENODO_UPDATE, so this is either a genuinely new
+  # version or a previous attempt that crashed before finishing. The check
+  # below only guards against the latter - resuming a run that already staged
+  # (unzipped) this exact version but didn't reach the "fully applied" marker
+  # yet - so re-downloading/re-staging isn't repeated needlessly on retry.
+  # The jar gets renamed to a fixed "denodo-update.jar", so its mere presence
+  # can't tell two different $DENODO_UPDATE versions apart - a stale jar left
+  # over from a previous, different version would otherwise wrongly look
+  # "already staged". Track which version was actually staged alongside it.
+  DENODO_UPDATE_MARKER="$DENODO_INSTALL/denodo-update/.staged_version"
+  if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ] \
+    && [ "$(cat "$DENODO_UPDATE_MARKER" 2>/dev/null)" = "$DENODO_UPDATE" ]; then
+    log_step "Update $DENODO_UPDATE already staged, skipping unzip"
+  else
+    # A previously staged update (a different $DENODO_UPDATE version, or the
+    # jre/jre-linux symlink tree Section 12 creates inside this same folder)
+    # can leave behind files/dirs that clash with what the new zip wants to
+    # extract - `unzip -o` overwrites individual files but can't reconcile a
+    # symlink or directory sitting where the new archive expects something
+    # else, and fails outright ("cannot create ... File exists"). Wipe the
+    # folder first whenever it already exists, so every extraction starts
+    # from a clean, empty directory.
+    if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ]; then
+      log_step "Clearing previously staged update files before extracting $DENODO_UPDATE"
+      rm -rf "$DENODO_INSTALL/denodo-update"
+      mkdir -p "$DENODO_INSTALL/denodo-update"
+    fi
+    unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
+    sudo rm -f "$DENODO_UPDATE.zip"
+    mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
+    echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
+  fi
 
-chmod +x installer_cli.sh
+  # Section 12:
+  # Prepare the Denodo installer directory, link the detected JVM, place the
+  # license file, and run the unattended platform installation.
+  log_section "12" "Install Denodo 9"
 
-# Default must be set before it's ever referenced - the log line below used
-# to read $DENODO_LIC first, which crashed with "unbound variable" whenever
-# the caller didn't set it (e.g. the Docker flow, which only mounts the
-# license file and never sets this env var).
-DENODO_LIC=${DENODO_LIC:-"denodo-developer-lic-9.lic"}
-log_step "Copying Denodo license: $DENODO_LIC"
+  unset DISPLAY
+  cd "$DENODO_INSTALL"
 
-# Check the unambiguous absolute-path locations (Docker mount, Pi boot
-# partition) before the bare $DENODO_LIC filename: cwd is $DENODO_INSTALL
-# here, and on a resumed run $DENODO_INSTALL/denodo-developer-lic-9.lic
-# (the copy *destination*) already exists - checking the relative filename
-# first previously matched that destination file itself as the "source"
-# and made `cp` fail with "are the same file".
-if [ -f "/denodo/license.lic" ]; then
-  DENODO_LIC_SRC="/denodo/license.lic"
-elif [ -f "/boot/firmware/denodo/$DENODO_LIC" ]; then
-  DENODO_LIC_SRC="/boot/firmware/denodo/$DENODO_LIC"
-elif [ -f "$DENODO_LIC" ]; then
-  DENODO_LIC_SRC="$DENODO_LIC"
-else
-  log_step "ERROR: no Denodo license file found (checked /denodo/license.lic, /boot/firmware/denodo/$DENODO_LIC, '$DENODO_LIC')"
-  exit 1
-fi
+  log_step "Resolving JAVA_HOME"
+  JAVA_BIN=$(readlink -f $(which java) || true)
+  JAVA_HOME=$(dirname $(dirname "$JAVA_BIN"))
 
-# Always overwrite an existing destination copy with whatever license was
-# just resolved above (e.g. a newer one mounted at /denodo/license.lic) -
-# `cp` does this by default. The one case that must be skipped is the
-# source and destination already being the exact same file (only possible
-# via the bare-filename fallback above): there's nothing to "overwrite"
-# there, and `cp` would just error out on a self-copy.
-if [ "$(readlink -f "$DENODO_LIC_SRC" 2>/dev/null)" = "$(readlink -f "$DENODO_INSTALL/denodo-developer-lic-9.lic" 2>/dev/null)" ]; then
-  log_step "License source and destination are the same file, nothing to copy"
-else
-  log_step "Copying license from $DENODO_LIC_SRC (overwriting any existing destination copy)"
-  sudo cp -f "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
-fi
-sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
-sudo mkdir -p /opt/denodo
-sudo chown -R denodo:denodo /opt/denodo
+  # Configure for current session
+  export JAVA_HOME="$JAVA_HOME"
+  export PATH="$JAVA_HOME/bin:$PATH"
 
-log_step "Faking the Java JRE in Denodo Home"
-# -f/-n so re-running after a failed install doesn't crash on "File exists".
-ln -sfn "$JAVA_HOME" jre
-cd denodo-update
-rm -rf jre
-mkdir -p jre
-cd jre
-ln -sfn "$JAVA_HOME" jre-linux
-cd "$DENODO_INSTALL"
+  chmod +x installer_cli.sh
 
-if [ "$DENODO_ACTION" = "upgrade" ]; then
-  # Applying an update patches the already-installed platform in place - it
-  # must not be run against live services (the updater requires them fully
-  # stopped), and it must not go through installer_cli.sh's full install,
-  # which would instead try to reinstall the base platform from scratch.
-  # Services were already stopped earlier in this script when the upgrade
-  # was requested (see "Upgrade requested - stopping services..." above);
-  # stopping again here is just cheap insurance in case that ever changes.
+  # Default must be set before it's ever referenced - the log line below used
+  # to read $DENODO_LIC first, which crashed with "unbound variable" whenever
+  # the caller didn't set it (e.g. the Docker flow, which only mounts the
+  # license file and never sets this env var).
+  DENODO_LIC=${DENODO_LIC:-"denodo-developer-lic-9.lic"}
+  log_step "Copying Denodo license: $DENODO_LIC"
+
+  # Check the unambiguous absolute-path locations (Docker mount, Pi boot
+  # partition) before the bare $DENODO_LIC filename: cwd is $DENODO_INSTALL
+  # here, and on a resumed run $DENODO_INSTALL/denodo-developer-lic-9.lic
+  # (the copy *destination*) already exists - checking the relative filename
+  # first previously matched that destination file itself as the "source"
+  # and made `cp` fail with "are the same file".
+  if [ -f "/denodo/license.lic" ]; then
+    DENODO_LIC_SRC="/denodo/license.lic"
+  elif [ -f "/boot/firmware/denodo/$DENODO_LIC" ]; then
+    DENODO_LIC_SRC="/boot/firmware/denodo/$DENODO_LIC"
+  elif [ -f "$DENODO_LIC" ]; then
+    DENODO_LIC_SRC="$DENODO_LIC"
+  else
+    log_step "ERROR: no Denodo license file found (checked /denodo/license.lic, /boot/firmware/denodo/$DENODO_LIC, '$DENODO_LIC')"
+    exit 1
+  fi
+
+  # Always overwrite an existing destination copy with whatever license was
+  # just resolved above (e.g. a newer one mounted at /denodo/license.lic) -
+  # `cp` does this by default. The one case that must be skipped is the
+  # source and destination already being the exact same file (only possible
+  # via the bare-filename fallback above): there's nothing to "overwrite"
+  # there, and `cp` would just error out on a self-copy.
+  if [ "$(readlink -f "$DENODO_LIC_SRC" 2>/dev/null)" = "$(readlink -f "$DENODO_INSTALL/denodo-developer-lic-9.lic" 2>/dev/null)" ]; then
+    log_step "License source and destination are the same file, nothing to copy"
+  else
+    log_step "Copying license from $DENODO_LIC_SRC (overwriting any existing destination copy)"
+    sudo cp -f "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
+  fi
+  sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
+  sudo mkdir -p /opt/denodo
+  sudo chown -R denodo:denodo /opt/denodo
+
+  log_step "Faking the Java JRE in Denodo Home"
+  # -f/-n so re-running after a failed install doesn't crash on "File exists".
+  ln -sfn "$JAVA_HOME" jre
+  cd denodo-update
+  rm -rf jre
+  mkdir -p jre
+  cd jre
+  ln -sfn "$JAVA_HOME" jre-linux
+  cd "$DENODO_INSTALL"
+
+  ###### Start Denodo Install
+  log_step "Starting the Denodo platform installer"
+  ./installer_cli.sh install --autoinstaller "$SCRIPT_DIR/response_file_9_0.xml" | tee -a $LOG
+ 
+  ## Change Java memory parameters to be able to run on a Raspberry Pi
+  log_step "Adjusting Java memory configuration"
+  change_config() {
+    local PARAM="$1"
+    local CONF_FILE="$2"
+    local NEW_XMX="$3"
+
+    cp -p "$CONF_FILE" "$CONF_FILE.bak.$(date +%F_%H%M%S)" &&
+    sed -i -E \
+        '/^java\.env\.DENODO_OPTS_START[[:space:]]*=/ s/-Xmx[0-9]+[mMgG]/-Xmx'"$NEW_XMX"'/g' \
+        "$CONF_FILE"
+  }
+  log_step "Java config: adjusting -Xmx in VDBConfiguration.properties"
+  change_config "-Xmx" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "2048m"
+  log_step "Java config: adjusting -XX:ReservedCodeCacheSize= in VDBConfiguration.properties"
+  change_config "-XX:ReservedCodeCacheSize=" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "256m"
+  log_step "Java config: adjusting -Xmx in resources/apache-tomcat/conf/tomcat.properties"
+  change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/tomcat.properties" "1024m"
+
+  /opt/denodo/denodo-platform/bin/regenerateFiles.sh
+
+  # A fresh install only runs the base GA installer above - it must also
+  # apply $DENODO_UPDATE here so the platform actually ends up on that
+  # version, rather than being left on GA while DENODO_APPLIED_UPDATE_FILE
+  # (written below) claims otherwise.
+  log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
+  stop_denodo_services
+  java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
+
+  # Clean Install files (saves disk space - safe to delete now that the
+  # install/update has been fully applied above; nothing below needs them).
+  sudo rm -f "/home/denodo/denodo-install-9/denodo-install-9.dat"
+  sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
+
+  # Record that $DENODO_UPDATE was fully and successfully applied, so a later
+  # run (e.g. after a container restart) can skip re-downloading/re-applying
+  # it via the DENODO_APPLIED_UPDATE_FILE check at the top of this section -
+  # written only here, after everything above has succeeded, and to a path
+  # outside $DENODO_INSTALL/denodo-update so it survives that folder's own
+  # staging files being deleted just above.
+  echo "$DENODO_UPDATE" > "$DENODO_APPLIED_UPDATE_FILE"
+
+fi # NEED_PLATFORM_INSTALL
+
+# Section 12.5:
+# An upgrade patches the already-installed platform in place via
+# denodo-update.jar - it must not go through installer_cli.sh's full
+# install, which would instead try to reinstall the base platform from
+# scratch. Services were already stopped earlier in this script when the
+# upgrade was requested (see "Upgrade requested - stopping services..."
+# above); stop_denodo_services is called again right before applying the
+# update below as cheap insurance in case that ever changes.
+if [ "$NEED_PLATFORM_UPGRADE" = "1" ]; then
+  log_section "12.5" "Apply Denodo update"
+
+  # Downloaded while cwd is still $TARGET_DIR/denodo-support-utils/bin (set
+  # unconditionally above) - "./denodo-support" is a relative path.
+  if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
+    log_step "Update archive already downloaded, skipping (remove /home/denodo/$DENODO_UPDATE.zip to force a re-download)"
+  else
+    log_step "Downloading update archive $DENODO_UPDATE"
+    ./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+  fi
+
+  cd /home/denodo
+
+  DENODO_UPDATE_MARKER="$DENODO_INSTALL/denodo-update/.staged_version"
+  if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ] \
+    && [ "$(cat "$DENODO_UPDATE_MARKER" 2>/dev/null)" = "$DENODO_UPDATE" ]; then
+    log_step "Update $DENODO_UPDATE already staged, skipping unzip"
+  else
+    # A previously staged update (a different $DENODO_UPDATE version, or the
+    # jre/jre-linux symlink tree Section 12 creates inside this same folder)
+    # can leave behind files/dirs that clash with what the new zip wants to
+    # extract - `unzip -o` overwrites individual files but can't reconcile a
+    # symlink or directory sitting where the new archive expects something
+    # else, and fails outright ("cannot create ... File exists"). Wipe the
+    # folder first whenever it already exists, so every extraction starts
+    # from a clean, empty directory.
+    if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ]; then
+      log_step "Clearing previously staged update files before extracting $DENODO_UPDATE"
+      rm -rf "$DENODO_INSTALL/denodo-update"
+      mkdir -p "$DENODO_INSTALL/denodo-update"
+    fi
+    unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
+    sudo rm -f "$DENODO_UPDATE.zip"
+    mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
+    echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
+  fi
+
+  # Applying the update must happen every time this block runs, even when
+  # staging above was skipped as already-done (e.g. resuming after a crash
+  # that happened after staging but before this step) - otherwise a retry
+  # would never actually apply it.
   log_step "Upgrade: stopping Denodo services before applying the update"
   stop_denodo_services
   log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
   java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
-else
-  log_step "Starting the Denodo platform installer"
-  ./installer_cli.sh install --autoinstaller "$SCRIPT_DIR/response_file_9_0.xml" | tee -a $LOG
+
+  # Record that $DENODO_UPDATE was fully and successfully applied - written
+  # only here, after the java -jar call above has succeeded, mirroring the
+  # marker write at the end of the NEED_PLATFORM_INSTALL block.
+  echo "$DENODO_UPDATE" > "$DENODO_APPLIED_UPDATE_FILE"
 fi
-
-## Change Java memory parameters to be able to run on a Raspberry Pi
-log_step "Adjusting Java memory configuration"
-change_config() {
-  local PARAM="$1"
-  local CONF_FILE="$2"
-  local NEW_XMX="$3"
-
-  cp -p "$CONF_FILE" "$CONF_FILE.bak.$(date +%F_%H%M%S)" &&
-  sed -i -E \
-      '/^java\.env\.DENODO_OPTS_START[[:space:]]*=/ s/-Xmx[0-9]+[mMgG]/-Xmx'"$NEW_XMX"'/g' \
-      "$CONF_FILE"
-}
-log_step "Java config: adjusting -Xmx in VDBConfiguration.properties"
-change_config "-Xmx" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "2048m"
-log_step "Java config: adjusting -XX:ReservedCodeCacheSize= in VDBConfiguration.properties"
-change_config "-XX:ReservedCodeCacheSize=" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "256m"
-log_step "Java config: adjusting -Xmx in resources/apache-tomcat/conf/tomcat.properties"
-change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/tomcat.properties" "1024m"
-
-/opt/denodo/denodo-platform/bin/regenerateFiles.sh
-
-# Clean Install files (saves disk space - safe to delete now that the
-# install/update has been fully applied above; nothing below needs them).
-sudo rm -f "/home/denodo/denodo-install-9/denodo-install-9.dat"
-sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
-
-# Record that $DENODO_UPDATE was fully and successfully applied, so a later
-# run (e.g. after a container restart) can skip re-downloading/re-applying
-# it via the DENODO_APPLIED_UPDATE_FILE check at the top of this section -
-# written only here, after everything above has succeeded, and to a path
-# outside $DENODO_INSTALL/denodo-update so it survives that folder's own
-# staging files being deleted just above.
-echo "$DENODO_UPDATE" > "$DENODO_APPLIED_UPDATE_FILE"
-
-fi # NEED_PLATFORM_INSTALL
 
 # Section 13:
 # The AI SDK lives in its own Git repository. On first install it is cloned;
