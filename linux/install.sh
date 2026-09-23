@@ -972,6 +972,7 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
   # install/update has been fully applied above; nothing below needs them).
   sudo rm -f "/home/denodo/denodo-install-9/denodo-install-9.dat"
   sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
+  sudo rm -f "/opt/denodo/denodo-platform/patches"
 
   # Record that $DENODO_UPDATE was fully and successfully applied, so a later
   # run (e.g. after a container restart) can skip re-downloading/re-applying
@@ -1006,8 +1007,7 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
   cd /home/denodo
 
   DENODO_UPDATE_MARKER="$DENODO_INSTALL/denodo-update/.staged_version"
-  if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ] \
-    && [ "$(cat "$DENODO_UPDATE_MARKER" 2>/dev/null)" = "$DENODO_UPDATE" ]; then
+  if [ "$(cat "$DENODO_UPDATE_MARKER" 2>/dev/null)" = "$DENODO_UPDATE" ]; then
     log_step "Update $DENODO_UPDATE already staged, skipping unzip"
   else
     # A previously staged update (a different $DENODO_UPDATE version, or the
@@ -1018,30 +1018,31 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
     # else, and fails outright ("cannot create ... File exists"). Wipe the
     # folder first whenever it already exists, so every extraction starts
     # from a clean, empty directory.
-    if [ -f "$DENODO_INSTALL/denodo-update/denodo-update.jar" ]; then
-      log_step "Clearing previously staged update files before extracting $DENODO_UPDATE"
-      rm -rf "$DENODO_INSTALL/denodo-update"
-      mkdir -p "$DENODO_INSTALL/denodo-update"
-    fi
+    
     unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
     sudo rm -f "$DENODO_UPDATE.zip"
     mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
     echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
+  
+
+    # Applying the update must happen every time this block runs, even when
+    # staging above was skipped as already-done (e.g. resuming after a crash
+    # that happened after staging but before this step) - otherwise a retry
+    # would never actually apply it.
+    log_step "Upgrade: stopping Denodo services before applying the update"
+    stop_denodo_services
+    log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
+    java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
+
+    sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
+    sudo rm -f "/opt/denodo/denodo-platform/patches"
+ 
+
+    # Record that $DENODO_UPDATE was fully and successfully applied - written
+    # only here, after the java -jar call above has succeeded, mirroring the
+    # marker write at the end of the NEED_PLATFORM_INSTALL block.
+    echo "$DENODO_UPDATE" > "$DENODO_APPLIED_UPDATE_FILE"
   fi
-
-  # Applying the update must happen every time this block runs, even when
-  # staging above was skipped as already-done (e.g. resuming after a crash
-  # that happened after staging but before this step) - otherwise a retry
-  # would never actually apply it.
-  log_step "Upgrade: stopping Denodo services before applying the update"
-  stop_denodo_services
-  log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
-  java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
-
-  # Record that $DENODO_UPDATE was fully and successfully applied - written
-  # only here, after the java -jar call above has succeeded, mirroring the
-  # marker write at the end of the NEED_PLATFORM_INSTALL block.
-  echo "$DENODO_UPDATE" > "$DENODO_APPLIED_UPDATE_FILE"
 fi
 
 # Section 13:
