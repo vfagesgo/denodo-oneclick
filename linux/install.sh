@@ -766,7 +766,7 @@ if [ -x "$TARGET_DIR/denodo-support-utils/bin/denodo-support" ]; then
 else
   curl -L "$ZIP_URL" -o "${TARGET_DIR}Denodo.Support.Utilities.zip"
   unzip -o "${TARGET_DIR}Denodo.Support.Utilities.zip" -d "$TARGET_DIR"
-  rm -f "${TARGET_DIR}Denodo.Support.Utilities.zip"
+  sudo rm -f "${TARGET_DIR}Denodo.Support.Utilities.zip"
 fi
 
 cd $TARGET_DIR/denodo-support-utils/bin/
@@ -781,7 +781,7 @@ chmod +x denodo-support
 # space after the original install.
 if [ "$DENODO_ACTION" = "upgrade" ]; then
   log_step "Upgrade: skipping the base installer archive download - only the update package is needed"
-elif [ -f "/home/denodo/denodo-install-9-ga.zip" ]; then
+elif [ -d "$DENODO_INSTALL" ]; then
   log_step "Installer archive already downloaded, skipping (remove /home/denodo/denodo-install-9-ga.zip to force a re-download)"
 else
   log_step "Downloading the Denodo installer archive"
@@ -808,6 +808,7 @@ elif [ "$DENODO_ACTION" = "upgrade" ]; then
   exit 1
 else
   unzip -o denodo-install-9-ga.zip
+  sudo rm -f denodo-install-9-ga.zip
 fi
 
 mkdir -p "$DENODO_INSTALL/denodo-update"
@@ -835,6 +836,7 @@ else
     mkdir -p "$DENODO_INSTALL/denodo-update"
   fi
   unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
+  sudo rm -f "$DENODO_UPDATE.zip"
   mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
   echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
 fi
@@ -1280,6 +1282,7 @@ else
   mkdir /opt/denodo/denodo-mcp-server
   cd /opt/denodo/denodo-mcp-server
   unzip -o "/home/denodo/Denodo MCP Server.zip"
+  sudo rm -f "/home/denodo/Denodo MCP Server.zip"
   mv denodo-mcp-server-*/* .
   rm -rf denodo-mcp-server-*
 
