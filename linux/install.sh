@@ -67,6 +67,18 @@ normalize_version() {
   printf '%s' "$1" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 }
 
+# The various "already downloaded, skipping" checks below only verified a
+# zip existed, not that it was actually a complete/valid archive - a run
+# that got killed mid-download (network drop, container stop, an earlier
+# unrelated failure elsewhere in the script) left a partial/corrupt zip
+# behind, and every later run would then reuse that same broken file forever
+# (unzip failing with "End-of-central-directory signature not found")
+# instead of ever re-downloading a good copy. Delete and report "not usable"
+# for anything that fails `unzip -tq` so callers re-download instead.
+zip_is_valid() {
+  unzip -tq "$1" >/dev/null 2>&1
+}
+
 # `service nginx restart` only ever reports a generic "nginx failed!" on
 # error - unhelpful for actually debugging what's wrong. Run `nginx -t`
 # first so the real config/state error lands in the log before that.
@@ -827,9 +839,13 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
     ./denodo-support -t installer -n denodo-install-9-ga -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
   fi
 
-  if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
+  if [ -f "/home/denodo/$DENODO_UPDATE.zip" ] && zip_is_valid "/home/denodo/$DENODO_UPDATE.zip"; then
     log_step "Update archive already downloaded, skipping (remove /home/denodo/$DENODO_UPDATE.zip to force a re-download)"
   else
+    if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
+      log_step "Existing update archive is corrupt/incomplete - removing and re-downloading"
+      rm -f "/home/denodo/$DENODO_UPDATE.zip"
+    fi
     log_step "Downloading update archive $DENODO_UPDATE"
     ./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
   fi
@@ -1009,9 +1025,13 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
 
   # Downloaded while cwd is still $TARGET_DIR/denodo-support-utils/bin (set
   # unconditionally above) - "./denodo-support" is a relative path.
-  if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
+  if [ -f "/home/denodo/$DENODO_UPDATE.zip" ] && zip_is_valid "/home/denodo/$DENODO_UPDATE.zip"; then
     log_step "Update archive already downloaded, skipping (remove /home/denodo/$DENODO_UPDATE.zip to force a re-download)"
   else
+    if [ -f "/home/denodo/$DENODO_UPDATE.zip" ]; then
+      log_step "Existing update archive is corrupt/incomplete - removing and re-downloading"
+      rm -f "/home/denodo/$DENODO_UPDATE.zip"
+    fi
     log_step "Downloading update archive $DENODO_UPDATE"
     ./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
   fi
@@ -1379,9 +1399,13 @@ if [ "$FORCE_REFRESH" = "1" ]; then
   sudo rm -rf "/opt/denodo/denodo-mcp-server"
 fi
 
-if [ -f "/home/denodo/Denodo MCP Server.zip" ]; then
+if [ -f "/home/denodo/Denodo MCP Server.zip" ] && zip_is_valid "/home/denodo/Denodo MCP Server.zip"; then
   log_step "Installer archive already downloaded, skipping (remove /home/denodo/Denodo MCP Server.zip to force a re-download)"
 else
+  if [ -f "/home/denodo/Denodo MCP Server.zip" ]; then
+    log_step "Existing MCP server archive is corrupt/incomplete - removing and re-downloading"
+    rm -f "/home/denodo/Denodo MCP Server.zip"
+  fi
   log_step "Downloading the Denodo MCP server archive"
   ./denodo-support -t denodoconnect-enterprise -n 'Denodo MCP Server' -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
 fi
