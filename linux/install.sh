@@ -947,6 +947,10 @@ change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/t
 
 /opt/denodo/denodo-platform/bin/regenerateFiles.sh
 
+# Clean Install files
+sudo rm -f "/home/denodo/denodo-install-9/denodo-install-9.dat"
+sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar" 
+
 fi # NEED_PLATFORM_INSTALL
 
 # Section 13:
@@ -1319,6 +1323,8 @@ nginx_restart
 # Docker container). Defined up top as start_denodo_services() so the
 # services-only fast path can call the exact same logic.
 log_section "17" "Configuring the different services"
+
+
 start_denodo_services
 # denodo-mcp (Denodo VDP MCP server) only depends on denodo-vdp-server, not
 # on OPENAI_API_KEY, so it always starts here. denodo-aisdk is started
