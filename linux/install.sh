@@ -1000,7 +1000,6 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
   # install/update has been fully applied above; nothing below needs them).
   sudo rm -f "/home/denodo/denodo-install-9/denodo-install-9.dat"
   sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
-  sudo rm -rf  "/opt/denodo/denodo-platform/patches"
 
   # Record that $DENODO_UPDATE was fully and successfully applied, so a later
   # run (e.g. after a container restart) can skip re-downloading/re-applying
@@ -1073,7 +1072,6 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
   java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c -skipfork --skip-jre-update | tee -a $LOG
 
   sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
-  sudo rm -rf "/opt/denodo/denodo-platform/patches"
 
   # Record that $DENODO_UPDATE was fully and successfully applied - written
   # only here, after the java -jar call above has succeeded, mirroring the
