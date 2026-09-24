@@ -994,7 +994,7 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
   # (written below) claims otherwise.
   log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
   stop_denodo_services
-  java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
+  java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c -skipfork --skip-jre-update| tee -a $LOG
 
   # Clean Install files (saves disk space - safe to delete now that the
   # install/update has been fully applied above; nothing below needs them).
@@ -1070,7 +1070,7 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
   log_step "Upgrade: stopping Denodo services before applying the update"
   stop_denodo_services
   log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
-  java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
+  java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c -skipfork --skip-jre-update | tee -a $LOG
 
   sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
   sudo rm -rf "/opt/denodo/denodo-platform/patches"
