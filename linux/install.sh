@@ -992,9 +992,9 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
   # apply $DENODO_UPDATE here so the platform actually ends up on that
   # version, rather than being left on GA while DENODO_APPLIED_UPDATE_FILE
   # (written below) claims otherwise.
- # log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
- # stop_denodo_services
- # java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
+  log_step "Applying update $DENODO_UPDATE via denodo-update.jar"
+  stop_denodo_services
+  java -jar "$DENODO_INSTALL/denodo-update/denodo-update.jar" /opt/denodo/denodo-platform -c | tee -a $LOG
 
   # Clean Install files (saves disk space - safe to delete now that the
   # install/update has been fully applied above; nothing below needs them).
