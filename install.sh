@@ -104,7 +104,8 @@ Optional (CLI only):
   --CLOUDFLARE_TUNNEL_KEY <value>
   --OPENAI_API_KEY <value>       Used to pre-fill the AI SDK/chatbot config
                                   (sdk_config.env, chatbot_config.env); can
-                                  also be added/changed later via --upgrade
+                                  also be added/changed later via --refresh
+                                  or --upgrade
   --mode <docker|local>          Default: docker (local not implemented yet)
   --reset                        Wipe any existing container + its volumes first,
                                   so the install starts truly from scratch
@@ -114,7 +115,12 @@ Actions on an existing container (instead of building/running one):
   --refresh                      Pull the latest denodo-oneclick repo into the
                                   running container and reapply its nginx/
                                   service config, then restart services. Does
-                                  not touch the installed Denodo software.
+                                  not touch the installed Denodo software or
+                                  re-fetch the AI SDK/MCP server. Also applies
+                                  --OPENAI_API_KEY and/or --DENODO_LIC if
+                                  either is passed - no need to repass
+                                  --DENODO_SUPPORT_CI/--DENODO_SUPPORT_SECRET
+                                  just for those.
   --upgrade                      Like --refresh, but also re-runs the Denodo
                                   platform installer if --DENODO_UPDATE changed,
                                   and always re-fetches the AI SDK and MCP
@@ -219,12 +225,28 @@ if [[ -n "$ACTION" ]]; then
       || sudo -H -u denodo git config --global --add safe.directory "*"
   '
 
+  # `docker exec -e DENODO_LIC=...` only passes a path *string* into the
+  # container - it can't hand over a new license file's actual bytes.
+  # /denodo/license.lic itself is a read-only bind mount fixed at the
+  # original `docker run` (see below) and can't be swapped on a running
+  # container either. So a --DENODO_LIC that points at a real file on this
+  # host is `docker cp`'d into a fresh, unmounted path inside the container,
+  # and that container-side path is what actually gets passed through -
+  # linux/install.sh's install_denodo_license() then picks it up via its
+  # bare-$DENODO_LIC-path fallback.
+  DENODO_LIC_FOR_EXEC="${DENODO_LIC:-}"
+  if [[ -n "${DENODO_LIC:-}" ]] && [[ -f "$DENODO_LIC" ]]; then
+    DENODO_LIC_FOR_EXEC="/tmp/refreshed-license.lic"
+    echo "Copying the license file into the container so --${ACTION} can pick it up..."
+    docker cp "$DENODO_LIC" "${IMAGE_NAME}:${DENODO_LIC_FOR_EXEC}"
+  fi
+
   echo "Pulling the latest denodo-oneclick repo into the container and running linux/install.sh --${ACTION}..."
   docker exec \
     -e DENODO_ACTION="${ACTION}" \
     -e DENODO_SUPPORT_CI="${DENODO_SUPPORT_CI:-}" \
     -e DENODO_SUPPORT_SECRET="${DENODO_SUPPORT_SECRET:-}" \
-    -e DENODO_LIC="${DENODO_LIC:-}" \
+    -e DENODO_LIC="${DENODO_LIC_FOR_EXEC}" \
     -e DENODO_UPDATE="${DENODO_UPDATE:-}" \
     -e DENODO_PG_USER="${DENODO_PG_USER:-}" \
     -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \

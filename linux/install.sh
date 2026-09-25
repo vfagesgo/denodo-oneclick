@@ -37,6 +37,48 @@ RUN_DIR="/var/run/denodo-oneclick"
 # aisdk_has_openai_key() just below for why.
 OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 
+# Defaulted here (rather than only in Section 12) so install_denodo_license()
+# below can be called from the refresh action too, which runs long before
+# Section 12 and wouldn't otherwise have this set under `set -u`.
+DENODO_LIC="${DENODO_LIC:-denodo-developer-lic-9.lic}"
+
+# Resolves a Denodo license source from $DENODO_LIC and copies it to $1 if
+# found. Returns 1 (and copies nothing) if no source is found at all - the
+# caller decides whether that's fatal (Section 12, on a fresh install) or
+# just means "nothing new to refresh" (the refresh action).
+install_denodo_license() {
+  local dest="$1"
+  local lic_src
+
+  if [ -f "$DENODO_LIC" ]; then
+    lic_src="$DENODO_LIC"
+  else
+    return 1
+  fi
+
+  # Always overwrite an existing destination copy with whatever license was
+  # just resolved above - `cp` does this by default. The one case that must
+  # be skipped is the source and destination already being the exact same
+  # file: there's nothing to "overwrite" there, and `cp` would just error
+  # out on a self-copy.
+  if [ "$(readlink -f "$lic_src" 2>/dev/null)" = "$(readlink -f "$dest" 2>/dev/null)" ]; then
+    log_step "License source and destination are the same file, nothing to copy"
+    return 0
+  fi
+
+  # Does NOT create the destination directory - if it's missing, the
+  # platform isn't actually installed there yet, and papering over that by
+  # creating it would just hide the real problem.
+  if [ ! -d "$(dirname "$dest")" ]; then
+    log_step "ERROR: $(dirname "$dest") doesn't exist - not copying the license there"
+    return 1
+  fi
+
+  log_step "Copying license from $lic_src to $dest"
+  sudo cp -f "$lic_src" "$dest"
+  sudo chown denodo:denodo "$dest"
+}
+
 # Whether the AI SDK should be (re)started is decided by looking at whether it
 # actually has a real key configured on disk - not by whether OPENAI_API_KEY
 # happens to be set on this particular invocation. Docker has no way to
@@ -47,12 +89,58 @@ OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 # /data volume via the /opt/denodo symlink) reliably reflects whatever the
 # last successful install/upgrade actually configured, regardless of how -
 # or whether - OPENAI_API_KEY was passed to this specific run.
-AISDK_SDK_CONFIG="/opt/denodo/denodo-aisdk/api/utils/sdk_config.env"
+# Moved up here (rather than only in Section 13) so it's available under
+# `set -u` to both aisdk_has_openai_key() and configure_aisdk_openai_key()
+# below, which the refresh action (further down) now also calls - refresh
+# never reaches Section 13 itself (it exits well before it).
+AISDK_INSTALL_DIR=${AISDK_INSTALL_DIR:-"/opt/denodo/denodo-aisdk"}
+AISDK_SDK_CONFIG="$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
 aisdk_has_openai_key() {
   [ -f "$AISDK_SDK_CONFIG" ] || return 1
   local value
   value=$(grep -E '^OPENAI_API_KEY=' "$AISDK_SDK_CONFIG" 2>/dev/null | tail -n1 | cut -d= -f2-)
   [ -n "$value" ]
+}
+
+# Writes $OPENAI_API_KEY into the AI SDK/chatbot config files. Used by both
+# Section 13 (install/upgrade) and the refresh action.
+#
+# Only touches the OPENAI_API_KEY line when a *new*, non-empty value was
+# actually passed to this run - a plain `sed` unconditionally rewriting it
+# to whatever $OPENAI_API_KEY happens to be would blank out a key
+# configured on an earlier run every time install/upgrade runs without
+# --OPENAI_API_KEY repassed (Section 13 used to do exactly that, silently
+# undoing a previously working AI SDK key on every plain --upgrade).
+configure_aisdk_openai_key() {
+  local sdk_config="$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
+  local chatbot_config="$AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env"
+
+  if [ ! -f "$sdk_config" ]; then
+    if [ ! -f "$sdk_config.example" ]; then
+      log_step "AI SDK isn't installed yet - skipping OPENAI_API_KEY config"
+      return 1
+    fi
+    log_step "Copying AI SDK config file sdk_config.env"
+    sudo cp "$sdk_config.example" "$sdk_config"
+    sudo chown denodo:denodo "$sdk_config"
+  fi
+  if [ ! -f "$chatbot_config" ]; then
+    if [ ! -f "$chatbot_config.example" ]; then
+      log_step "AI SDK chatbot isn't installed yet - skipping OPENAI_API_KEY config"
+      return 1
+    fi
+    log_step "Copying chatbot config file chatbot_config.env"
+    sudo cp "$chatbot_config.example" "$chatbot_config"
+    sudo chown denodo:denodo "$chatbot_config"
+  fi
+
+  if [ -n "$OPENAI_API_KEY" ]; then
+    log_step "Updating OPENAI_API_KEY in sdk_config.env/chatbot_config.env"
+    sed -i "s|^#\?OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$sdk_config"
+    sed -i "s|^#\?OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$chatbot_config"
+  else
+    log_step "No OPENAI_API_KEY passed this run - leaving the existing AI SDK config untouched"
+  fi
 }
 
 # Used to compare $DENODO_UPDATE against the applied/staged version markers
@@ -422,12 +510,26 @@ start_cloudflare_tunnel() {
 #   refresh       - pick up a freshly-pulled copy of this repo (nginx
 #                 config, service unit files) without touching the
 #                 installed Denodo software: just reapply config and
-#                 restart services. Triggered on demand via
-#                 `install.sh --refresh`.
+#                 restart services. Also picks up a freshly-passed
+#                 OPENAI_API_KEY and/or DENODO_LIC, if either was actually
+#                 passed to this run (see configure_aisdk_openai_key()/
+#                 install_denodo_license() above) - neither is required,
+#                 so refresh can be called with just whichever of those
+#                 changed, no DENODO_SUPPORT_CI/DENODO_SUPPORT_SECRET
+#                 needed. Triggered on demand via `install.sh --refresh`.
 #   upgrade       - also checks whether DENODO_UPDATE changed and, if so,
 #                 re-runs the Denodo platform installer to apply it, and
 #                 always re-fetches the AI SDK and MCP server. Triggered
 #                 on demand via `install.sh --upgrade`.
+#
+# The PostgreSQL sample-DB restore (Section 09/10) and the AI SDK/MCP
+# server install (Section 13/15) only ever run for "install" and "upgrade"
+# - not because of any explicit check on those two, but because
+# services-only/refresh/cloudflare-refresh all `exit 0` above, well before
+# reaching those sections. Keep that in mind if this dispatch block is ever
+# restructured: moving Section 03+ above these early exits would silently
+# make a plain --refresh re-run the sample DB restore and AI SDK/MCP
+# install too.
 #   cloudflare-refresh - restarts *only* the Cloudflare tunnel, nothing
 #                 else. Needed because a plain `docker restart` (which
 #                 install.sh's --refresh/--upgrade trigger once, as a
@@ -470,6 +572,23 @@ if [ "$DENODO_ACTION" = "refresh" ]; then
   sudo cp -f "$SCRIPT_DIR/nginx-site.conf" /etc/nginx/sites-enabled/default
   nginx_restart
   stop_denodo_services
+
+  # Neither of these requires DENODO_SUPPORT_CI/DENODO_SUPPORT_SECRET (no
+  # denodo-support CLI use here), so refresh works with just whichever of
+  # OPENAI_API_KEY/DENODO_LIC actually changed - no need to repass anything
+  # else. Both are no-ops when nothing new was passed (see each function's
+  # own comment for why).
+  configure_aisdk_openai_key || true
+  # /opt/denodo/denodo-platform/conf/denodo.lic is where the already-running
+  # platform actually reads its license from at runtime - a fresh install
+  # (Section 12) never needs to touch it directly since installer_cli.sh
+  # places it there itself from $DENODO_INSTALL/denodo-developer-lic-9.lic.
+  if install_denodo_license "/opt/denodo/denodo-platform/conf/denodo.lic"; then
+    log_step "Refreshed the Denodo license from the value/mount passed to this run"
+  else
+    log_step "No new license source passed for this refresh - leaving the existing license untouched"
+  fi
+
   start_denodo_services
   start_denodo_mcp_service
   if aisdk_has_openai_key; then
@@ -913,43 +1032,15 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
 
   chmod +x installer_cli.sh
 
-  # Default must be set before it's ever referenced - the log line below used
-  # to read $DENODO_LIC first, which crashed with "unbound variable" whenever
-  # the caller didn't set it (e.g. the Docker flow, which only mounts the
-  # license file and never sets this env var).
-  DENODO_LIC=${DENODO_LIC:-"denodo-developer-lic-9.lic"}
   log_step "Copying Denodo license: $DENODO_LIC"
-
-  # Check the unambiguous absolute-path locations (Docker mount, Pi boot
-  # partition) before the bare $DENODO_LIC filename: cwd is $DENODO_INSTALL
-  # here, and on a resumed run $DENODO_INSTALL/denodo-developer-lic-9.lic
-  # (the copy *destination*) already exists - checking the relative filename
-  # first previously matched that destination file itself as the "source"
-  # and made `cp` fail with "are the same file".
-  if [ -f "/denodo/license.lic" ]; then
-    DENODO_LIC_SRC="/denodo/license.lic"
-  elif [ -f "/boot/firmware/denodo/$DENODO_LIC" ]; then
-    DENODO_LIC_SRC="/boot/firmware/denodo/$DENODO_LIC"
-  elif [ -f "$DENODO_LIC" ]; then
-    DENODO_LIC_SRC="$DENODO_LIC"
-  else
-    log_step "ERROR: no Denodo license file found (checked /denodo/license.lic, /boot/firmware/denodo/$DENODO_LIC, '$DENODO_LIC')"
+  # See install_denodo_license() near the top of this script - it resolves
+  # the license from $DENODO_LIC. A fresh install has no license at all
+  # without one, so a resolution failure is fatal here - unlike the refresh
+  # action, which treats it as "nothing new to apply".
+  if ! install_denodo_license "$DENODO_INSTALL/denodo-developer-lic-9.lic"; then
+    log_step "ERROR: no Denodo license file found (checked '$DENODO_LIC')"
     exit 1
   fi
-
-  # Always overwrite an existing destination copy with whatever license was
-  # just resolved above (e.g. a newer one mounted at /denodo/license.lic) -
-  # `cp` does this by default. The one case that must be skipped is the
-  # source and destination already being the exact same file (only possible
-  # via the bare-filename fallback above): there's nothing to "overwrite"
-  # there, and `cp` would just error out on a self-copy.
-  if [ "$(readlink -f "$DENODO_LIC_SRC" 2>/dev/null)" = "$(readlink -f "$DENODO_INSTALL/denodo-developer-lic-9.lic" 2>/dev/null)" ]; then
-    log_step "License source and destination are the same file, nothing to copy"
-  else
-    log_step "Copying license from $DENODO_LIC_SRC (overwriting any existing destination copy)"
-    sudo cp -f "$DENODO_LIC_SRC" "$DENODO_INSTALL/denodo-developer-lic-9.lic"
-  fi
-  sudo chown denodo:denodo "$DENODO_INSTALL/denodo-developer-lic-9.lic"
   sudo mkdir -p /opt/denodo
   sudo chown -R denodo:denodo /opt/denodo
 
@@ -1084,11 +1175,12 @@ fi
 # on later runs it is refreshed so the workspace matches the remote branch.
 log_section "13" "Install Denodo AI SDK"
 GITHUB_REPO_URL="https://github.com/denodo/denodo-ai-sdk.git"
-# Was referenced below without ever being set, which crashed under `set -u`.
-# Lives under /opt/denodo (not a separate /opt/denodo-aisdk) so it's covered
-# by the same persisted-data symlink as the rest of the Denodo install.
-# Must match denodo-aisdk.service's WorkingDirectory.
-AISDK_INSTALL_DIR=${AISDK_INSTALL_DIR:-"/opt/denodo/denodo-aisdk"}
+# AISDK_INSTALL_DIR is defaulted near the top of this script now (both
+# aisdk_has_openai_key() and configure_aisdk_openai_key() need it under
+# `set -u` before Section 13 ever runs). Lives under /opt/denodo (not a
+# separate /opt/denodo-aisdk) so it's covered by the same persisted-data
+# symlink as the rest of the Denodo install. Must match
+# denodo-aisdk.service's WorkingDirectory.
 # OPENAI_API_KEY is already defaulted near the top of this script -
 # referenced further down as-is, to write it into sdk_config.env/
 # chatbot_config.env.
@@ -1362,21 +1454,12 @@ sed -i 's/^pysqlite3-binary==/pysqlite3==/' requirements.txt
 
 
 # Configure the AI SDK and the sample chatbot's config files, including
-# writing in OPENAI_API_KEY (if one was passed).
-
-log_step "Copying AI SDK config file sdk_config.env"
-
-sudo cp $AISDK_INSTALL_DIR/api/utils/sdk_config.env.example $AISDK_INSTALL_DIR/api/utils/sdk_config.env
-sudo chown denodo:denodo $AISDK_INSTALL_DIR/api/utils/sdk_config.env
-
-sed -i "s|^#\?OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
-
-log_step "Copying chatbot config file chatbot_config.env"
-
-sudo cp $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env.example $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
-sudo chown denodo:denodo $AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env
-
-sed -i "s|^#\?OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" "$AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env"
+# writing in OPENAI_API_KEY (if one was passed) - see
+# configure_aisdk_openai_key() near the top of this script: it only touches
+# the OPENAI_API_KEY line when a new value was actually passed this run, so
+# a plain --upgrade/refresh without --OPENAI_API_KEY doesn't blank out a
+# key configured on an earlier run.
+configure_aisdk_openai_key || true
 
 
 
@@ -1505,7 +1588,16 @@ done
 log_step "Denodo Data Marketplace is running"
 log_section "17.6" "Synchronizing Denodo Metadata"
 
-response=$(curl --silent --show-error --fail  \
+# NOTE: the sync must run as `if response=$(curl ...); then ... else ... fi`
+# (the curl call as the if's own condition), not `response=$(curl ...)`
+# followed by a separate `if [ $? -eq 0 ]`: under `set -e`, a plain
+# assignment statement's command substitution failing exits the script
+# immediately, right there, before a later `if [ $? -eq 0 ]` is ever
+# reached - making that "gentle failure" branch dead code and turning any
+# sync hiccup into a hard install failure. Putting the assignment directly
+# in the if's condition is exempt from `set -e` by design, so a failure
+# here is just logged as a warning and the install continues.
+if response=$(curl --silent --show-error --fail  \
   --request 'POST' \
   --header 'accept: */*' \
   --user "admin:$DENODO_VDP_PWD" \
@@ -1516,15 +1608,14 @@ response=$(curl --silent --show-error --fail  \
     "allServers": "true",
     "priority": "server"
   }' \
-"http://localhost:9090/denodo-data-catalog/public/api/element-management/all/synchronize/all-servers")
-if [ $? -eq 0 ]; then
+"http://localhost:9090/denodo-data-catalog/public/api/element-management/all/synchronize/all-servers"); then
   log_step "Data Marketplace sync (all-servers): SUCCESS"
 else
-  log_step "Data Marketplace sync (all-servers): FAILED"
+  log_step "WARNING: Data Marketplace sync (all-servers) failed - continuing anyway"
   echo "$response" | tee -a "$LOG"
 fi
 
-response=$(curl --silent --show-error --fail  \
+if response=$(curl --silent --show-error --fail  \
   --request 'POST' \
   --header 'accept: */*' \
   --user "admin:$DENODO_VDP_PWD" \
@@ -1536,11 +1627,10 @@ response=$(curl --silent --show-error --fail  \
     "ai_ready"
   ]
 }' \
-"http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize")
-if [ $? -eq 0 ]; then
+"http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize"); then
   log_step "Data Marketplace sync (tags): SUCCESS"
 else
-  log_step "Data Marketplace sync (tags): FAILED"
+  log_step "WARNING: Data Marketplace sync (tags) failed - continuing anyway"
   echo "$response" | tee -a "$LOG"
 fi
 
@@ -1570,17 +1660,18 @@ if aisdk_has_openai_key; then
   done
   log_step "Denodo AI SDK is running"
   log_section "17.7" "Synchronizing AI SDK Metadata"
-  response=$(curl --silent --show-error --fail \
+  # Same `if var=$(curl ...); then` pattern as the Data Marketplace sync
+  # above, and for the same reason: keeps a sync failure from being a hard
+  # `set -e` exit instead of the warning it's meant to be.
+  if response=$(curl --silent --show-error --fail \
     --request GET \
     --header 'accept: */*' \
     --user "admin:$DENODO_VDP_PWD" \
     --header 'Content-Type: application/json' \
-    "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready")
-
-  if [ $? -eq 0 ]; then
+    "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready"); then
     log_step "AI SDK metadata sync: SUCCESS"
   else
-    log_step "AI SDK metadata sync: FAILED"
+    log_step "WARNING: AI SDK metadata sync failed - continuing anyway"
     echo "$response" | tee -a "$LOG"
   fi
 else
