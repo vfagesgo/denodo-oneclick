@@ -376,6 +376,7 @@ else
     -v "${VOLUME_NAME}":/data \
     -e DENODO_SUPPORT_CI="${DENODO_SUPPORT_CI}" \
     -e DENODO_SUPPORT_SECRET="${DENODO_SUPPORT_SECRET}" \
+    -e DENODO_LIC="/denodo/license.lic" \
     -e DENODO_UPDATE="${DENODO_UPDATE:-}" \
     -e DENODO_PG_USER="${DENODO_PG_USER:-}" \
     -e DENODO_PG_PWD="${DENODO_PG_PWD:-}" \
