@@ -1,7 +1,7 @@
 # denodo-oneclick
-Denodo Platform Developer Edition One-Click install for Docker on Windows and Linux.
+Denodo Platform Developer Edition One-Click deployment for Docker on Windows and Linux.
 
-This package provide a fully automated deployment and install of the following Denodo Platform components:
+This package provides a fully automated deployment and install of the following Denodo Platform components:
 * Denodo Virtual Data Port
 * Design Studio
 * Data Marketplace
@@ -15,34 +15,37 @@ This package provide a fully automated deployment and install of the following D
   * PostgreSQL DB
   * Nginx HTTP Server
   
-Following a successful deployment you will get access to a landing webpage with link to all the install components.
+Following a successful deployment, you will get access to a landing webpage with links to all the install components.
 
 
 ![landing page](./landing.png)
 
 
+You will also find a quick start guide to MCP and API services.
+
+![mcp - api](./mcp-api.png)
 
 ## Getting Started
 
 ### Preparation
 
-To install Denodo Platform Developper Edition you just need to follow those steaps
-* Regirster with [Denodo](https://auth.denodo.com/user-management/denodo-platform-developer-tier-previous-register)
+To install Denodo Platform Developer Edition you just need to follow those steps
+* Register with [Denodo](https://auth.denodo.com/user-management/denodo-platform-developer-tier-previous-register)
 * Obtain your Denodo Support Client ID
 * Obtain your Denodo Support Secret
 * Download your Free Denodo Developper License
 
-> **_NOTE:_**  You must have Docker priorly installed on your machine
+> **_NOTE:_**  You must have Docker previously installed on your machine
 
 > **_NOTE:_** Give **Docker** at least **6 GB** of memory (8 GB recommended). 
-> VDP Server, Design Studio, Data Marketplace, AISDK Sample Chatbot and the MCP servers all run as separate concurrent Java processes. Running them under too little memory would causes them to crash shortly after starting (often showing as a 502 from nginx) rather than a clean out-of-memory error. 
+> VDP Server, Design Studio, Data Marketplace, AISDK Sample Chatbot and the MCP servers all run as separate concurrent Java processes. Running them under too little memory would cause them to crash shortly after starting (often showing as a 502 from nginx) rather than a clean out-of-memory error. 
 
 > This is especially easy to hit if you are using [**Colima**](https://github.com/abiosoft/colima), lightweight container runtime tool for macOS and Linux, whose default profile only allocates only 2 GB.
 
 * Increase it with `colima stop && colima start --memory 8 --cpu 4`, or by setting `memory: 8` in `~/.colima/default/colima.yaml`. 
 * On Docker Desktop, adjust it under Settings → Resources → Memory.
 
- You arenow nearly done have can then run the following command to install your own local container image of Denodo Developper by running the following command (change the parameters first)
+ You are now nearly done have can then run the following command to install your own local container image of Denodo Developper by running the following command (change the parameters first)
 
 
 
@@ -173,3 +176,4 @@ Install progress and data live in a single named Docker volume, so they survive 
 ## Current status
 
 The Docker install mode is fully working: it builds a Debian-based image, installs PostgreSQL, Java, the Denodo platform, the Denodo AI SDK, the Denodo MCP server, Sample Data Model and nginx, then starts the Denodo services. **Local (non-Docker) install mode is not implemented yet.**
+
