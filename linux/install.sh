@@ -1092,6 +1092,11 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
   sudo rm -f "/home/denodo/denodo-install-9/denodo-install-9.dat"
   sudo rm -f "/home/denodo/denodo-install-9/denodo-update/denodo-update.jar"
 
+  # Copy the PostgreSQL driver to the DM library
+  # <DENODO_HOME>/lib/data-catalog-extensions
+  # <DENODO_HOME>/lib/extensions/jdbc-drivers/postgresql-17
+
+  cp -R "/opt/denodo/denodo-platform/lib/extensions/jdbc-drivers/postgresql-17/." "/opt/denodo/denodo-platform/lib/data-catalog-extensions/"
   # Record that $DENODO_UPDATE was fully and successfully applied, so a later
   # run (e.g. after a container restart) can skip re-downloading/re-applying
   # it via the DENODO_APPLIED_UPDATE_FILE check at the top of this section -
