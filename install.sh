@@ -12,7 +12,7 @@ set -euo pipefail
 # Override with an env var for testing against a fork/branch.
 REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main}"
 
-IMAGE_NAME="denodo-oneclick"
+IMAGE_NAME="denodo-juan"
 IMAGE_TAG="beta"
 # Single volume: entrypoint.sh mounts everything that needs to persist
 # (repo checkout, downloads, Denodo install, AI SDK, Postgres data) as
