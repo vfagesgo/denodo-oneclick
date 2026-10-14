@@ -17,7 +17,7 @@ IMAGE_TAG="beta"
 # Single volume: entrypoint.sh mounts everything that needs to persist
 # (repo checkout, downloads, Denodo install, AI SDK, Postgres data) as
 # symlinks into subdirectories of /data instead of one volume per path.
-VOLUME_NAME="denodo-oneclick-data"
+VOLUME_NAME="denodo-juan-data"
 
 MODE="docker"
 RESET=0
