@@ -7,10 +7,34 @@
 ## Local install mode is not implemented yet.
 set -euo pipefail
 
+# Repository branch to install from. Optional. Precedence (highest first):
+#   --branch <name> (CLI)  >  BRANCH env var  >  denodo_config.env  >  "wip"
+# It drives three things that must all agree: the raw-file base below (artifacts
+# fetched by `curl | bash`), the `git reset --hard origin/<branch>` run inside
+# the container on --refresh/--upgrade, and the BRANCH passed to
+# docker/entrypoint.sh so its clone/pull uses the same branch.
+#
+# denodo_config.env is only sourced in step 1 (and, for a piped install, is
+# itself fetched in step 0), so any explicit CLI/env value is captured here
+# first: it seeds the bootstrap fetch below, and is re-applied after the config
+# is sourced (see step 2) so the file acts as a default, never an override.
+# A BRANCH set *only* inside denodo_config.env still can't bootstrap the very
+# first fetch of that file in a piped install - that uses the "wip" fallback
+# (or a CLI/env value) - but it is honoured for everything downstream.
+BRANCH_OVERRIDE="${BRANCH:-}"
+for ((i = 1; i <= $#; i++)); do
+  if [[ "${!i}" == "--branch" ]]; then
+    j=$((i + 1))
+    [[ $j -le $# ]] && BRANCH_OVERRIDE="${!j}"
+    break
+  fi
+done
+BRANCH="${BRANCH_OVERRIDE:-wip}"
+
 # Raw-file base used to fetch install artifacts when this script is run via
 # `curl | bash` (no local checkout to read docker/, denodo_config.env from).
 # Override with an env var for testing against a fork/branch.
-REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/wip}"
+REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/${BRANCH}}"
 
 # Overridable via --IMAGE_NAME/--IMAGE_TAG below - e.g. to run a second,
 # independent instance side by side (a different tag for testing an
@@ -115,6 +139,11 @@ Optional (CLI only):
                                   derived from IMAGE_NAME + IMAGE_TAG, so
                                   changing either starts a fresh instance
                                   rather than reusing an existing volume.
+  --branch <name>                Default: wip. Git branch of the denodo-oneclick
+                                  repo to install from. Drives the raw-file base
+                                  used to fetch artifacts, the branch cloned/
+                                  pulled inside the container, and the
+                                  git reset on --refresh/--upgrade.
   --mode <docker|local>          Default: docker (local not implemented yet)
   --reset                        Wipe any existing container + its volumes first,
                                   so the install starts truly from scratch
@@ -161,6 +190,7 @@ while [[ $# -gt 0 ]]; do
     --OPENAI_API_KEY) OPENAI_API_KEY="$2"; shift 2 ;;
     --IMAGE_NAME) IMAGE_NAME="$2"; shift 2 ;;
     --IMAGE_TAG) IMAGE_TAG="$2"; shift 2 ;;
+    --branch) BRANCH="$2"; shift 2 ;;  # pre-scanned above for step 0; re-consumed here
     --mode) MODE="$2"; shift 2 ;;
     --reset) RESET=1; shift ;;
     --refresh) ACTION="refresh"; shift ;;
@@ -170,6 +200,13 @@ while [[ $# -gt 0 ]]; do
     *) echo "Unknown argument: $1" >&2; usage; exit 1 ;;
   esac
 done
+
+# Re-apply an explicit CLI/env branch now that denodo_config.env has been
+# sourced (step 1). Sourcing the config may have set BRANCH from the file; this
+# keeps the file as a default only, so --branch / the BRANCH env var still win.
+# When neither was given, BRANCH keeps whatever the config provided (or the
+# "wip" fallback set before the fetch).
+[[ -n "$BRANCH_OVERRIDE" ]] && BRANCH="$BRANCH_OVERRIDE"
 
 # Derived from the now-final IMAGE_NAME/IMAGE_TAG (CLI overrides, if any,
 # have already been applied above), so a different --IMAGE_NAME/--IMAGE_TAG
@@ -278,12 +315,13 @@ if [[ -n "$ACTION" ]]; then
     -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
     -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY:-}" \
     -e OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
+    -e BRANCH="${BRANCH}" \
     -u denodo \
     "${IMAGE_NAME}" bash -c '
       set -e
       cd /opt/denodo-oneclick
       git fetch origin
-      git reset --hard origin/wip
+      git reset --hard "origin/${BRANCH}"
       git clean -fd
       bash linux/install.sh
     '
@@ -408,6 +446,7 @@ else
     -e DENODO_VDP_PWD="${DENODO_VDP_PWD:-}" \
     -e CLOUDFLARE_TUNNEL_KEY="${CLOUDFLARE_TUNNEL_KEY:-}" \
     -e OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
+    -e BRANCH="${BRANCH}" \
     -v "$(cd "$(dirname "$DENODO_LIC")" && pwd)/$(basename "$DENODO_LIC")":/denodo/license.lic:ro \
     "${IMAGE_NAME}:${IMAGE_TAG}"
 fi

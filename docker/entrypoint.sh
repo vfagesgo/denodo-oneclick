@@ -91,6 +91,9 @@ sudo git config --system http.postBuffer 157286400
 # Install Denodo-Oneclick repository
 
 # Defaults (in case .env is missing values)
+# BRANCH is normally passed in by the top-level install.sh (docker run/exec
+# -e BRANCH=...). This default only applies if the var is unset (e.g. the
+# image is run directly); kept in sync with install.sh's own default.
 GITHUB_REPO=${GITHUB_REPO:-"vfagesgo/denodo-oneclick"}
 INSTALL_DIR="/opt/denodo-oneclick"
 BRANCH=${BRANCH:-"main"}

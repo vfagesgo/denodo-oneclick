@@ -18,6 +18,7 @@ This package provides a fully automated deployment and install of the following 
 Following a successful deployment, you will get access to a landing webpage with links to all the install components.
 
 
+
 ![landing page](./landing.png)
 
 
@@ -89,11 +90,13 @@ Defaults come from `denodo_config.env`; pass any of these to override them:
 - `--DENODO_PG_PWD <value>` (default: `password`)
 - `--DENODO_VDP_PWD <value>` (default: `admin`)
 
+
 ### Optional (CLI only)
 - `--CLOUDFLARE_TUNNEL_KEY <value>` — optional Cloudflare Tunnel token, if you want to expose the instance publicly. Each Cloudflare Tunnel has its own unique token.
 - `--OPENAI_API_KEY <value>` — optional OpenAI API key, used to pre-fill the AI SDK's and sample chatbot's config files (`sdk_config.env`, `chatbot_config.env`); can also be added/changed later via `--refresh` or `--upgrade`.
 - `--IMAGE_NAME <value>` (default: `denodo-oneclick`) — set this to run a separate, independent instance (its own container and data volume) side by side with another one.
 - `--IMAGE_TAG <value>` (default: `beta`) — the data volume name is derived from `IMAGE_NAME`+`IMAGE_TAG` (see [Persistence](#persistence)), so changing either starts a fresh instance rather than reusing an existing volume.
+- `--branch <name>` (default: `wip`, from `denodo_config.env`) — git branch of the `denodo-oneclick` repo to install from. It drives the raw-file base used to fetch the install artifacts (`curl | bash`), the branch cloned/pulled inside the container, and the `git reset --hard origin/<branch>` run on `--refresh`/`--upgrade`. Precedence is `--branch` > `BRANCH` env var > `denodo_config.env` > `wip`. You can set a persistent default by editing `BRANCH` in `denodo_config.env`. Note: for a piped `curl | bash` install, the first fetch of `denodo_config.env` itself uses the built-in `wip` default (or a `--branch`/`BRANCH` value), so a branch set *only* in the config file applies to everything downstream but can't bootstrap that initial fetch.
 - `--mode <docker|local>` — default `docker`; `local` is not implemented yet. The objective in the future would be to also support local automatic installation in linux environment
 - Script bahavior:
   - `--install` - **(default)** - full install. Used the very first time, and whenever entrypoint.sh's marker/OS sanity check says a full install is still needed.
