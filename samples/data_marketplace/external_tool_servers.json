@@ -1,0 +1,81 @@
+[ {
+  "custom" : true,
+  "externalProviderTypeId" : 103,
+  "externalToolServerId" : 108,
+  "serverConfig" : "{\"databaseName\":\"asset_extensions\",\"viewName\":\"i_skill_metadata\"}",
+  "serverDescription" : "A virtual server that provides agent skills",
+  "serverId" : 1,
+  "serverName" : "Agent Skill Server",
+  "serverType" : "CUSTOM",
+  "serverUri" : null
+}, {
+  "custom" : true,
+  "externalProviderTypeId" : 207,
+  "externalToolServerId" : 111,
+  "serverConfig" : "{\"databaseName\":\"asset_extensions\",\"viewName\":\"i_qlik_metadata\"}",
+  "serverDescription" : "Qlik Server description",
+  "serverId" : 1,
+  "serverName" : "Qlik Server",
+  "serverType" : "CUSTOM",
+  "serverUri" : null
+}, {
+  "custom" : true,
+  "externalProviderTypeId" : 208,
+  "externalToolServerId" : 112,
+  "serverConfig" : "{\"databaseName\":\"asset_extensions\",\"viewName\":\"i_looker_metadata\"}",
+  "serverDescription" : "Looker Server description",
+  "serverId" : 1,
+  "serverName" : "Looker Server",
+  "serverType" : "CUSTOM",
+  "serverUri" : null
+}, {
+  "custom" : true,
+  "externalProviderTypeId" : 209,
+  "externalToolServerId" : 113,
+  "serverConfig" : "{\"databaseName\":\"asset_extensions\",\"viewName\":\"i_collibra_metadata\"}",
+  "serverDescription" : "Collibra Server description",
+  "serverId" : 1,
+  "serverName" : "Collibra Server",
+  "serverType" : "CUSTOM",
+  "serverUri" : null
+}, {
+  "custom" : true,
+  "externalProviderTypeId" : 210,
+  "externalToolServerId" : 114,
+  "serverConfig" : "{\"databaseName\":\"asset_extensions\",\"viewName\":\"i_glossary_metadata\"}",
+  "serverDescription" : "Serves Glossary metadata sourced from Confluence into the Data Marketplace",
+  "serverId" : 1,
+  "serverName" : "Confluence Glossary Server",
+  "serverType" : "CUSTOM",
+  "serverUri" : null
+}, {
+  "custom" : true,
+  "externalProviderTypeId" : 211,
+  "externalToolServerId" : 115,
+  "serverConfig" : "{\"databaseName\":\"asset_extensions\",\"viewName\":\"i_dm_query_metadata\"}",
+  "serverDescription" : "Serves Public Query metadata into the Data Marketplace",
+  "serverId" : 1,
+  "serverName" : "DataMarketplace Queries Server",
+  "serverType" : "CUSTOM",
+  "serverUri" : null
+}, {
+  "custom" : true,
+  "externalProviderTypeId" : 205,
+  "externalToolServerId" : 116,
+  "serverConfig" : "{\"databaseName\":\"asset_extensions\",\"viewName\":\"i_data_product_metadata\"}",
+  "serverDescription" : "Serves Data Product metadata into the Data Marketplace",
+  "serverId" : 1,
+  "serverName" : "Denodo Data Product Server",
+  "serverType" : "CUSTOM",
+  "serverUri" : null
+}, {
+  "custom" : true,
+  "externalProviderTypeId" : 206,
+  "externalToolServerId" : 117,
+  "serverConfig" : "{\"databaseName\":\"asset_extensions\",\"viewName\":\"i_scheduler_metadata\"}",
+  "serverDescription" : "Denodo Scheduler server description",
+  "serverId" : 1,
+  "serverName" : "Denodo Scheduler",
+  "serverType" : "CUSTOM",
+  "serverUri" : null
+} ]

@@ -1,5 +1,5 @@
 # denodo-oneclick
-Denodo Platform Developer Edition One-Click deployment for Docker on Windows and Linux.
+Denodo Platform Developer Edition One-Click deployment for Docker on Linux and macOS.
 
 This package provides a fully automated deployment and install of the following Denodo Platform components:
 * Denodo Virtual Data Port
@@ -69,30 +69,6 @@ If you already have this repository checked out locally, you can run the script 
   --DENODO_LIC <Path to your Denodo license file>
 ```
 
-### Windows
-
-On Windows, use `install.ps1` from a PowerShell prompt. Docker Desktop's Linux container backend builds/runs the exact same image as the Linux / MacOS version.
-
-> **_NOTE:_** Start **Docker** Desktop before running the script as it calls `docker` directly and would fail immediately if the Docker engine isn't running.
-
-> **_NOTE:_** **PowerShell** doesn't support piping a script straight into execution the way `curl | bash` does, so download it first, then run it. PowerShell also blocks running downloaded `.ps1` scripts by default, so bypass that for the current session with `Set-ExecutionPolicy`:
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
-
-```powershell
-iwr -useb https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main/install.ps1 -OutFile install.ps1
-```
-
-```powershell
-.\install.ps1 -DENODO_SUPPORT_CI <Support_CI> -DENODO_SUPPORT_SECRET <Support_Secret> -DENODO_LIC <Path to your Denodo license file>
-```
-
-`-Scope Process` only relaxes the policy for the current PowerShell session, not your machine's overall setting.
-
-If you already have this repository checked out locally, run `.\install.ps1 ...` directly instead (still preceded by the `Set-ExecutionPolicy` line above if needed).
-
 ### Final Step 
 
 The install runs in the background. The script automatically follows its logs in your terminal until you Ctrl-C (the container keeps running either way).
@@ -108,14 +84,16 @@ Once it completes, you will wait for about 30 min for the initial install, Denod
 
 ### Optional overrides
 Defaults come from `denodo_config.env`; pass any of these to override them:
-- `--DENODO_UPDATE <value>` (default: `denodo-update-9.5.1`)
+- `--DENODO_UPDATE <value>` (default: `denodo-update-9.5.2`)
 - `--DENODO_PG_USER <value>` (default: `denodo`)
 - `--DENODO_PG_PWD <value>` (default: `password`)
 - `--DENODO_VDP_PWD <value>` (default: `admin`)
 
 ### Optional (CLI only)
 - `--CLOUDFLARE_TUNNEL_KEY <value>` — optional Cloudflare Tunnel token, if you want to expose the instance publicly. Each Cloudflare Tunnel has its own unique token.
-- `--OPENAI_API_KEY <value>` — optional OpenAI API key, used to pre-fill the AI SDK's and sample chatbot's config files (`sdk_config.env`, `chatbot_config.env`).
+- `--OPENAI_API_KEY <value>` — optional OpenAI API key, used to pre-fill the AI SDK's and sample chatbot's config files (`sdk_config.env`, `chatbot_config.env`); can also be added/changed later via `--refresh` or `--upgrade`.
+- `--IMAGE_NAME <value>` (default: `denodo-oneclick`) — set this to run a separate, independent instance (its own container and data volume) side by side with another one.
+- `--IMAGE_TAG <value>` (default: `beta`) — the data volume name is derived from `IMAGE_NAME`+`IMAGE_TAG` (see [Persistence](#persistence)), so changing either starts a fresh instance rather than reusing an existing volume.
 - `--mode <docker|local>` — default `docker`; `local` is not implemented yet. The objective in the future would be to also support local automatic installation in linux environment
 - Script bahavior:
   - `--install` - **(default)** - full install. Used the very first time, and whenever entrypoint.sh's marker/OS sanity check says a full install is still needed.
@@ -145,7 +123,7 @@ These act on the existing `denodo-oneclick` container in place, it does not rebu
 ```
 - `--upgrade` — does everything `--refresh` does, and also: re-runs the Denodo platform installer if `--DENODO_UPDATE` (or its default in `denodo_config.env`) has changed since the last install, and always re-fetches and reinstalls the AI SDK and the Denodo MCP server. Needs `--DENODO_SUPPORT_CI`/`--DENODO_SUPPORT_SECRET` (used to fetch the update/MCP archives); pass `--DENODO_UPDATE <value>` too if you're upgrading to a specific platform version. The Denodo services are stopped before the platform installer runs (required by the installer) and restarted afterwards.
 
-Both commands require a container from a previous install to already exist; they error out if none is found. On Windows, use `-Refresh`/`-Upgrade` with `install.ps1` instead — same behavior, same requirements.
+Both commands require a container from a previous install to already exist; they error out if none is found. If you're running more than one instance via `--IMAGE_NAME`/`--IMAGE_TAG`, pass the same values here too so they target the right container.
 
 ## Stopping and starting the container
 
@@ -168,10 +146,14 @@ docker logs -f denodo-oneclick
 
 ## Persistence
 
-Install progress and data live in a single named Docker volume, so they survive the container being removed and recreated (for example after rebuilding the image):
-- `denodo-oneclick-data` — mounted at `/data`; contains the repository checkout, the installed Denodo platform (including the AI SDK and MCP server), and the PostgreSQL database.
+Install progress and data live in a single named Docker volume, so they survive the container being removed and recreated (for example after rebuilding the image). The volume name is derived from `--IMAGE_NAME`/`--IMAGE_TAG` as `<IMAGE_NAME>-<IMAGE_TAG>-data` — by default `denodo-oneclick-beta-data` — mounted at `/data`; it contains the repository checkout, the installed Denodo platform (including the AI SDK and MCP server), and the PostgreSQL database.
 
 `--reset` removes both this volume and the container.
+
+> **_NOTE:_** This default volume name changed from the previous `denodo-oneclick-data` (now `denodo-oneclick-beta-data`). If you have an existing install you want to keep using, copy its data into the new volume with a throwaway container before running this version of `install.sh` again:
+> ```zsh
+> docker run --rm -v denodo-oneclick-data:/from -v denodo-oneclick-beta-data:/to alpine cp -a /from/. /to/
+> ```
 
 ## Current status
 

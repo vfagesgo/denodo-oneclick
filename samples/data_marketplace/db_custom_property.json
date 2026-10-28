@@ -1,0 +1,71 @@
+[ {
+  "dbId" : 204,
+  "propertyId" : 1,
+  "searchValue" : "📧 business.owner@yourcompany.com | 📞 +10000000000 | 💬 Chat on Teams",
+  "visualValue" : "📧 <a href=\"mailto:business.owner@yourcompany.com\">business.owner@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a>+10000000000</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=business.owner@yourcompany.com\">Chat on Teams</a>"
+}, {
+  "dbId" : 204,
+  "propertyId" : 2,
+  "searchValue" : "📧 data.steward@yourcompany.com | 📞 +10000000001 | 💬 Chat on Teams",
+  "visualValue" : "📧 <a href=\"mailto:data.steward@yourcompany.com\">data.steward@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a>+10000000001</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data.steward@yourcompany.com\">Chat on Teams</a>"
+}, {
+  "dbId" : 204,
+  "propertyId" : 3,
+  "searchValue" : "e.g. Commercial Analytics",
+  "visualValue" : "e.g. Commercial Analytics"
+}, {
+  "dbId" : 204,
+  "propertyId" : 4,
+  "searchValue" : "📧 data-support@yourcompany.com | 📞 +10000000002 | 💬 Chat on Teams",
+  "visualValue" : "📧 <a href=\"mailto:data-support@yourcompany.com\">data-support@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a>+10000000002</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data-support@yourcompany.com\">Chat on Teams</a>"
+}, {
+  "dbId" : 204,
+  "propertyId" : 5,
+  "searchValue" : "📧 data-escalation@yourcompany.com | 📞 +10000000003 | 💬 Chat on Teams",
+  "visualValue" : "📧 <a href=\"mailto:data-escalation@yourcompany.com\">data-escalation@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a>+10000000003</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data-escalation@yourcompany.com\">Chat on Teams</a>"
+}, {
+  "dbId" : 204,
+  "propertyId" : 6,
+  "searchValue" : "e.g. Pharma / Clinical Trials",
+  "visualValue" : "e.g. Pharma / Clinical Trials"
+}, {
+  "dbId" : 204,
+  "propertyId" : 7,
+  "searchValue" : "1.0.0",
+  "visualValue" : "1.0.0"
+}, {
+  "dbId" : 204,
+  "propertyId" : 8,
+  "searchValue" : "🟡 Draft",
+  "visualValue" : "🟡 Draft"
+}, {
+  "dbId" : 204,
+  "propertyId" : 9,
+  "searchValue" : "🏢 Internal",
+  "visualValue" : "🏢 Internal"
+}, {
+  "dbId" : 204,
+  "propertyId" : 10,
+  "searchValue" : "📅 Daily",
+  "visualValue" : "📅 Daily"
+}, {
+  "dbId" : 204,
+  "propertyId" : 11,
+  "searchValue" : "🥉 Bronze - Experimental",
+  "visualValue" : "🥉 Bronze - Experimental"
+}, {
+  "dbId" : 204,
+  "propertyId" : 12,
+  "searchValue" : "e.g. ERP, Clinical Trials DB, BNF reference data",
+  "visualValue" : "e.g. ERP, Clinical Trials DB, BNF reference data"
+}, {
+  "dbId" : 204,
+  "propertyId" : 13,
+  "searchValue" : "⚠️ Internal use only unless otherwise approved by Data Governance.",
+  "visualValue" : "⚠️ <b>Internal use only</b> unless otherwise approved by Data Governance."
+}, {
+  "dbId" : 204,
+  "propertyId" : 14,
+  "searchValue" : "e.g. 7 years",
+  "visualValue" : "e.g. 7 years"
+} ]

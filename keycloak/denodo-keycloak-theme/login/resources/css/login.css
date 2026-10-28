@@ -1,0 +1,207 @@
+/* Denodo OneClick-inspired Keycloak login theme */
+:root {
+  --denodo-navy: #112533;
+  --denodo-navy-light: #193747;
+  --denodo-white: #ffffff;
+  --denodo-text: #243746;
+  --denodo-muted: #667783;
+  --denodo-border: #d5dde2;
+  --denodo-focus: #3b91c9;
+}
+
+/* Background and page framing */
+html, body {
+  min-height: 100%;
+}
+body {
+  background: var(--denodo-navy) !important;
+  color: var(--denodo-text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+.login-pf body {
+  background: var(--denodo-navy) !important;
+  background-image: none !important;
+}
+#kc-header, #kc-header-wrapper {
+  display: none;
+}
+#kc-content {
+  padding-top: 0;
+}
+#kc-content-wrapper {
+  margin-top: 0;
+}
+
+/* Centered white authentication panel */
+.login-pf-page {
+  padding-top: 5vh;
+  padding-bottom: 40px;
+}
+.card-pf {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 34px 36px 30px;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .24);
+  background: var(--denodo-white);
+}
+#kc-page-title {
+  display: none;
+}
+.denodo-brand {
+  text-align: center;
+  margin: 0 0 28px;
+}
+.denodo-logo {
+  display: block;
+  width: min(210px, 75%);
+  max-height: 68px;
+  object-fit: contain;
+  margin: 0 auto 12px;
+}
+.denodo-product-name {
+  color: var(--denodo-navy);
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -.35px;
+}
+.denodo-subtitle {
+  margin: 8px 0 0;
+  color: var(--denodo-muted);
+  font-size: 14px;
+}
+
+/* Fields */
+#kc-form-login .form-group,
+#kc-form-login .pf-c-form__group {
+  margin-bottom: 19px;
+}
+#kc-form-login label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--denodo-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+#kc-form-login input[type="text"],
+#kc-form-login input[type="password"],
+#kc-form-login input[type="email"],
+#kc-form-login .form-control {
+  box-sizing: border-box;
+  width: 100%;
+  height: 46px;
+  padding: 10px 12px;
+  border: 1px solid var(--denodo-border);
+  border-radius: 5px;
+  background: #fff;
+  color: var(--denodo-text);
+  font-size: 15px;
+  box-shadow: none;
+}
+#kc-form-login input:focus {
+  border-color: var(--denodo-focus);
+  outline: 2px solid rgba(59, 145, 201, .18);
+  outline-offset: 1px;
+}
+.denodo-form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 3px 0 22px;
+  font-size: 13px;
+}
+.denodo-form-options a,
+#kc-content-wrapper a {
+  color: #176b9c;
+  text-decoration: none;
+}
+.denodo-form-options a:hover,
+#kc-content-wrapper a:hover {
+  text-decoration: underline;
+}
+.denodo-remember {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 7px;
+  margin: 0 !important;
+  font-weight: 400 !important;
+}
+.denodo-remember input {
+  margin: 0;
+}
+
+/* Match the wide primary buttons used by OneClick */
+.denodo-button,
+#kc-login {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--denodo-navy);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, transform .15s ease;
+}
+.denodo-button:hover,
+#kc-login:hover {
+  background: var(--denodo-navy-light);
+}
+.denodo-button:focus-visible,
+#kc-login:focus-visible {
+  outline: 3px solid var(--denodo-focus);
+  outline-offset: 2px;
+}
+#kc-form-buttons, #kc-form-options {
+  margin-top: 0;
+}
+
+/* Messages and footer */
+.alert, .pf-c-alert {
+  border-radius: 5px;
+}
+#kc-info-wrapper {
+  background: transparent;
+}
+#kc-locale {
+  color: #fff;
+}
+.login-pf-page .login-pf-signup {
+  color: #fff;
+}
+#kc-registration-container, #kc-info {
+  color: #fff;
+}
+#kc-registration-container a, #kc-info a {
+  color: #fff;
+  text-decoration: underline;
+}
+body::after {
+  content: "Property of Denodo. © Copyright Denodo 2026";
+  display: block;
+  padding: 18px 12px 0;
+  color: rgba(255,255,255,.85);
+  text-align: center;
+  font-size: 12px;
+}
+
+/* Small screens */
+@media (max-width: 480px) {
+  .login-pf-page {
+    padding: 20px 12px 24px;
+  }
+  .card-pf {
+    padding: 26px 22px 24px;
+    border-radius: 8px;
+  }
+  .denodo-product-name {
+    font-size: 22px;
+  }
+  .denodo-form-options {
+    align-items: flex-start;
+  }
+}

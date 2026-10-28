@@ -1,0 +1,34 @@
+# Copy this file to `samples_bank.yaml` and adjust the values for your environment.
+# Icon file name expected in the `api/agents/custom/icons` directory.
+
+name: "Banking agent"
+id: "banking-agent"
+description: >-
+  Retail banking analytics assistant for the the samples_bank database. This example
+  shows how to scope a custom agent to a specific database, expose end-user filters,
+  and configure agent-specific behavior.
+icon_file_name: "bank_agent.png"
+allowed_users:
+  - "admin"
+settings:
+  deepquery_enabled: true
+  reporting_enabled: true
+  feedback_enabled: false
+  unstructured_mode: true
+  user_edit_llm: true
+  auto_graph: true
+  filters_enabled: true
+
+  report_max_size: 50
+  report_max_files: 20
+
+  databases:
+    - "bank_demo"
+
+  custom_instructions:
+    ai_sdk: >-
+      Always return the loan officer associated with a loan when returning information about a loan.
+    chatbot: >-
+      Answer in a concise banking-analyst tone.
+
+  user_edit_instructions: true

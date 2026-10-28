@@ -1240,6 +1240,11 @@ else
   git clean -fd
 fi
 
+## Creating AISDK Agents
+cp -a /opt/denodo-oneclick/samples/chatbot_agent/custom/. \
+      /opt/denodo/denodo-aisdk/api/agents/custom/
+chown -R denodo:denodo /opt/denodo/denodo-aisdk/api/agents/custom/
+
 # Section 14:
 # The AI SDK depends on a fairly large native/Python build toolchain on
 # Raspberry Pi. This section installs apt dependencies, bootstraps pyenv,
@@ -1572,7 +1577,19 @@ log_step "Denodo VDP is listening on TCP port 9999"
 log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
 
-/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/sample_model.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
+local export_properties="/opt/denodo-oneclick/samples/full_export/fullExport.properties"
+sed -i "s|<OpenAI_apiKey>|$OPENAI_API_KEY|g" $export_properties
+
+#Copy assets extensions samples
+unzip /opt/denodo-oneclick/samples/asset_extensions.zip -d /opt/denodo/denodo-platform/samples/
+unzip /opt/denodo-oneclick/samples/skills.zip -d /opt/denodo/denodo-platform/samples/
+
+/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/full_export/fullExport.vql --properties-file $export_properties --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password 
+#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/admin_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
+#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/asset_extensions_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
+#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/pharm_ai_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
+#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/bank_demo_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
+#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/aws_tpcds_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
 
 
 log_step "Waiting for Denodo DM to start"
@@ -1638,6 +1655,10 @@ else
   log_step "WARNING: Data Marketplace sync (tags) failed - continuing anyway"
   echo "$response" | tee -a "$LOG"
 fi
+
+
+### import data marketplace metadata
+/opt/denodo/denodo-platform/tools/data-catalog/import -h localhost -p 9090 -l admin -P admin -f /opt/denodo-oneclick/samples/data_marketplace.zip
 
 
 # Load the AI SDK's metadata into its vector DB, so it can answer natural-

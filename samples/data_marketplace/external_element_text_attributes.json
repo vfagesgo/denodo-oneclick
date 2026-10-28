@@ -1,0 +1,341 @@
+[ {
+  "attributeId" : 14,
+  "externalElementId" : 457,
+  "searchValue" : null,
+  "textValue" : "https://qlik-server.denodo.com/sense/app/7d5b2a3c-8e1f-4902-b6d7-123456789abc/sheet/f9e8d7c6-b5a4-4321-9876-0123456789ab/state/analysis"
+}, {
+  "attributeId" : 14,
+  "externalElementId" : 458,
+  "searchValue" : null,
+  "textValue" : "https://qlik-server.denodo.com/sense/app/7d5b2a3c-8e1f-4902-b6d7-123456789abc/sheet/f9e8d7c6-b5a4-4321-9876-0123456789ab/state/analysis"
+}, {
+  "attributeId" : 119,
+  "externalElementId" : 459,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 460,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 460,
+  "searchValue" : null,
+  "textValue" : "eferences/01_rank_practices_by_spend.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 461,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 461,
+  "searchValue" : null,
+  "textValue" : "eferences/03_rank_reps_by_capacity.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 462,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 462,
+  "searchValue" : null,
+  "textValue" : "eferences/02_flag_zero_visit_practices.md"
+}, {
+  "attributeId" : 119,
+  "externalElementId" : 463,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 464,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 464,
+  "searchValue" : null,
+  "textValue" : "eferences/03_imaging_records.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 465,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 465,
+  "searchValue" : null,
+  "textValue" : "eferences/02_trial_history.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 466,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 466,
+  "searchValue" : null,
+  "textValue" : "eferences/01_patient_profile.md"
+}, {
+  "attributeId" : 119,
+  "externalElementId" : 467,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 468,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 468,
+  "searchValue" : null,
+  "textValue" : "eferences/04_safety_signal_scan.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 469,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 469,
+  "searchValue" : null,
+  "textValue" : "eferences/02_patient_roster.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 470,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 470,
+  "searchValue" : null,
+  "textValue" : "eferences/01_trial_metrics.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 471,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 471,
+  "searchValue" : null,
+  "textValue" : "eferences/00_resolve_trial.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 472,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 472,
+  "searchValue" : null,
+  "textValue" : "eferences/03_prescribing_uptake.md"
+}, {
+  "attributeId" : 119,
+  "externalElementId" : 473,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 474,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 474,
+  "searchValue" : null,
+  "textValue" : "eferences/06_preferred_vs_nonpreferred.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 475,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 475,
+  "searchValue" : null,
+  "textValue" : "eferences/14_shipping_mode_carrier_cost.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 476,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 476,
+  "searchValue" : null,
+  "textValue" : "eferences/08_aov_by_household_size.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 477,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 477,
+  "searchValue" : null,
+  "textValue" : "eferences/02_revenue_by_demographic_segment.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 478,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 478,
+  "searchValue" : null,
+  "textValue" : "eferences/10_top_customer_marketing_list.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 479,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 479,
+  "searchValue" : null,
+  "textValue" : "eferences/09_new_customer_cohort_revenue.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 480,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 480,
+  "searchValue" : null,
+  "textValue" : "eferences/11_coupon_discount_usage.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 481,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 481,
+  "searchValue" : null,
+  "textValue" : "eferences/05_profitability_by_credit_rating.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 482,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 482,
+  "searchValue" : null,
+  "textValue" : "eferences/03_aov_by_education.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 483,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 483,
+  "searchValue" : null,
+  "textValue" : "eferences/01_top_customers_by_revenue.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 484,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 484,
+  "searchValue" : null,
+  "textValue" : "eferences/13_income_band_buy_potential.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 485,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 485,
+  "searchValue" : null,
+  "textValue" : "eferences/12_demographics_at_time_of_purchase.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 486,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 486,
+  "searchValue" : null,
+  "textValue" : "eferences/07_revenue_by_state.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 487,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 487,
+  "searchValue" : null,
+  "textValue" : "eferences/15_billing_shipping_address_mismatch.md"
+}, {
+  "attributeId" : 121,
+  "externalElementId" : 488,
+  "searchValue" : null,
+  "textValue" : null
+}, {
+  "attributeId" : 123,
+  "externalElementId" : 488,
+  "searchValue" : null,
+  "textValue" : "eferences/04_revenue_trend_by_quarter.md"
+}, {
+  "attributeId" : 19,
+  "externalElementId" : 498,
+  "searchValue" : null,
+  "textValue" : ""
+}, {
+  "attributeId" : 21,
+  "externalElementId" : 507,
+  "searchValue" : null,
+  "textValue" : "https://id.atlassian.com/login"
+}, {
+  "attributeId" : 21,
+  "externalElementId" : 508,
+  "searchValue" : null,
+  "textValue" : "https://id.atlassian.com/login"
+}, {
+  "attributeId" : 21,
+  "externalElementId" : 509,
+  "searchValue" : null,
+  "textValue" : "https://id.atlassian.com/login"
+}, {
+  "attributeId" : 21,
+  "externalElementId" : 510,
+  "searchValue" : null,
+  "textValue" : "https://id.atlassian.com/login"
+}, {
+  "attributeId" : 21,
+  "externalElementId" : 515,
+  "searchValue" : null,
+  "textValue" : "https://id.atlassian.com/login"
+}, {
+  "attributeId" : 21,
+  "externalElementId" : 516,
+  "searchValue" : null,
+  "textValue" : "https://id.atlassian.com/login"
+}, {
+  "attributeId" : 21,
+  "externalElementId" : 517,
+  "searchValue" : null,
+  "textValue" : "https://id.atlassian.com/login"
+}, {
+  "attributeId" : 21,
+  "externalElementId" : 518,
+  "searchValue" : null,
+  "textValue" : "https://id.atlassian.com/login"
+}, {
+  "attributeId" : 14,
+  "externalElementId" : 530,
+  "searchValue" : null,
+  "textValue" : "https://looker-server.denodo.com/sense/app/7d5b2a3c-8e1f-4902-b6d7-123456789abc/sheet/f9e8d7c6-b5a4-4321-9876-0123456789ab/state/analysis"
+} ]

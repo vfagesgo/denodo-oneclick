@@ -1,0 +1,71 @@
+[ {
+  "description" : "The external element report",
+  "descriptionType" : "TEXT",
+  "externalElementTypeId" : 1,
+  "iconColorCode" : "#8690DB",
+  "iconKey" : "far fa-chart-simple",
+  "name" : "REPORT",
+  "reversedIconColorCode" : "#fff",
+  "searchDescription" : "The external element report",
+  "visualName" : "Report"
+}, {
+  "description" : "Data Product description",
+  "descriptionType" : "TEXT",
+  "externalElementTypeId" : 2,
+  "iconColorCode" : "#CFB53B",
+  "iconKey" : "fas fa-cube",
+  "name" : "DATA_PRODUCT",
+  "reversedIconColorCode" : "#fff",
+  "searchDescription" : "Data Product description",
+  "visualName" : "Data Product"
+}, {
+  "description" : "ETL description",
+  "descriptionType" : "TEXT",
+  "externalElementTypeId" : 3,
+  "iconColorCode" : "#E8B4B8",
+  "iconKey" : "fas fa-circle-nodes",
+  "name" : "ETL",
+  "reversedIconColorCode" : "#fff",
+  "searchDescription" : "ETL description",
+  "visualName" : "ETL"
+}, {
+  "description" : "Glossary description",
+  "descriptionType" : "TEXT",
+  "externalElementTypeId" : 4,
+  "iconColorCode" : "#5D4037",
+  "iconKey" : "fas fa-book",
+  "name" : "GLOSSARY",
+  "reversedIconColorCode" : "#fff",
+  "searchDescription" : "Glossary description",
+  "visualName" : "Glossary"
+}, {
+  "description" : "A modular capability or function that enables an AI agent to execute a specific task, connect to an external tool, or interact with an API.",
+  "descriptionType" : "TEXT",
+  "externalElementTypeId" : 102,
+  "iconColorCode" : "#5C937B",
+  "iconKey" : "fas fa-brain",
+  "name" : "AGENT_SKILL",
+  "reversedIconColorCode" : "#fff",
+  "searchDescription" : "A modular capability or function that enables an AI agent to execute a specific task, connect to an external tool, or interact with an API.",
+  "visualName" : "Agent Skill"
+}, {
+  "description" : "The specific asset required by a skill to successfully execute its function.",
+  "descriptionType" : "TEXT",
+  "externalElementTypeId" : 103,
+  "iconColorCode" : "#A21CAF",
+  "iconKey" : "fas fa-book-sparkles",
+  "name" : "AGENT_SKILL_RESOURCE",
+  "reversedIconColorCode" : "#fff",
+  "searchDescription" : "The specific asset required by a skill to successfully execute its function.",
+  "visualName" : "Skill Resource"
+}, {
+  "description" : "A saved, publicly shared query executable against the Data Marketplace",
+  "descriptionType" : "TEXT",
+  "externalElementTypeId" : 202,
+  "iconColorCode" : "#6A4C93",
+  "iconKey" : "fas fa-magnifying-glass",
+  "name" : "PUBLIC_QUERY",
+  "reversedIconColorCode" : "#fff",
+  "searchDescription" : "A saved, publicly shared query executable against the Data Marketplace",
+  "visualName" : "Public Query"
+} ]

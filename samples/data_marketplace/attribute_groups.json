@@ -1,0 +1,82 @@
+[ {
+  "attributeGroupId" : 1,
+  "customOrder" : 1,
+  "description" : "The report data insights",
+  "descriptionType" : "TEXT",
+  "isDefault" : false,
+  "name" : "report_data_insights",
+  "placeToShow" : "DATA_INSIGHTS_PANEL",
+  "searchDescription" : "The report data insights"
+}, {
+  "attributeGroupId" : 2,
+  "customOrder" : 2,
+  "description" : "The report roles",
+  "descriptionType" : "TEXT",
+  "isDefault" : false,
+  "name" : "report_roles",
+  "placeToShow" : "ROLES_PANEL",
+  "searchDescription" : "The report roles"
+}, {
+  "attributeGroupId" : 3,
+  "customOrder" : 3,
+  "description" : "The report metadata",
+  "descriptionType" : "TEXT",
+  "isDefault" : true,
+  "name" : "report_metadata",
+  "placeToShow" : "METADATA_PANEL",
+  "searchDescription" : "The report metadata"
+}, {
+  "attributeGroupId" : 4,
+  "customOrder" : 1,
+  "description" : "Default attribute group for DATA_PRODUCT",
+  "descriptionType" : "TEXT",
+  "isDefault" : true,
+  "name" : "data_product_default",
+  "placeToShow" : null,
+  "searchDescription" : "Default attribute group for DATA_PRODUCT"
+}, {
+  "attributeGroupId" : 5,
+  "customOrder" : 1,
+  "description" : "Default attribute group for ETL",
+  "descriptionType" : "TEXT",
+  "isDefault" : true,
+  "name" : "etl_default",
+  "placeToShow" : null,
+  "searchDescription" : "Default attribute group for ETL"
+}, {
+  "attributeGroupId" : 6,
+  "customOrder" : 1,
+  "description" : "Default attribute group for GLOSSARY",
+  "descriptionType" : "TEXT",
+  "isDefault" : true,
+  "name" : "glossary_default",
+  "placeToShow" : null,
+  "searchDescription" : "Default attribute group for GLOSSARY"
+}, {
+  "attributeGroupId" : 104,
+  "customOrder" : 1,
+  "description" : "Default attribute group for Agent Skill",
+  "descriptionType" : "TEXT",
+  "isDefault" : true,
+  "name" : "agent_skill_default",
+  "placeToShow" : null,
+  "searchDescription" : "Default attribute group for Agent Skill"
+}, {
+  "attributeGroupId" : 105,
+  "customOrder" : 1,
+  "description" : "Default attribute group for Agent Skill Resource",
+  "descriptionType" : "TEXT",
+  "isDefault" : true,
+  "name" : "agent_skill_resource_default",
+  "placeToShow" : null,
+  "searchDescription" : "Default attribute group for Agent Skill Resource"
+}, {
+  "attributeGroupId" : 204,
+  "customOrder" : 1,
+  "description" : "Default attribute group for PUBLIC_QUERY",
+  "descriptionType" : "TEXT",
+  "isDefault" : true,
+  "name" : "public_query_default",
+  "placeToShow" : null,
+  "searchDescription" : "Default attribute group for PUBLIC_QUERY"
+} ]

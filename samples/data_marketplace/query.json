@@ -1,0 +1,37 @@
+[ {
+  "queryId" : 1,
+  "serverId" : 1,
+  "userName" : "admin",
+  "name" : {
+    "database" : "admin",
+    "description" : "",
+    "id" : null,
+    "name" : "Amoxicillin trials",
+    "sharedQuery" : false,
+    "type" : "vql_shell",
+    "username" : "admin",
+    "vqlShellQuery" : "WITH \"ct_codes\" AS (\n         SELECT DISTINCT \"bnf_code\" AS \"bnf_code\"\n         FROM \"pharm_ai\".\"clinical_trials\"\n         WHERE \"trial_name\" = 'Amoxicillin 500mg capsules Trial'\n     )\nSELECT ROUND(SUM(\"gp\".\"actual_cost\"), 2) AS \"TotalActualCost\",\n       SUM(\"gp\".\"items\") AS \"TotalItems\",\n       COUNT(DISTINCT \"gp\".\"practice_code\") AS \"PracticeCount\",\n       COUNT(DISTINCT \"ct\".\"bnf_code\") AS \"BnfCodeCount\"\nFROM \"ct_codes\" \"ct\"\n     JOIN \"pharm_ai\".\"fact_gpprescribing_sample\" \"gp\"\n         ON \"ct\".\"bnf_code\" = \"gp\".\"bnf_code\""
+  },
+  "queryName" : "Amoxicillin trials",
+  "queryDesc" : "",
+  "creationDate" : "2026-10-15T16:31:08.237",
+  "lastModificationDate" : null
+}, {
+  "queryId" : 101,
+  "serverId" : 1,
+  "userName" : "admin",
+  "name" : {
+    "database" : "admin",
+    "description" : "",
+    "id" : 1,
+    "name" : "Amoxicillin trials_public",
+    "sharedQuery" : false,
+    "type" : "vql_shell",
+    "username" : "admin",
+    "vqlShellQuery" : "WITH \"ct_codes\" AS (\n         SELECT DISTINCT \"bnf_code\" AS \"bnf_code\"\n         FROM \"pharm_ai\".\"clinical_trials\"\n         WHERE \"trial_name\" = 'Amoxicillin 500mg capsules Trial'\n     )\nSELECT ROUND(SUM(\"gp\".\"actual_cost\"), 2) AS \"TotalActualCost\",\n       SUM(\"gp\".\"items\") AS \"TotalItems\",\n       COUNT(DISTINCT \"gp\".\"practice_code\") AS \"PracticeCount\",\n       COUNT(DISTINCT \"ct\".\"bnf_code\") AS \"BnfCodeCount\"\nFROM \"ct_codes\" \"ct\"\n     JOIN \"pharm_ai\".\"fact_gpprescribing_sample\" \"gp\"\n         ON \"ct\".\"bnf_code\" = \"gp\".\"bnf_code\""
+  },
+  "queryName" : "Amoxicillin trials_public",
+  "queryDesc" : "",
+  "creationDate" : "2026-10-15T17:26:43.642",
+  "lastModificationDate" : null
+} ]

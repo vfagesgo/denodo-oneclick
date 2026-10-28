@@ -1,0 +1,21 @@
+[ {
+  "creationDate" : "2026-10-16T20:25:23.507834606",
+  "description" : "",
+  "idPublicQuery" : 202,
+  "idQuery" : 101,
+  "lastModificationDate" : null,
+  "lastPublicationDate" : "2026-10-16T20:25:23.507842439",
+  "name" : "Amoxicillin trials_public",
+  "publisher" : "admin",
+  "query" : {
+    "database" : "admin",
+    "description" : "",
+    "id" : 101,
+    "name" : "Amoxicillin trials_public",
+    "sharedQuery" : false,
+    "type" : "vql_shell",
+    "username" : "admin",
+    "vqlShellQuery" : "WITH \"ct_codes\" AS (\n         SELECT DISTINCT \"bnf_code\" AS \"bnf_code\"\n         FROM \"pharm_ai\".\"clinical_trials\"\n         WHERE \"trial_name\" = 'Amoxicillin 500mg capsules Trial'\n     )\nSELECT ROUND(SUM(\"gp\".\"actual_cost\"), 2) AS \"TotalActualCost\",\n       SUM(\"gp\".\"items\") AS \"TotalItems\",\n       COUNT(DISTINCT \"gp\".\"practice_code\") AS \"PracticeCount\",\n       COUNT(DISTINCT \"ct\".\"bnf_code\") AS \"BnfCodeCount\"\nFROM \"ct_codes\" \"ct\"\n     JOIN \"pharm_ai\".\"fact_gpprescribing_sample\" \"gp\"\n         ON \"ct\".\"bnf_code\" = \"gp\".\"bnf_code\""
+  },
+  "type" : "vql_shell"
+} ]

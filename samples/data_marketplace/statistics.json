@@ -1,0 +1,19 @@
+[ {
+  "allTime" : false,
+  "databaseConnection" : null,
+  "datasourceUrl" : null,
+  "fetching" : false,
+  "login" : null,
+  "oneDay" : false,
+  "oneMonth" : false,
+  "oneYear" : false,
+  "password" : null,
+  "query" : false,
+  "requestDatabase" : null,
+  "requestDatabaseOrDefault" : null,
+  "requestView" : null,
+  "requestViewOrDefault" : "usage_statistics_src",
+  "serverId" : 1,
+  "user" : false,
+  "userAgent" : false
+} ]

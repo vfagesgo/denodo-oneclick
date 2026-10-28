@@ -1,0 +1,34 @@
+[ {
+  "aiUsage" : "DISABLED",
+  "customOrder" : 1,
+  "default" : true,
+  "description" : "Default group to create properties.",
+  "descriptionType" : "TEXT",
+  "id" : 1,
+  "name" : "Default Group",
+  "placeToShow" : "SUMMARY_TAB",
+  "propertyCount" : null,
+  "searchDescription" : "Default group to create properties."
+}, {
+  "aiUsage" : "ENABLED",
+  "customOrder" : 2,
+  "default" : false,
+  "description" : "Accountable and responsible contacts for this Data Product.",
+  "descriptionType" : "TEXT",
+  "id" : 2,
+  "name" : "Data Product Owners",
+  "placeToShow" : "SUMMARY_TAB",
+  "propertyCount" : null,
+  "searchDescription" : "Accountable and responsible contacts for this Data Product."
+}, {
+  "aiUsage" : "ENABLED",
+  "customOrder" : 3,
+  "default" : false,
+  "description" : "Classification, lifecycle and operational metadata for this Data Product.",
+  "descriptionType" : "TEXT",
+  "id" : 3,
+  "name" : "Data Product Details",
+  "placeToShow" : "SUMMARY_TAB",
+  "propertyCount" : null,
+  "searchDescription" : "Classification, lifecycle and operational metadata for this Data Product."
+} ]

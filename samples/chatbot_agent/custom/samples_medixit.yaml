@@ -1,0 +1,35 @@
+# Copy this file to `samples_bank.yaml` and adjust the values for your environment.
+# Icon file name expected in the `api/agents/custom/icons` directory.
+
+name: "Pharma agent"
+id: "pharma-agent"
+description: >-
+  Medical and Pharma drug manufacturer assistant for the the pharm_ai database. This example
+  shows how to scope a custom agent to a specific database, expose end-user filters,
+  and configure agent-specific behavior.
+icon_file_name: "pharma_agent.png"
+allowed_users:
+  - "admin"
+  - "pharm_ai"
+settings:
+  deepquery_enabled: true
+  reporting_enabled: true
+  feedback_enabled: true
+  unstructured_mode: true
+  user_edit_llm: true
+  auto_graph: true
+  filters_enabled: true
+
+
+
+  ai_sdk_llm_settings:
+    
+    check_ambiguity: true
+
+  report_max_size: 50
+  report_max_files: 20
+
+  databases:
+    - "pharm_ai"
+
+  user_add_custom_instructions: false

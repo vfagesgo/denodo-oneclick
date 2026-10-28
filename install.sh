@@ -12,12 +12,13 @@ set -euo pipefail
 # Override with an env var for testing against a fork/branch.
 REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main}"
 
+# Overridable via --IMAGE_NAME/--IMAGE_TAG below - e.g. to run a second,
+# independent instance side by side (a different tag for testing an
+# upgrade, say) without colliding with an existing one. VOLUME_NAME is
+# derived from these further down, once CLI parsing has settled their
+# final values, rather than fixed here.
 IMAGE_NAME="denodo-oneclick"
 IMAGE_TAG="beta"
-# Single volume: entrypoint.sh mounts everything that needs to persist
-# (repo checkout, downloads, Denodo install, AI SDK, Postgres data) as
-# symlinks into subdirectories of /data instead of one volume per path.
-VOLUME_NAME="denodo-oneclick-data"
 
 MODE="docker"
 RESET=0
@@ -106,6 +107,14 @@ Optional (CLI only):
                                   (sdk_config.env, chatbot_config.env); can
                                   also be added/changed later via --refresh
                                   or --upgrade
+  --IMAGE_NAME <value>           Default: denodo-oneclick. Set this to run a
+                                  separate, independent instance (its own
+                                  container + data volume) side by side with
+                                  another one.
+  --IMAGE_TAG <value>            Default: beta. The data volume name is
+                                  derived from IMAGE_NAME + IMAGE_TAG, so
+                                  changing either starts a fresh instance
+                                  rather than reusing an existing volume.
   --mode <docker|local>          Default: docker (local not implemented yet)
   --reset                        Wipe any existing container + its volumes first,
                                   so the install starts truly from scratch
@@ -150,6 +159,8 @@ while [[ $# -gt 0 ]]; do
     --DENODO_VDP_PWD) DENODO_VDP_PWD="$2"; shift 2 ;;
     --CLOUDFLARE_TUNNEL_KEY) CLOUDFLARE_TUNNEL_KEY="$2"; shift 2 ;;
     --OPENAI_API_KEY) OPENAI_API_KEY="$2"; shift 2 ;;
+    --IMAGE_NAME) IMAGE_NAME="$2"; shift 2 ;;
+    --IMAGE_TAG) IMAGE_TAG="$2"; shift 2 ;;
     --mode) MODE="$2"; shift 2 ;;
     --reset) RESET=1; shift ;;
     --refresh) ACTION="refresh"; shift ;;
@@ -159,6 +170,20 @@ while [[ $# -gt 0 ]]; do
     *) echo "Unknown argument: $1" >&2; usage; exit 1 ;;
   esac
 done
+
+# Derived from the now-final IMAGE_NAME/IMAGE_TAG (CLI overrides, if any,
+# have already been applied above), so a different --IMAGE_NAME/--IMAGE_TAG
+# gets its own isolated data volume instead of colliding with (or reusing)
+# another instance's.
+#
+# NOTE: this changes the default volume name from the old hardcoded
+# "denodo-oneclick-data" to "denodo-oneclick-beta-data" - an existing
+# install's data isn't deleted, but a plain `install.sh` run won't find it
+# under this new name and will start a fresh volume instead. Docker has no
+# `volume rename`; migrating old data over means copying it into the new
+# volume with a throwaway container, e.g.:
+#   docker run --rm -v denodo-oneclick-data:/from -v denodo-oneclick-beta-data:/to alpine cp -a /from/. /to/
+VOLUME_NAME="${IMAGE_NAME}-${IMAGE_TAG}-data"
 
 # --- 2.5. --refresh / --upgrade: act on an existing container, then exit ---
 # These don't build or run anything - they reach into an already-running
