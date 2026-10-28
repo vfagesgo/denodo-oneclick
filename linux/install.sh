@@ -1577,7 +1577,7 @@ log_step "Denodo VDP is listening on TCP port 9999"
 log_step "Denodo VDP is running"
 log_section "17.5" "Import Denodo Metadata"
 
-local export_properties="/opt/denodo-oneclick/samples/full_export/fullExport.properties"
+export_properties="/opt/denodo-oneclick/samples/full_export/fullExport.properties"
 sed -i "s|<OpenAI_apiKey>|$OPENAI_API_KEY|g" $export_properties
 
 #Copy assets extensions samples
