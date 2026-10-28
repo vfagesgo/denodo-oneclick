@@ -1581,8 +1581,8 @@ export_properties="/opt/denodo-oneclick/samples/full_export/fullExport.propertie
 sed -i "s|<OpenAI_apiKey>|$OPENAI_API_KEY|g" $export_properties
 
 #Copy assets extensions samples
-unzip /opt/denodo-oneclick/samples/asset_extensions.zip -d /opt/denodo/denodo-platform/samples/
-unzip /opt/denodo-oneclick/samples/skills.zip -d /opt/denodo/denodo-platform/samples/
+unzip -o /opt/denodo-oneclick/samples/asset_extensions.zip -d /opt/denodo/denodo-platform/samples/
+unzip -o /opt/denodo-oneclick/samples/skills.zip -d /opt/denodo/denodo-platform/samples/
 
 /opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/full_export/fullExport.vql --properties-file $export_properties --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password 
 #/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/admin_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
