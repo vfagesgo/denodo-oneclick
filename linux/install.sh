@@ -1658,7 +1658,7 @@ fi
 
 
 ### import data marketplace metadata
-/opt/denodo/denodo-platform/tools/data-catalog/import.sh -h localhost -p 9090 -l admin -P admin -f /opt/denodo-oneclick/samples/data_marketplace.zip
+#/opt/denodo/denodo-platform/tools/data-catalog/import.sh -h localhost -p 9090 -l admin -P admin -f /opt/denodo-oneclick/samples/data_marketplace.zip
 
 
 # Load the AI SDK's metadata into its vector DB, so it can answer natural-
