@@ -10,7 +10,7 @@ set -euo pipefail
 # Raw-file base used to fetch install artifacts when this script is run via
 # `curl | bash` (no local checkout to read docker/, denodo_config.env from).
 # Override with an env var for testing against a fork/branch.
-REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/main}"
+REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denodo-oneclick/wip}"
 
 # Overridable via --IMAGE_NAME/--IMAGE_TAG below - e.g. to run a second,
 # independent instance side by side (a different tag for testing an
@@ -283,7 +283,7 @@ if [[ -n "$ACTION" ]]; then
       set -e
       cd /opt/denodo-oneclick
       git fetch origin
-      git reset --hard origin/main
+      git reset --hard origin/wip
       git clean -fd
       bash linux/install.sh
     '
