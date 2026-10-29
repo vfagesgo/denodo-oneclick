@@ -1,0 +1,14 @@
+owner_external_element_id,external_tool_server_name,associated_element_id,associated_element_type,direction,role
+27N/VCWIQa79XYM+1ggvIQ==,,pharm_ai.fact_gpprescribing_sample,VIEW,OUT,Contains
+27N/VCWIQa79XYM+1ggvIQ==,,pharm_ai.sales_rep_visits,VIEW,OUT,Contains
+27N/VCWIQa79XYM+1ggvIQ==,,pharm_ai.sales_rep,VIEW,OUT,Contains
+zU1bTzKamFXR3tGqfFTfQw==,,pharm_ai.mv_clinical_trials,VIEW,OUT,Contains
+zU1bTzKamFXR3tGqfFTfQw==,,pharm_ai.clinical_trials,VIEW,OUT,Contains
+zU1bTzKamFXR3tGqfFTfQw==,,pharm_ai.patients,VIEW,OUT,Contains
+zU1bTzKamFXR3tGqfFTfQw==,,pharm_ai.common_date,VIEW,OUT,Contains
+zU1bTzKamFXR3tGqfFTfQw==,,pharm_ai.fact_gpprescribing_sample,VIEW,OUT,Contains
+zU1bTzKamFXR3tGqfFTfQw==,,pharm_ai.iv_xray_images,VIEW,OUT,Contains
+HXyCVRPVXbRm18MLLhTkpA==,,pharm_ai.patients,VIEW,OUT,Contains
+HXyCVRPVXbRm18MLLhTkpA==,,pharm_ai.clinical_trials,VIEW,OUT,Contains
+HXyCVRPVXbRm18MLLhTkpA==,,pharm_ai.presentation,VIEW,OUT,Contains
+HXyCVRPVXbRm18MLLhTkpA==,,pharm_ai.xray_analysis_embedding,VIEW,OUT,Contains

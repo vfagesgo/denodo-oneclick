@@ -1,0 +1,4 @@
+owner_external_element_id,external_tool_server_name,associated_element_id,associated_element_type,direction,role
+DATAPRODUCT_trialpulse,Qlik Server,qlik_clinical_trials_report,EXTERNAL_ELEMENT,OUT,Contains
+DATAPRODUCT_trialpulse,,pharm_ai.clinical_trials,VIEW,OUT,Contains
+DATAPRODUCT_trialpulse,,pharm_ai.patients,VIEW,OUT,Contains

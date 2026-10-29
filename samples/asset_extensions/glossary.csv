@@ -1,0 +1,5 @@
+id,name,description,external_element_type,url,created_at,updated_at
+GLOSSARY.trial_site,Trial Site,he physical or virtual location where trial-related activities are conducted and where the patient interacts with the clinical team.,GLOSSARY,https://id.atlassian.com/login,4/9/2026 21:30,4/9/2026 21:30
+GLOSSARY.adverse_event,Adverse Event (AE),"Any untoward medical occurrence in a patient or clinical investigation subject administered a pharmaceutical product, regardless of causal relationship.",GLOSSARY,https://id.atlassian.com/login,4/9/2026 21:30,4/9/2026 21:30
+GLOSSARY.active_participant,Active Participant,A patient who has successfully passed the screening phase and is currently receiving treatment or being observed within a clinical trial.,GLOSSARY,https://id.atlassian.com/login,4/10/2026 21:30,4/10/2026 21:30
+GLOSSARY.informed_consent_date,Informed Consent Date,"The specific date a patient signs the legal document agreeing to the risks and procedures of a trial; often the first ""event"" in the patient journey.",GLOSSARY,https://id.atlassian.com/login,4/9/2026 21:30,4/9/2026 21:30

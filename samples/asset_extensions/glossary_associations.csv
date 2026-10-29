@@ -1,0 +1,8 @@
+owner_external_element_id,external_tool_server_name,associated_element_id,associated_element_type,direction,role
+GLOSSARY.trial_site,,pharm_ai.clinical_trials,VIEW,OUT,defines
+GLOSSARY.adverse_event,,pharm_ai.clinical_trials,VIEW,OUT,defines
+GLOSSARY.active_participant,,pharm_ai.patients,VIEW,OUT,defines
+GLOSSARY.informed_consent_date,,pharm_ai.common_date,VIEW,OUT,defines
+GLOSSARY.trial_site,Denodo Data Product Server,DATAPRODUCT_trialpulse,EXTERNAL_ELEMENT,OUT,defines
+GLOSSARY.active_participant,Denodo Data Product Server,DATAPRODUCT_trialpulse,EXTERNAL_ELEMENT,OUT,defines
+GLOSSARY.active_participant,Denodo Data Product Server,DATAPRODUCT_trialpulse,EXTERNAL_ELEMENT,OUT,defines

@@ -1,0 +1,5 @@
+owner_external_element_id,external_tool_server_name,associated_element_id,associated_element_type,direction,role
+ETL.patients_data_load_job,,pharm_ai.clinical_trials,VIEW,IN,referenced_by
+ETL.patients_data_load_job,,pharm_ai.patients,VIEW,IN,referenced_by
+ETL.patients_data_load_job,,pharm_ai.common_date,VIEW,IN,referenced_by
+ETL.patients_data_load_job,,pharm_ai.clinical_trials_patients_date,VIEW,OUT,referenced_by

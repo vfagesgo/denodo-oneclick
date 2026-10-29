@@ -1,0 +1,3 @@
+owner_external_element_id,external_tool_server_name,associated_element_id,associated_element_type,direction,role
+qlik_clinical_trials_report,Qlik Server,pharm_ai.clinical_trials,VIEW,OUT,References
+qlik_clinical_trials_report,Qlik Server,pharm_ai.patients,VIEW,OUT,References

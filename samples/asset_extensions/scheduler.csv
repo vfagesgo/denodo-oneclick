@@ -1,0 +1,3 @@
+id,name,description,external_element_type,url,created_at,updated_at
+ETL.patients_data_load_job,patients_data_load_job,This job materializes the pharma models,ETL,http://kubernetes.docker.internal:9090/webadmin/denodo-scheduler-admin/?uri=//localhost:8000#/jobs/102/205,1/1/2024 15:30,4/9/2024 21:30
+ETL.no_reference_job,standalone_job,This job has no references,ETL,,1/1/2024 15:30,4/9/2024 21:30

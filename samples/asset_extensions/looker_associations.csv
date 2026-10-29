@@ -1,0 +1,2 @@
+owner_external_element_id,external_tool_server_name,associated_element_id,associated_element_type,direction,role
+looker_report_3,Denodo Data Product Server,DATAPRODUCT_trialpulse,EXTERNAL_ELEMENT,IN,referenced_by

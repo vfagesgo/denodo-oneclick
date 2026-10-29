@@ -1,0 +1,3 @@
+id,name,description,external_element_type,url,created_at,updated_at
+qlik_clinical_trials_report,Clinical_Trials_KPI_Report,This report shows all the metrics aroung the clinical trials,REPORT,https://qlik-server.denodo.com/sense/app/7d5b2a3c-8e1f-4902-b6d7-123456789abc/sheet/f9e8d7c6-b5a4-4321-9876-0123456789ab/state/analysis,1/1/2024 15:30,4/9/2024 21:30
+qlik_informe_mercados,Informe Analisis Mercados,This report shows all the metrics aroung the clinical trials,REPORT,https://qlik-server.denodo.com/sense/app/7d5b2a3c-8e1f-4902-b6d7-123456789abc/sheet/f9e8d7c6-b5a4-4321-9876-0123456789ab/state/analysis,1/1/2026 15:30,4/9/2026 21:30

@@ -1,0 +1,4 @@
+id,name,description,external_element_type,url,created_at,updated_at
+DATAPRODUCT_trialpulse,TrialPulse: 360 Patient Insights,"TrialPulse is a comprehensive, production-ready data product that consolidates fragmented patient data from Electronic Data Capture (EDC) systems, electronic Patient-Reported Outcomes (ePRO), clinical trial management systems (CTMS), and wearable health iot devices into a single, highly governed semantic layer.
+
+By unifying patient demographics, clinical vitals, protocol deviations, and retention metrics, TrialPulse eliminates the complex SQL data-wrangling typically required by clinical data analysts. Instead, it delivers a clean, standardized, and compliant ecosystem of data assets and analytical reports designed to optimize patient safety, monitor enrollment velocity, and minimize participant drop-out rates.",DATA_PRODUCT,,1/1/2024 15:30,1/2/2024 21:30
