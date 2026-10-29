@@ -1643,7 +1643,7 @@ until (echo > /dev/tcp/localhost/9999) >/dev/null 2>&1; do
     exit 1
   fi
 
-  sleep 2
+  sleep 4
   VDP_WAITED=$((VDP_WAITED + 2))
 done
 
