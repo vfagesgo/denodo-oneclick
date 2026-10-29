@@ -1052,7 +1052,20 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
     fi
     unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
     sudo rm -f "$DENODO_UPDATE.zip"
-    mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
+    # The jar inside the update archive can differ in letter case from
+    # $DENODO_UPDATE - e.g. the archive ships "...-9.6.0-Beta.jar" while the
+    # config/CLI value is "...-9.6.0-beta" - so a literal "$DENODO_UPDATE.jar"
+    # mv fails with "cannot stat ... No such file or directory". Resolve the
+    # actual file case-insensitively instead, falling back to whatever single
+    # *.jar the archive extracted. `-print -quit` (not `... | head`) avoids a
+    # SIGPIPE that would trip `set -o pipefail`.
+    update_jar="$(find "$DENODO_INSTALL/denodo-update" -maxdepth 1 -iname "$DENODO_UPDATE.jar" -print -quit)"
+    [ -z "$update_jar" ] && update_jar="$(find "$DENODO_INSTALL/denodo-update" -maxdepth 1 -iname '*.jar' -print -quit)"
+    if [ -z "$update_jar" ]; then
+      log_step "ERROR: no update jar found in $DENODO_INSTALL/denodo-update after extracting $DENODO_UPDATE"
+      exit 1
+    fi
+    mv "$update_jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
     echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
   fi
 
@@ -1194,7 +1207,20 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
     mkdir -p "$DENODO_INSTALL/denodo-update"
     unzip -q -o "$DENODO_UPDATE.zip" -d "$DENODO_INSTALL/denodo-update"
     sudo rm -f "$DENODO_UPDATE.zip"
-    mv "$DENODO_INSTALL/denodo-update/$DENODO_UPDATE.jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
+    # The jar inside the update archive can differ in letter case from
+    # $DENODO_UPDATE - e.g. the archive ships "...-9.6.0-Beta.jar" while the
+    # config/CLI value is "...-9.6.0-beta" - so a literal "$DENODO_UPDATE.jar"
+    # mv fails with "cannot stat ... No such file or directory". Resolve the
+    # actual file case-insensitively instead, falling back to whatever single
+    # *.jar the archive extracted. `-print -quit` (not `... | head`) avoids a
+    # SIGPIPE that would trip `set -o pipefail`.
+    update_jar="$(find "$DENODO_INSTALL/denodo-update" -maxdepth 1 -iname "$DENODO_UPDATE.jar" -print -quit)"
+    [ -z "$update_jar" ] && update_jar="$(find "$DENODO_INSTALL/denodo-update" -maxdepth 1 -iname '*.jar' -print -quit)"
+    if [ -z "$update_jar" ]; then
+      log_step "ERROR: no update jar found in $DENODO_INSTALL/denodo-update after extracting $DENODO_UPDATE"
+      exit 1
+    fi
+    mv "$update_jar" "$DENODO_INSTALL/denodo-update/denodo-update.jar"
     echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
   fi
 
