@@ -966,7 +966,7 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
       rm -f "/home/denodo/$DENODO_UPDATE.zip"
     fi
     log_step "Downloading update archive $DENODO_UPDATE"
-    ./denodo-support -t update -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+    ./denodo-support -t $DENODO_UPDATE_TARGET -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
   fi
 
   log_step "Preparing the install folder"
