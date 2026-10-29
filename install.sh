@@ -7,6 +7,16 @@
 ## Local install mode is not implemented yet.
 set -euo pipefail
 
+# Wall-clock start, used to report total elapsed time on successful completion
+# (both the normal Docker install and the --refresh/--upgrade actions).
+START_EPOCH=$(date +%s)
+
+# Pretty-prints the time since START_EPOCH as "<m>m <s>s".
+format_elapsed() {
+  local total=$(( $(date +%s) - START_EPOCH ))
+  printf '%dm %ds' $(( total / 60 )) $(( total % 60 ))
+}
+
 # Repository branch to install from. Optional. Precedence (highest first):
 #   --branch <name> (CLI)  >  BRANCH env var  >  denodo_config.env  >  "wip"
 # It drives three things that must all agree: the raw-file base below (artifacts
@@ -356,7 +366,7 @@ if [[ -n "$ACTION" ]]; then
   fi
 
   echo ""
-  echo "--${ACTION} completed."
+  echo "== Job completed in $(format_elapsed) (--${ACTION}) =="
   exit 0
 fi
 
@@ -459,8 +469,25 @@ echo "Following its logs now (Ctrl-C stops watching - the container keeps runnin
 echo ""
 docker logs -f "${IMAGE_NAME}" &
 LOGS_PID=$!
-wait_for_install_then_restart_workaround
+# `if ...; then` keeps `set -e` from aborting when the wait reports a timeout
+# or a non-running container (it returns non-zero) - we want to fall through
+# and tell the user either way.
+if wait_for_install_then_restart_workaround; then
+  INSTALL_RC=0
+else
+  INSTALL_RC=$?
+fi
 kill "$LOGS_PID" >/dev/null 2>&1 || true
+
+echo ""
+if [[ "$INSTALL_RC" -eq 0 ]]; then
+  echo "== Job completed in $(format_elapsed) =="
+  echo "Denodo is available at http://localhost"
+else
+  echo "== Install did not confirm completion within the wait window (elapsed: $(format_elapsed)) =="
+  echo "Check the warnings above and the container logs."
+fi
+
 echo ""
 echo "Reattaching to logs after the workaround restart above (Ctrl-C stops watching - the container keeps running):"
 echo ""
