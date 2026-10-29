@@ -823,14 +823,14 @@ sudo -u postgres psql -d denodo -c "CREATE EXTENSION IF NOT EXISTS vector;"
 # explicitly tolerated here with `|| true`.
 log_step "Restoring sample database: pharma (ignored-error warnings from pg_restore are expected and non-fatal)"
 sudo -u postgres psql -d denodo -c "DROP SCHEMA IF EXISTS pharma CASCADE;"
-sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-pharma.dump || true
+sudo -u postgres pg_restore --jobs=4 --no-owner -d denodo /opt/denodo-oneclick/samples/dump-pharma.dump || true
 
 log_step "Restoring sample database: bank (ignored-error warnings from pg_restore are expected and non-fatal)"
 sudo -u postgres psql -d denodo -c "DROP SCHEMA IF EXISTS bank CASCADE;"
-sudo -u postgres pg_restore --no-owner -d denodo /opt/denodo-oneclick/samples/dump-bank.dump || true
+sudo -u postgres pg_restore --jobs=4 --no-owner -d denodo /opt/denodo-oneclick/samples/dump-bank.dump || true
 
 log_step "Restoring sample database: c_api_gp_details_service (ignored-error warnings from pg_restore are expected and non-fatal)"
-sudo -u postgres pg_restore --no-owner --clean --if-exists -d denodo /opt/denodo-oneclick/samples/c_api_gp_details_service.dump || true
+sudo -u postgres pg_restore --jobs=4 --no-owner --clean --if-exists -d denodo /opt/denodo-oneclick/samples/c_api_gp_details_service.dump || true
 
 
 sudo -u postgres psql -d denodo <<'SQL'
