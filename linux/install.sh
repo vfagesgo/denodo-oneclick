@@ -24,6 +24,34 @@ log_step() {
   echo "[STEP] $1" | tee -a "$LOG"
 }
 
+# --- Download-time accounting ----------------------------------------------
+# The network-download operations in this script (apt, git/GitHub clones and
+# fetches, and the ./denodo-support archive pulls) are bracketed with
+# dl_begin/dl_end so their combined wall-clock time can be split out from pure
+# compute in the final summary printed by the top-level install.sh.
+#
+# The running total (in seconds) is accumulated in DL_SECONDS_FILE on the
+# persisted volume, zeroed here at the start of each run, and read back by the
+# host via `docker exec` once the install finishes. Writes are best-effort
+# (|| true) so timing instrumentation can never break the install itself.
+# CPU-bound steps (e.g. `pyenv install`, which compiles Python) are
+# deliberately NOT bracketed, so they count as compute.
+DL_SECONDS_FILE="${DL_SECONDS_FILE:-/data/.download_seconds}"
+sudo mkdir -p "$(dirname "$DL_SECONDS_FILE")" 2>/dev/null || true
+sudo touch "$DL_SECONDS_FILE" 2>/dev/null || true
+sudo chmod 666 "$DL_SECONDS_FILE" 2>/dev/null || true
+echo 0 > "$DL_SECONDS_FILE" 2>/dev/null || true
+
+__dl_mark=0
+dl_begin() { __dl_mark=$(date +%s); }
+dl_end() {
+  local now prev
+  now=$(date +%s)
+  prev=$(cat "$DL_SECONDS_FILE" 2>/dev/null || echo 0)
+  printf '%s\n' "$(( prev + (now - __dl_mark) ))" > "$DL_SECONDS_FILE" 2>/dev/null || true
+  __dl_mark=0
+}
+
 # --- Reusable pieces -------------------------------------------------------
 # Defined up front (rather than inline further down) so the services-only
 # fast path below and the normal full-install flow can both call them
@@ -646,10 +674,11 @@ fi
 # dependencies. This block refreshes package indexes and installs the base
 # toolchain used by the later bootstrap steps.
 log_section "04" "Refresh apt metadata and install base dependencies"
-sudo apt update -y 
-sudo apt upgrade -y 
+dl_begin
+sudo apt update -y
+sudo apt upgrade -y
 
-sudo apt install -y vim libglib2.0-dev build-essential 
+sudo apt install -y vim libglib2.0-dev build-essential
 sudo apt install -y python3 python3-venv python3-dev
 
 sudo apt install -y jq
@@ -657,6 +686,7 @@ sudo apt install -y jq
 # These packages are only here to support repository registration and secure
 # package downloads from external vendors.
 sudo apt install -y wget gnupg ca-certificates lsb-release curl
+dl_end
 
 
 # Section 05:
@@ -664,9 +694,11 @@ sudo apt install -y wget gnupg ca-certificates lsb-release curl
 # version stays available regardless of the base Raspberry Pi OS defaults.
 log_section "05" "Configure the PostgreSQL apt repository"
 # Import the PostgreSQL signing key.
+dl_begin
 wget -qO- https://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc \
   | gpg --dearmor \
   | sudo tee /usr/share/keyrings/postgresql.gpg > /dev/null
+dl_end
 
 # Register the PostgreSQL repository for the current Debian release.
 echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
@@ -677,6 +709,7 @@ echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.o
 # libraries that the final Denodo environment depends on.
 log_section "06" "Install PostgreSQL and runtime packages"
 # Refresh package indexes after adding PostgreSQL and install runtime packages.
+dl_begin
 sudo apt update
 sudo apt install -y postgresql-17 postgresql-client-17 libpq-dev postgresql-17-pgvector
 sudo apt install nginx -y
@@ -686,6 +719,7 @@ sudo apt install python3-gi gstreamer1.0-tools gstreamer1.0-plugins-base gstream
 sudo apt install python3-pil -y
 sudo apt install python3-pip -y
 sudo apt install dnsmasq network-manager -y
+dl_end
 
 # Section 09:
 # (Sections 07-08 no longer exist - consolidated into earlier sections over
@@ -865,16 +899,18 @@ SQL
 # Denodo 9 requires Java 17. This block registers the Azul repository and
 # installs Zulu JDK 17 so the installer has a supported JVM.
 log_section "11" "Configure Zulu Java 17"
+dl_begin
 curl -s https://repos.azul.com/azul-repo.key \
 | sudo gpg --yes --dearmor -o /usr/share/keyrings/azul.gpg
 
 echo "deb [signed-by=/usr/share/keyrings/azul.gpg] https://repos.azul.com/zulu/deb stable main" \
 | sudo tee /etc/apt/sources.list.d/zulu.list
 
-sudo chmod 644 /usr/share/keyrings/azul.gpg  
+sudo chmod 644 /usr/share/keyrings/azul.gpg
 sudo apt update -y
 
 sudo apt install -y zulu17-jdk
+dl_end
 
 # Section 11.5:
 # Fetch the Denodo Support CLI tool, then use it to download the Denodo
@@ -933,7 +969,9 @@ ZIP_URL="https://github.com/denodo/$DENODO_UTILS_URL"
 if [ -x "$TARGET_DIR/denodo-support-utils/bin/denodo-support" ]; then
   log_step "denodo-support already installed, skipping"
 else
+  dl_begin
   curl -L "$ZIP_URL" -o "${TARGET_DIR}Denodo.Support.Utilities.zip"
+  dl_end
   unzip -o "${TARGET_DIR}Denodo.Support.Utilities.zip" -d "$TARGET_DIR"
   sudo rm -f "${TARGET_DIR}Denodo.Support.Utilities.zip"
 fi
@@ -955,7 +993,9 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
     log_step "$DENODO_INSTALL already extracted - no need to (re)download the installer archive"
   else
     log_step "Downloading the Denodo installer archive"
+    dl_begin
     ./denodo-support -t installer -n denodo-install-9-ga -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+    dl_end
   fi
 
   if [ -f "/home/denodo/$DENODO_UPDATE.zip" ] && zip_is_valid "/home/denodo/$DENODO_UPDATE.zip"; then
@@ -966,7 +1006,9 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
       rm -f "/home/denodo/$DENODO_UPDATE.zip"
     fi
     log_step "Downloading update archive $DENODO_UPDATE"
+    dl_begin
     ./denodo-support -t $DENODO_UPDATE_TARGET -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+    dl_end
   fi
 
   log_step "Preparing the install folder"
@@ -1128,7 +1170,9 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
       rm -f "/home/denodo/$DENODO_UPDATE.zip"
     fi
     log_step "Downloading update archive $DENODO_UPDATE"
+    dl_begin
     ./denodo-support -t $DENODO_UPDATE_TARGET -n $DENODO_UPDATE -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+    dl_end
   fi
 
   cd /home/denodo
@@ -1209,6 +1253,7 @@ git config --global http.version HTTP/1.1
 git config --global http.postBuffer 157286400
 
 # Clone the repo on first install, otherwise refresh the existing checkout.
+dl_begin
 if [ ! -d "$AISDK_INSTALL_DIR/.git" ]; then
   log_step "Cloning denodo-ai-sdk repository"
   # Retry a few times too, in case a real transient drop happens on top of
@@ -1239,6 +1284,7 @@ else
   git reset --hard "origin"
   git clean -fd
 fi
+dl_end
 
 ## Creating AISDK Agents
 cp -a /opt/denodo-oneclick/samples/chatbot_agent/custom/. \
@@ -1341,7 +1387,9 @@ add_if_available() {
 }
 
 log_step "Refreshing apt metadata"
+dl_begin
 sudo apt-get update
+dl_end
 
 log_step "Collecting available apt packages"
 for pkg in "${base_packages[@]}"; do
@@ -1363,7 +1411,9 @@ if [[ "${#available_packages[@]}" -eq 0 ]]; then
 fi
 
 log_step "Installing ${#available_packages[@]} apt package(s)"
+dl_begin
 sudo apt-get install -y "${available_packages[@]}"
+dl_end
 
 # Install pyenv to manage the project Python version. This used to
 # unconditionally `rm -rf ~/.pyenv` and rebuild Python 3.11 from source on
@@ -1498,7 +1548,9 @@ else
     rm -f "/home/denodo/Denodo MCP Server.zip"
   fi
   log_step "Downloading the Denodo MCP server archive"
+  dl_begin
   ./denodo-support -t denodoconnect-enterprise -n 'Denodo MCP Server' -d /home/denodo -u $DENODO_SUPPORT_CI -s $DENODO_SUPPORT_SECRET
+  dl_end
 fi
 
 log_step "Preparing the MCP server folder"

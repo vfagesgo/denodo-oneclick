@@ -11,10 +11,30 @@ set -euo pipefail
 # (both the normal Docker install and the --refresh/--upgrade actions).
 START_EPOCH=$(date +%s)
 
-# Pretty-prints the time since START_EPOCH as "<m>m <s>s".
-format_elapsed() {
-  local total=$(( $(date +%s) - START_EPOCH ))
-  printf '%dm %ds' $(( total / 60 )) $(( total % 60 ))
+# Pretty-prints a number of seconds as "<m>m <s>s".
+fmt_secs() { printf '%dm %ds' $(( $1 / 60 )) $(( $1 % 60 )); }
+
+# Seconds since START_EPOCH, and the same value pretty-printed.
+elapsed_secs() { echo $(( $(date +%s) - START_EPOCH )); }
+format_elapsed() { fmt_secs "$(elapsed_secs)"; }
+
+# Reads the in-container download-time total (seconds) that linux/install.sh
+# accumulates in /data/.download_seconds, and prints a download/compute split
+# of the overall elapsed time. Best-effort: if the counter can't be read (old
+# container, install didn't reach that code), it just reports the overall time.
+print_time_split() {
+  local overall dl compute
+  overall="$(elapsed_secs)"
+  dl="$(docker exec "${IMAGE_NAME}" cat /data/.download_seconds 2>/dev/null | tr -dc '0-9')"
+  if [[ -z "$dl" ]]; then
+    echo "  Overall:  $(fmt_secs "$overall")"
+    return
+  fi
+  compute=$(( overall - dl ))
+  (( compute < 0 )) && compute=0
+  echo "  Overall:   $(fmt_secs "$overall")"
+  echo "  Downloads: $(fmt_secs "$dl")   (apt, git/GitHub, denodo-support)"
+  echo "  Compute:   $(fmt_secs "$compute")   (overall minus downloads)"
 }
 
 # Repository branch to install from. Optional. Precedence (highest first):
@@ -367,6 +387,7 @@ if [[ -n "$ACTION" ]]; then
 
   echo ""
   echo "== Job completed in $(format_elapsed) (--${ACTION}) =="
+  print_time_split
   exit 0
 fi
 
@@ -482,9 +503,11 @@ kill "$LOGS_PID" >/dev/null 2>&1 || true
 echo ""
 if [[ "$INSTALL_RC" -eq 0 ]]; then
   echo "== Job completed in $(format_elapsed) =="
+  print_time_split
   echo "Denodo is available at http://localhost"
 else
   echo "== Install did not confirm completion within the wait window (elapsed: $(format_elapsed)) =="
+  print_time_split
   echo "Check the warnings above and the container logs."
 fi
 
