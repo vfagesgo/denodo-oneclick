@@ -84,7 +84,7 @@
 <body>
   <div class="full-page-container">
     <div class="main-container vertical-horizontal-center">
-      <form class="form-signin">
+      <form class="form-signin" style="max-width: 950px;">
         <script>
           function openTool(toolName) {
             document.write(showHostname());
@@ -94,7 +94,8 @@
         </script>
         <h1> <img src="images/denodo_logo.svg" alt="Denodo logo" class="denodo-logo"><span class="denodo-product-name">Denodo
             Developer V9</span> </h1>
-        
+        <div style="display: flex; align-items: center; gap: 40px;">
+        <div style="flex: 1 1 300px; max-width: 550px;">
         <button class="button button___primary button___wide button___xl btn-login btn-save" type="button"
           onclick="window.open('http://'+window.location.hostname+'/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login','_blank'); return false;">
           <span class="button_text">Design Studio</span> <span class="spinner-container hidden">
@@ -131,7 +132,9 @@
           <div style="text-align: center;"><br>
           </div>
         </div>
-        <div style="text-align: center;"><img src="images/activecontextlayer.webp" alt="Ninja" style="top: 369px; left: 229px; width: 312px; height: 312px;"></div>
+        </div>
+        <div style="flex: 0 0 auto; text-align: center;"><img src="images/activecontextlayer.webp" alt="Ninja" style="width: 312px; height: 312px;"></div>
+        </div>
       </form>
     </div>
     <footer style="display: block; color: var(--white)">Property of Denodo. ©
