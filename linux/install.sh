@@ -896,9 +896,9 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA bank
 SQL
 
 # Section 11:
-# Denodo 9 requires Java 17. This block registers the Azul repository and
-# installs Zulu JDK 17 so the installer has a supported JVM.
-log_section "11" "Configure Zulu Java 17"
+# Denodo 9 requires Java 21. This block registers the Azul repository and
+# installs Zulu JDK 21 so the installer has a supported JVM.
+log_section "11" "Configure Zulu Java 21"
 dl_begin
 curl -s https://repos.azul.com/azul-repo.key \
 | sudo gpg --yes --dearmor -o /usr/share/keyrings/azul.gpg
@@ -909,7 +909,7 @@ echo "deb [signed-by=/usr/share/keyrings/azul.gpg] https://repos.azul.com/zulu/d
 sudo chmod 644 /usr/share/keyrings/azul.gpg
 sudo apt update -y
 
-sudo apt install -y zulu17-jdk
+sudo apt install -y zulu21-jdk
 dl_end
 
 # Section 11.5:
