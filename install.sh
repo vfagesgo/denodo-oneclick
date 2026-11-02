@@ -428,9 +428,43 @@ if [[ "$RESET" -eq 1 ]]; then
   # printed at the end of a normal run) is easy to get wrong - miss one
   # volume name and the "fresh" container silently reattaches to old state.
   # This does the full, reliable teardown in one step.
-  echo "--reset: removing any existing '${IMAGE_NAME}' container and its volume"
-  docker rm -f "${IMAGE_NAME}" >/dev/null 2>&1 || true
-  docker volume rm "${VOLUME_NAME}" >/dev/null 2>&1 || true
+  #
+  # Volumes are removed by what the container *actually* mounts (read from
+  # `docker inspect`), not only by the name derived here: the volume naming
+  # changed between versions (denodo-oneclick-data -> ${IMAGE_NAME}-${IMAGE_TAG}-data),
+  # so a container created by an older install.sh would otherwise keep its
+  # volume. Errors are no longer silenced, and the result is verified.
+  echo "--reset: removing any existing '${IMAGE_NAME}' container and its volume(s)"
+
+  RESET_VOLUMES=("${VOLUME_NAME}")
+  if docker inspect "${IMAGE_NAME}" >/dev/null 2>&1; then
+    while IFS= read -r v; do
+      [[ -n "$v" ]] && RESET_VOLUMES+=("$v")
+    done < <(docker inspect -f '{{range .Mounts}}{{if eq .Type "volume"}}{{println .Name}}{{end}}{{end}}' "${IMAGE_NAME}")
+    echo "  removing container ${IMAGE_NAME}"
+    docker rm -f -v "${IMAGE_NAME}" >/dev/null
+  fi
+
+  # De-duplicate, then remove each volume that still exists. A volume still
+  # used by another container can't be removed - report which one and stop,
+  # rather than silently reinstalling on top of old state.
+  for v in $(printf '%s\n' "${RESET_VOLUMES[@]}" | sort -u); do
+    docker volume inspect "$v" >/dev/null 2>&1 || continue
+    users="$(docker ps -aq --filter "volume=$v")"
+    if [[ -n "$users" ]]; then
+      echo "ERROR: volume '$v' is still used by container(s): $(docker ps -a --filter "volume=$v" --format '{{.Names}}' | paste -sd, -)" >&2
+      echo "       Remove them first (docker rm -f <name>) or use a different --IMAGE_NAME/--IMAGE_TAG." >&2
+      exit 1
+    fi
+    echo "  removing volume $v"
+    docker volume rm "$v" >/dev/null
+  done
+
+  if docker inspect "${IMAGE_NAME}" >/dev/null 2>&1 || docker volume inspect "${VOLUME_NAME}" >/dev/null 2>&1; then
+    echo "ERROR: --reset could not fully remove '${IMAGE_NAME}' / '${VOLUME_NAME}'." >&2
+    exit 1
+  fi
+  echo "  reset done - starting a fresh install"
 fi
 
 # The previous version always did `docker rm -f` + a fresh `docker run`
