@@ -175,8 +175,10 @@ Optional (CLI only):
                                   pulled inside the container, and the
                                   git reset on --refresh/--upgrade.
   --mode <docker|local>          Default: docker (local not implemented yet)
-  --reset                        Wipe any existing container + its volumes first,
-                                  so the install starts truly from scratch
+  --reset                        Restart from scratch: remove the container + its
+                                  volumes, rebuild the image without cache
+                                  (--pull --no-cache), then do a fresh install.
+                                  The previous image is kept as :previous.
 
 Actions on an existing container (instead of building/running one):
   --services-only - install already completed; just (re)start everything.
@@ -491,7 +493,17 @@ else
     docker tag "${IMAGE_NAME}:${IMAGE_TAG}" "${IMAGE_NAME}:previous"
   fi
 
-  docker build -t "${IMAGE_NAME}:${IMAGE_TAG}" "${SCRIPT_DIR}/docker"
+  # --reset means "from scratch": also refresh the base image and ignore
+  # cached layers, so stale apt/OS layers can't survive a reset. The old
+  # image is still kept as :previous above for rollback.
+  BUILD_OPTS=()
+  if [[ "$RESET" -eq 1 ]]; then
+    echo "--reset: rebuilding the image without cache (fresh base image and layers)"
+    BUILD_OPTS=(--pull --no-cache)
+  fi
+  # ${arr[@]+"${arr[@]}"}: safe expansion of a possibly-empty array under
+  # `set -u` on macOS's bash 3.2.
+  docker build ${BUILD_OPTS[@]+"${BUILD_OPTS[@]}"} -t "${IMAGE_NAME}:${IMAGE_TAG}" "${SCRIPT_DIR}/docker"
 
   # A named volume is a second safety net (on top of container reuse above):
   # it keeps the Denodo install/database intact even if this container is
