@@ -230,6 +230,14 @@
     .tile:active { background-color: var(--peacock-blue-active); }
     .tile:focus-visible { outline: 0; box-shadow: var(--shadow-input); }
 
+    /* Placeholder tile (target not defined yet) */
+    .tile[aria-disabled="true"],
+    .tile[aria-disabled="true"]:hover {
+      background-color: var(--peacock-blue);
+      opacity: 0.55;
+      cursor: default;
+    }
+
     /* Override Login.css absolute footer */
     footer.page-footer {
       position: static;
@@ -295,10 +303,9 @@
         aria-label="Toggle navigation">&#9776;</button>
       <nav class="nav" id="main-nav" aria-label="Main">
         <ul>
-          <li><a href="index_v2.html" class="active" aria-current="page">Home</a></li>
+          <li><a href="index.html" class="active" aria-current="page">Home</a></li>
           <li data-demo><a href="#guided-tours">Guided tours</a></li>
           <li><a href="#" aria-disabled="true">Data models</a></li>
-          <li><a href="/chatbot/" target="_blank" rel="noopener">AI assistant</a></li>
           <li><a href="mcp-api.html">MCP &amp; APIs</a></li>
           <li><a href="#" aria-disabled="true">Upgrade</a></li>
         </ul>
@@ -331,10 +338,10 @@
             </div>
           </a>
           <a class="tour-card tour-card--teal" href="#">
-            <div class="tour-band">10 min</div>
+            <div class="tour-band">20 min</div>
             <div class="tour-body">
-              <h3>Ask with AI</h3>
-              <p>Query governed data with the chatbot and MCP</p>
+              <h3>AWS SageMaker &amp; Denodo MCP</h3>
+              <p>Making Enterprise Data Agent-Ready with AWS SageMaker and Denodo MCP</p>
             </div>
           </a>
         </div>
@@ -346,10 +353,10 @@
           <a class="tile" href="/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login"
             target="_blank" rel="noopener">Design Studio</a>
           <a class="tile" href="/denodo-data-catalog/#/" target="_blank" rel="noopener">Data Marketplace</a>
-          <!-- TODO (open question): VDP has no web UI; points to the SQL (JDBC/ODBC) access info for now -->
-          <a class="tile" href="mcp-api.html#sql">Virtual DataPort</a>
-          <a class="tile" href="/chatbot/" target="_blank" rel="noopener">AI chatbot</a>
           <a class="tile" href="mcp-api.html#mcp">MCP servers</a>
+          <!-- TODO (open question): GEO Services target not defined yet -->
+          <a class="tile" href="#" aria-disabled="true">GEO Services</a>
+          <a class="tile" href="/chatbot/" target="_blank" rel="noopener">AI Sample chatbot</a>
           <a class="tile" href="mcp-api.html#rest">API quick start</a>
         </div>
       </section>
@@ -362,7 +369,7 @@
     // Root-relative hrefs already follow the current protocol/host/port
     // (works for localhost and the Cloudflare tunnel alike) - no URL building needed.
 
-    // Optional personalised greeting: index_v2.html?name=Jane (open question: real source TBD)
+    // Optional personalised greeting: index.html?name=Jane (open question: real source TBD)
     (function () {
       var name = new URLSearchParams(window.location.search).get('name');
       if (name) {
