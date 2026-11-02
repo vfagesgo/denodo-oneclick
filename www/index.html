@@ -2,144 +2,389 @@
 <html lang="en">
 
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="stylesheet" href="css/button.css?_=05da9697-e744-45df-ab6b-f434cb969715">
-  <link rel="stylesheet" href="css/fonts.css?_=05da9697-e744-45df-ab6b-f434cb969715">
-  <link rel="stylesheet" href="css/input.css?_=05da9697-e744-45df-ab6b-f434cb969715">
-  <link rel="stylesheet" href="css/variables.css?_=05da9697-e744-45df-ab6b-f434cb969715">
-  <link rel="stylesheet" href="css/Common.css?_=05da9697-e744-45df-ab6b-f434cb969715">
-  <link rel="stylesheet" href="css/Login.css?_=05da9697-e744-45df-ab6b-f434cb969715">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/button.css">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/input.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/Common.css">
+  <link rel="stylesheet" href="css/Login.css">
   <link rel="shortcut icon" href="images/favicon.ico">
   <title>Try Denodo Developer V9</title>
   <style>
+    /* Layout and look defined in .claude/rules/index.html.md:
+       dark sidebar (current landing-page identity) + light main pane. */
+    html, body {
+      height: auto;
+      min-height: 100%;
+    }
+
     body {
-      overflow: hidden;
+      margin: 0;
+      overflow: auto;
+      background-color: var(--light-grey-b);
+      color: var(--midnight-blue);
     }
 
-    .overlay {
-      background-color: #112533;
-      width: 100%;
-      height: 100%;
-      z-index: 4000;
-      top: 0;
-      left: 0;
-      position: fixed;
-      opacity: 1;
+    .app {
+      display: flex;
+      min-height: 100vh;
     }
 
-    .loading-logo {
-      position: absolute;
-      top: 8px;
-      left: 24px;
-    }
-
-    .loading {
-      display: inline-block;
-      position: absolute;
-      width: 64px;
-      height: 64px;
-      top: 46%;
-      left: 46%;
-    }
-
-    .loading div {
+    /* ---------- Sidebar ---------- */
+    .sidebar {
+      flex: 0 0 260px;
+      display: flex;
+      flex-direction: column;
+      padding: var(--s7) var(--s4);
       box-sizing: border-box;
+      background-color: var(--midnight-blue);
+      background-image: url(images/login-background.jpg);
+      background-size: cover;
+      background-position: center bottom;
+      background-repeat: no-repeat;
+      color: var(--white);
+    }
+
+    .brand {
+      padding: 0 var(--s3);
+      margin-bottom: var(--s8);
+    }
+
+    .brand img {
       display: block;
-      position: absolute;
-      width: 51px;
-      height: 51px;
-      margin: 6px;
-      border: 6px solid #fff;
-      border-radius: 50%;
-      animation: loading 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-      border-color: #fff transparent transparent transparent;
+      height: 40px;
     }
 
-    .loading div:nth-child(1) {
-      animation-delay: -0.45s;
+    .brand .denodo-product-name {
+      display: block;
+      margin-top: var(--s2);
+      font-size: 14px;
+      color: var(--light-blue);
+      white-space: normal;
     }
 
-    .loading div:nth-child(2) {
-      animation-delay: -0.3s;
+    .nav-toggle {
+      display: none;
     }
 
-    .loading div:nth-child(3) {
-      animation-delay: -0.15s;
+    .nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
     }
 
-    @keyframes loading {
-      0% {
-        transform: rotate(0deg);
+    .nav li + li {
+      margin-top: var(--s2);
+    }
+
+    .nav a {
+      display: block;
+      padding: var(--s3) var(--s3);
+      border-radius: var(--border-radius);
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .nav a:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .nav a:focus-visible {
+      outline: 2px solid var(--light-blue);
+      outline-offset: 2px;
+    }
+
+    .nav a.active,
+    .nav a.active:hover {
+      background-color: var(--warning-red);
+    }
+
+    /* ---------- Main pane ---------- */
+    .main {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      padding: var(--s8) var(--s8) 0;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s6);
+    }
+
+    .page-header h1 {
+      margin: 0 0 var(--s3);
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--midnight-blue);
+    }
+
+    .page-header p {
+      margin: 0;
+      font-size: 17px;
+      color: var(--gunmetal);
+    }
+
+    .acl-image {
+      flex: 0 0 auto;
+      width: 200px;
+      height: 200px;
+    }
+
+    .main h2 {
+      margin: var(--s7) 0 var(--s4);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--midnight-blue);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--s5);
+    }
+
+    /* Guided tour cards */
+    .tours {
+      margin-top: var(--s7);
+    }
+
+    .tour-card {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--white);
+      border: 1px solid var(--light-grey);
+      border-radius: 8px;
+      box-shadow: var(--shadow-dialog);
+      overflow: hidden;
+      text-decoration: none;
+      transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .tour-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .tour-card:focus-visible {
+      outline: 0;
+      box-shadow: var(--shadow-input);
+    }
+
+    .tour-band {
+      padding: var(--s4) var(--s5);
+      font-size: 19px; /* bold >= 18.66px counts as large text for WCAG contrast */
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .tour-card--red .tour-band { background-color: var(--warning-red); }
+    .tour-card--blue .tour-band { background-color: var(--peacock-blue); }
+    .tour-card--teal .tour-band { background-color: var(--accent-teal); }
+
+    .tour-body {
+      padding: var(--s5);
+      min-height: 150px;
+    }
+
+    .tour-body h3 {
+      margin: 0 0 var(--s5);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--midnight-blue);
+    }
+
+    .tour-body p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--gunmetal);
+    }
+
+    /* Component tiles: same look as the current index buttons */
+    .tile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 64px;
+      padding: var(--s3) var(--s4);
+      border-radius: var(--border-radius);
+      background-color: var(--peacock-blue);
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: background-color 0.15s ease-in-out;
+    }
+
+    .tile:hover { background-color: var(--peacock-blue-hover); }
+    .tile:active { background-color: var(--peacock-blue-active); }
+    .tile:focus-visible { outline: 0; box-shadow: var(--shadow-input); }
+
+    /* Override Login.css absolute footer */
+    footer.page-footer {
+      position: static;
+      margin-top: auto;
+      padding: var(--s7) 0 var(--s5);
+      color: var(--gunmetal);
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1100px) {
+      .acl-image { display: none; }
+    }
+
+    @media (max-width: 900px) {
+      .app { flex-direction: column; }
+
+      .sidebar {
+        flex: 0 0 auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--s4);
       }
 
-      100% {
-        transform: rotate(360deg);
+      .brand { margin-bottom: 0; padding: 0; }
+      .brand img { height: 32px; }
+
+      .nav-toggle {
+        display: inline-flex;
+        background: none;
+        border: 1px solid var(--light-blue);
+        border-radius: var(--border-radius);
+        color: var(--white);
+        font-size: 20px;
+        padding: var(--s1) var(--s3);
+        cursor: pointer;
       }
+
+      .nav {
+        display: none;
+        flex: 1 0 100%;
+        margin-top: var(--s4);
+      }
+
+      .nav.open { display: block; }
+
+      .main { padding: var(--s6) var(--s4) 0; }
+      .page-header h1 { font-size: 26px; }
+      .grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
-  <div class="full-page-container">
-    <div class="main-container vertical-horizontal-center">
-      <form class="form-signin" style="max-width: 1150px;">
-        <script>
-          function openTool(toolName) {
-            document.write(showHostname());
-            //window.open('https://google.com','_blank');
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="images/denodo_logo.svg" alt="Denodo">
+        <span class="denodo-product-name">Try Denodo Developer V9</span>
+      </div>
+      <button class="nav-toggle" type="button" aria-controls="main-nav" aria-expanded="false"
+        aria-label="Toggle navigation">&#9776;</button>
+      <nav class="nav" id="main-nav" aria-label="Main">
+        <ul>
+          <li><a href="index_v2.html" class="active" aria-current="page">Home</a></li>
+          <li data-demo><a href="#guided-tours">Guided tours</a></li>
+          <li><a href="#" aria-disabled="true">Data models</a></li>
+          <li><a href="/chatbot/" target="_blank" rel="noopener">AI assistant</a></li>
+          <li><a href="mcp-api.html">MCP &amp; APIs</a></li>
+          <li><a href="#" aria-disabled="true">Upgrade</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-          }
-        </script>
-        <h1> <img src="images/denodo_logo.svg" alt="Denodo logo" class="denodo-logo"><span class="denodo-product-name">Try Denodo
-            Developer V9</span> </h1>
-        <div style="display: flex; align-items: center; gap: 40px;">
-        <div style="flex: 1 1 300px; max-width: 550px;">
-        <button class="button button___primary button___wide button___xl btn-login btn-save" type="button"
-          onclick="window.open(window.location.protocol+'//'+window.location.hostname+'/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login','_blank'); return false;">
-          <span class="button_text">Design Studio</span> <span class="spinner-container hidden">
-            <i class="fas fa-spinner fa-pulse" aria-hidden="true"></i> </span>
-        </button> 
-        <label class="or-separator">&nbsp; </label> 
-        
-        <button class="button button___primary button___wide button___xl btn-login btn-save" type="button"
-          onclick="window.open(window.location.protocol+'//'+window.location.hostname+'/denodo-data-catalog/#/','_blank'); return false;">
-          <span class="button_text">Data MarketPlace</span> <span class="spinner-container hidden">
-            <i class="fas fa-spinner fa-pulse" aria-hidden="true"></i> </span>
-        </button>
-        <label class="or-separator">&nbsp; </label> 
-
-        <button class="button button___primary button___wide button___xl btn-login btn-save" type="button"
-          onclick="window.open(window.location.protocol+'//'+window.location.hostname+'/mcp-api.html','_blank'); return false;">
-          <span class="button_text">MCP & API Services</span> <span class="spinner-container hidden">
-            <i class="fas fa-spinner fa-pulse" aria-hidden="true"></i> </span>
-        </button>
-        <label class="or-separator">&nbsp; </label> 
-
-        <button class="button button___primary button___wide button___xl btn-login btn-save" type="button"
-          onclick="window.open(window.location.protocol+'//'+window.location.hostname+'/chatbot','_blank'); return false;">
-          <span class="button_text">AI Chatbot</span> <span class="spinner-container hidden">
-            <i class="fas fa-spinner fa-pulse" aria-hidden="true"></i> </span>
-        </button>
-        <label class="or-separator">&nbsp; </label> 
-
-        <div style="text-align: center;">
-           <button class="button button___primary button___wide button___xl btn-login btn-save" type="button" onclick="window.open('documentation.html','_top'); return false;">
-            <span class="button_text">Documentation</span><span class="spinner-container hidden">
-            </span></button><span class="spinner-container hidden"><i class="fas fa-spinner fa-pulse" aria-hidden="true"></i>
-          </span>
-          <div style="text-align: center;"><br>
-          </div>
+    <main class="main">
+      <header class="page-header">
+        <div>
+          <h1 id="welcome">Welcome, pick a guided tour</h1>
+          <p>Live Denodo Platform with sample data, ready to explore. No setup needed.</p>
         </div>
+        <img class="acl-image" src="images/activecontextlayer.webp" alt="">
+      </header>
+
+      <section id="guided-tours" class="tours" data-demo aria-label="Guided tours">
+        <div class="grid">
+          <a class="tour-card tour-card--red" href="#">
+            <div class="tour-band">15 min</div>
+            <div class="tour-body">
+              <h3>Connect &amp; combine</h3>
+              <p>Join Retail Bank sources in one logical view</p>
+            </div>
+          </a>
+          <a class="tour-card tour-card--blue" href="#">
+            <div class="tour-band">10 min</div>
+            <div class="tour-body">
+              <h3>Publish a data product</h3>
+              <p>Govern and share it in Data Marketplace</p>
+            </div>
+          </a>
+          <a class="tour-card tour-card--teal" href="#">
+            <div class="tour-band">10 min</div>
+            <div class="tour-body">
+              <h3>Ask with AI</h3>
+              <p>Query governed data with the chatbot and MCP</p>
+            </div>
+          </a>
         </div>
-        <div style="flex: 0 0 auto; text-align: center;"><img src="images/activecontextlayer.webp" alt="Ninja" style="width: 450px; height: 450px;"></div>
+      </section>
+
+      <section aria-labelledby="components-title">
+        <h2 id="components-title">Your components</h2>
+        <div class="grid">
+          <a class="tile" href="/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login"
+            target="_blank" rel="noopener">Design Studio</a>
+          <a class="tile" href="/denodo-data-catalog/#/" target="_blank" rel="noopener">Data Marketplace</a>
+          <!-- TODO (open question): VDP has no web UI; points to the SQL (JDBC/ODBC) access info for now -->
+          <a class="tile" href="mcp-api.html#sql">Virtual DataPort</a>
+          <a class="tile" href="/chatbot/" target="_blank" rel="noopener">AI chatbot</a>
+          <a class="tile" href="mcp-api.html#mcp">MCP servers</a>
+          <a class="tile" href="mcp-api.html#rest">API quick start</a>
         </div>
-      </form>
-    </div>
-    <footer style="display: block; color: var(--white)">Property of Denodo. ©
-      Copyright Denodo <span>2026</span> </footer>
+      </section>
+
+      <footer class="page-footer">Property of Denodo. © Copyright Denodo <span>2026</span></footer>
+    </main>
   </div>
+
+  <script>
+    // Root-relative hrefs already follow the current protocol/host/port
+    // (works for localhost and the Cloudflare tunnel alike) - no URL building needed.
+
+    // Optional personalised greeting: index_v2.html?name=Jane (open question: real source TBD)
+    (function () {
+      var name = new URLSearchParams(window.location.search).get('name');
+      if (name) {
+        document.getElementById('welcome').textContent = 'Welcome ' + name + ', pick a guided tour';
+      }
+    })();
+
+    // Placeholder links (targets not defined yet) do nothing
+    document.querySelectorAll('a[aria-disabled="true"], .tour-card[href="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); });
+    });
+
+    // Mobile nav toggle
+    (function () {
+      var btn = document.querySelector('.nav-toggle');
+      var nav = document.getElementById('main-nav');
+      btn.addEventListener('click', function () {
+        var open = nav.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    })();
+  </script>
 </body>
 
 </html>
