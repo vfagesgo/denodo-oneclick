@@ -23,6 +23,7 @@
     --black: #000000;
     --highlight-orange: #ff9933;
     --warning-red: #f05149;
+    --accent-teal: #1f7a70; /* index_v2 guided-tour card 3; dark enough for white text (>4.5:1) */
     --shadow-dialog: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
 
     --border-radius: 4px;
