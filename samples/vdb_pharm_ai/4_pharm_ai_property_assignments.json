@@ -1,0 +1,125 @@
+[
+  {
+    "comment": "Domain: Pharma / Life Sciences > Clinical Trials",
+    "views": [
+      "pharm_ai.clinical_trials",
+      "pharm_ai.patients",
+      "pharm_ai.i_clinical_trials_patients_start_date",
+      "pharm_ai.mv_clinical_trials"
+    ],
+    "groups": {
+      "Data Product Owners": {
+        "Business Owner": "📧 <a href=\"mailto:clinical.owner@yourcompany.com\">clinical.owner@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000010\">+10000000010</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=clinical.owner@yourcompany.com\">Chat on Teams</a>",
+        "Technical Owner / Data Steward": "📧 <a href=\"mailto:clinical.steward@yourcompany.com\">clinical.steward@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000001010\">+10000001010</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=clinical.steward@yourcompany.com\">Chat on Teams</a>",
+        "Department / Domain Team": "Clinical Operations",
+        "Support Contact": "📧 <a href=\"mailto:clinical.support@yourcompany.com\">clinical.support@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000002010\">+10000002010</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=clinical.support@yourcompany.com\">Chat on Teams</a>",
+        "Escalation Contact": "📧 <a href=\"mailto:data-escalation@yourcompany.com\">data-escalation@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000003\">+10000000003</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data-escalation@yourcompany.com\">Chat on Teams</a>"
+      },
+      "Data Product Details": {
+        "Domain": "Pharma / Life Sciences > Clinical Trials",
+        "Version": "1.0.0",
+        "Status": "🟢 Active",
+        "Data Classification": "🔒 Confidential",
+        "Refresh Frequency": "📅 Daily",
+        "Certification Tier": "🥇 Gold - Verified",
+        "Source Systems": "CTMS, EDC, ePRO, Snowflake",
+        "Retention Period": "25 years (ICH GCP)"
+      }
+    }
+  },
+  {
+    "comment": "Domain: Pharma / Life Sciences > R&D – Pharma",
+    "views": ["pharm_ai.iv_xray_images"],
+    "groups": {
+      "Data Product Owners": {
+        "Business Owner": "📧 <a href=\"mailto:imaging.ai.owner@yourcompany.com\">imaging.ai.owner@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000012\">+10000000012</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=imaging.ai.owner@yourcompany.com\">Chat on Teams</a>",
+        "Technical Owner / Data Steward": "📧 <a href=\"mailto:imaging.ai.steward@yourcompany.com\">imaging.ai.steward@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000001012\">+10000001012</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=imaging.ai.steward@yourcompany.com\">Chat on Teams</a>",
+        "Department / Domain Team": "Medical Imaging AI",
+        "Support Contact": "📧 <a href=\"mailto:imaging.ai.support@yourcompany.com\">imaging.ai.support@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000002012\">+10000002012</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=imaging.ai.support@yourcompany.com\">Chat on Teams</a>",
+        "Escalation Contact": "📧 <a href=\"mailto:data-escalation@yourcompany.com\">data-escalation@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000003\">+10000000003</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data-escalation@yourcompany.com\">Chat on Teams</a>"
+      },
+      "Data Product Details": {
+        "Domain": "Pharma / Life Sciences > R&D – Pharma",
+        "Version": "1.0.0",
+        "Status": "🟡 Draft",
+        "Data Classification": "🛡️ PII / Sensitive",
+        "Refresh Frequency": "📅 Daily",
+        "Certification Tier": "🥉 Bronze - Experimental",
+        "Source Systems": "X-ray image store, AI image analysis",
+        "Retention Period": "10 years"
+      }
+    }
+  },
+  {
+    "comment": "Domain: Sales & Commercial > Sales Analytics",
+    "views": [
+      "pharm_ai.fact_gpprescribing_sample",
+      "pharm_ai.sales_rep_visits",
+      "pharm_ai.sales_rep"
+    ],
+    "groups": {
+      "Data Product Owners": {
+        "Business Owner": "📧 <a href=\"mailto:sales.analytics.owner@yourcompany.com\">sales.analytics.owner@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000020\">+10000000020</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=sales.analytics.owner@yourcompany.com\">Chat on Teams</a>",
+        "Technical Owner / Data Steward": "📧 <a href=\"mailto:sales.analytics.steward@yourcompany.com\">sales.analytics.steward@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000001020\">+10000001020</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=sales.analytics.steward@yourcompany.com\">Chat on Teams</a>",
+        "Department / Domain Team": "Commercial Analytics",
+        "Support Contact": "📧 <a href=\"mailto:sales.analytics.support@yourcompany.com\">sales.analytics.support@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000002020\">+10000002020</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=sales.analytics.support@yourcompany.com\">Chat on Teams</a>",
+        "Escalation Contact": "📧 <a href=\"mailto:data-escalation@yourcompany.com\">data-escalation@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000003\">+10000000003</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data-escalation@yourcompany.com\">Chat on Teams</a>"
+      },
+      "Data Product Details": {
+        "Domain": "Sales & Commercial > Sales Analytics",
+        "Version": "1.0.0",
+        "Status": "🟢 Active",
+        "Data Classification": "🏢 Internal",
+        "Refresh Frequency": "📅 Daily",
+        "Certification Tier": "🥈 Silver - Reviewed",
+        "Source Systems": "ERP, NHS GP prescribing (Snowflake), Bank core system",
+        "Retention Period": "7 years"
+      }
+    }
+  },
+  {
+    "comment": "Domain: IT & Technology > Data & Analytics",
+    "views": ["pharm_ai.common_date"],
+    "groups": {
+      "Data Product Owners": {
+        "Business Owner": "📧 <a href=\"mailto:data.platform.owner@yourcompany.com\">data.platform.owner@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000040\">+10000000040</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data.platform.owner@yourcompany.com\">Chat on Teams</a>",
+        "Technical Owner / Data Steward": "📧 <a href=\"mailto:data.platform.steward@yourcompany.com\">data.platform.steward@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000001040\">+10000001040</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data.platform.steward@yourcompany.com\">Chat on Teams</a>",
+        "Department / Domain Team": "Data Platform",
+        "Support Contact": "📧 <a href=\"mailto:data.platform.support@yourcompany.com\">data.platform.support@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000002040\">+10000002040</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data.platform.support@yourcompany.com\">Chat on Teams</a>",
+        "Escalation Contact": "📧 <a href=\"mailto:data-escalation@yourcompany.com\">data-escalation@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000003\">+10000000003</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data-escalation@yourcompany.com\">Chat on Teams</a>"
+      },
+      "Data Product Details": {
+        "Domain": "IT & Technology > Data & Analytics",
+        "Version": "1.0.0",
+        "Status": "🟢 Active",
+        "Data Classification": "🏢 Internal",
+        "Refresh Frequency": "📅 Daily",
+        "Certification Tier": "🥇 Gold - Verified",
+        "Source Systems": "Snowflake, Denodo Scheduler",
+        "Retention Period": "3 years"
+      }
+    }
+  },
+  {
+    "comment": "Override: patient-level data is PII",
+    "views": [
+      "pharm_ai.patients",
+      "pharm_ai.i_clinical_trials_patients_start_date"
+    ],
+    "groups": {
+      "Data Product Details": {
+        "Data Classification": "🛡️ PII / Sensitive"
+      }
+    }
+  },
+  {
+    "comment": "Override: metric views are aggregated, internal and certified",
+    "views": ["pharm_ai.mv_clinical_trials"],
+    "groups": {
+      "Data Product Details": {
+        "Data Classification": "🏢 Internal",
+        "Certification Tier": "🥇 Gold - Verified"
+      }
+    }
+  }
+]

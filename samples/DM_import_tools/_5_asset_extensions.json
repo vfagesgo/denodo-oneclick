@@ -1,0 +1,129 @@
+{
+  "elementTypes": [
+    {
+      "name": "DATA_PRODUCT",
+      "visualName": "Data Product",
+      "description": "A curated, consumable data product exposed to data consumers",
+      "iconKey": "fas fa-cube",
+      "iconColorCode": "#CFB53B",
+      "reversedIconColorCode": "#fff"
+    },
+    {
+      "name": "GLOSSARY",
+      "visualName": "Glossary",
+      "description": "A business glossary term or definition",
+      "iconKey": "fas fa-book",
+      "iconColorCode": "#5D4037",
+      "reversedIconColorCode": "#fff"
+    },
+    {
+      "name": "PUBLIC_QUERY",
+      "visualName": "Public Query",
+      "description": "A saved, publicly shared query executable against the Data Marketplace",
+      "iconKey": "fas fa-magnifying-glass",
+      "iconColorCode": "#6A4C93",
+      "reversedIconColorCode": "#fff"
+    },
+    {
+      "name": "ETL",
+      "visualName": "ETL",
+      "description": "An ETL / data loading job",
+      "iconKey": "fas fa-circle-nodes",
+      "iconColorCode": "#E8B4B8",
+      "reversedIconColorCode": "#fff"
+    }
+  ],
+
+  "providerTypes": [
+    {
+      "name": "DATA_PRODUCT_PROVIDER",
+      "visualName": "Data product provider",
+      "icon": "icons/data_product_provider.svg"
+    },
+    {
+      "name": "CONFLUENCE",
+      "visualName": "Confluence",
+      "icon": "icons/confluence_provider.svg"
+    },
+    {
+      "name": "SCHEDULER_PROVIDER",
+      "visualName": "Denodo Scheduler",
+      "icon": "icons/scheduler_provider.svg"
+    },
+    { "name": "QLIK", "visualName": "Qlik", "icon": "icons/qlik_provider.svg" },
+    {
+      "name": "LOOKER",
+      "visualName": "Looker",
+      "icon": "icons/looker_provider.svg"
+    },
+    {
+      "name": "COLLIBRA",
+      "visualName": "Collibra",
+      "icon": "icons/collibra_provider.svg"
+    },
+    {
+      "name": "DM_QUERIES",
+      "visualName": "DataMarketplace Queries",
+      "icon": "icons/query_provider.svg"
+    }
+  ],
+
+  "toolServers": [
+    {
+      "name": "Agent Skill Server",
+      "description": "A virtual server that provides agent skills",
+      "providerType": "AGENT_SKILL_PROVIDER",
+      "databaseName": "asset_extensions",
+      "viewName": "i_skill_metadata"
+    },
+    {
+      "name": "Denodo Scheduler",
+      "description": "Denodo Scheduler server description",
+      "providerType": "SCHEDULER_PROVIDER",
+      "databaseName": "asset_extensions",
+      "viewName": "i_scheduler_metadata"
+    },
+    {
+      "name": "Denodo Data Product Server",
+      "description": "Serves Data Product metadata into the Data Marketplace",
+      "providerType": "DATA_PRODUCT_PROVIDER",
+      "databaseName": "asset_extensions",
+      "viewName": "i_data_product_metadata"
+    },
+    {
+      "name": "Qlik Server",
+      "description": "Qlik Server description",
+      "providerType": "QLIK",
+      "databaseName": "asset_extensions",
+      "viewName": "i_qlik_metadata"
+    },
+    {
+      "name": "Looker Server",
+      "description": "Looker Server description",
+      "providerType": "LOOKER",
+      "databaseName": "asset_extensions",
+      "viewName": "i_looker_metadata"
+    },
+    {
+      "name": "Collibra Server",
+      "description": "Collibra Server description",
+      "providerType": "COLLIBRA",
+      "databaseName": "asset_extensions",
+      "viewName": "i_collibra_metadata"
+    },
+    {
+      "name": "Confluence Glossary Server",
+      "description": "Serves Glossary metadata sourced from Confluence into the Data Marketplace",
+      "providerType": "CONFLUENCE",
+      "databaseName": "asset_extensions",
+      "viewName": "i_glossary_metadata"
+    },
+    {
+      "name": "DataMarketplace Queries Server",
+      "description": "Serves Public Query metadata into the Data Marketplace",
+      "providerType": "DM_QUERIES",
+      "databaseName": "asset_extensions",
+      "viewName": "i_dm_query_metadata"
+    }
+  ]
+}

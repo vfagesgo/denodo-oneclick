@@ -1,0 +1,1600 @@
+﻿# REQUIRES-PROPERTIES-FILE - # Do not remove this comment!
+# 
+# Generated with Denodo Platform 9.6.0 BETA.
+
+ENTER SINGLE USER MODE;
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+# #######################################
+# USER CREATION
+# #######################################
+# No users
+# #######################################
+# ROLE CREATION
+# #######################################
+CREATE OR REPLACE ROLE denodooneclickrole '';
+
+CREATE OR REPLACE ROLE enduser_executeonly 'metadata and execute access only';
+
+
+# 0 ====================================================================
+
+# #######################################
+# DATABASE
+# #######################################
+CREATE OR REPLACE DATABASE pharm_ai '';
+
+CONNECT DATABASE pharm_ai;
+
+# #######################################
+# FOLDERS
+# #######################################
+CREATE OR REPLACE FOLDER '/1 - Connectivity' ;
+
+CHOWN admin FOLDER '/1 - Connectivity';
+
+CREATE OR REPLACE FOLDER '/1 - connectivity/1 - Data Sources' ;
+
+CHOWN admin FOLDER '/1 - connectivity/1 - Data Sources';
+
+CREATE OR REPLACE FOLDER '/1 - connectivity/2 - Base Views' ;
+
+CHOWN admin FOLDER '/1 - connectivity/2 - Base Views';
+
+CREATE OR REPLACE FOLDER '/2 - Integration Views' ;
+
+CHOWN admin FOLDER '/2 - Integration Views';
+
+CREATE OR REPLACE FOLDER '/3 - Data Products' ;
+
+CHOWN admin FOLDER '/3 - Data Products';
+
+CREATE OR REPLACE FOLDER '/3 - data products/Metrics Views' ;
+
+CHOWN admin FOLDER '/3 - data products/Metrics Views';
+
+CREATE OR REPLACE FOLDER '/4 - Report Views' ;
+
+CHOWN admin FOLDER '/4 - Report Views';
+
+CREATE OR REPLACE FOLDER '/5 - Data Services' ;
+
+CHOWN admin FOLDER '/5 - Data Services';
+
+CREATE OR REPLACE FOLDER '/6 - Associations' ;
+
+CHOWN admin FOLDER '/6 - Associations';
+
+# #######################################
+# RESOURCES
+# #######################################
+# No resources
+# #######################################
+# LISTENERS JMS
+# #######################################
+# No listeners jms
+# #######################################
+# LISTENERS KAFKA
+# #######################################
+# No listeners kafka
+# #######################################
+# DATASOURCES
+# #######################################
+CREATE OR REPLACE DATASOURCE JDBC erp
+    FOLDER = '/1 - connectivity/1 - data sources'
+    DRIVERCLASSNAME = 'org.postgresql.Driver'
+    DATABASEURI = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.erp.DATABASEURI}'
+    USERNAME = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.erp.USERNAME}'
+    USERPASSWORD = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.erp.USERPASSWORD}' ${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.erp.USERPASSWORD.ENCRYPTED}
+    CLASSPATH = 'postgresql'
+    DATABASENAME = 'postgresql'
+    DATABASEVERSION = '17'
+    FETCHSIZE = 1000
+    VALIDATIONQUERY = 'Select 1'
+    INITIALSIZE = 4
+    MAXIDLE = -1
+    MINIDLE = 0
+    MAXACTIVE = 20
+    EXHAUSTEDACTION = 1
+    TESTONBORROW = true
+    TESTONRETURN = false
+    TESTWHILEIDLE = false
+    TIMEBETWEENEVICTION = -1
+    NUMTESTPEREVICTION = 3
+    MINEVICTABLETIME = 1800000
+    POOLPREPAREDSTATEMENTS = false
+    MAXOPENPREPAREDSTATEMENTS = -1
+    PROPERTIES ('reWriteBatchedInserts'='true', 'escapeSyntaxCallMode'='callIfNoReturn', 'ApplicationName'='Denodo')
+    KERBEROSPROPERTIES ('jaasLogin'='false', 'user'='<user>')
+    DATA_LOAD_CONFIGURATION (
+        BATCHINSERTSIZE = 200
+    )
+    PROCESSING_UNITS = 1
+    CPUS_PER_PROCESSING_UNIT = 1;
+
+CHOWN admin DATASOURCE JDBC erp LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE DATASOURCE JDBC sec_clinical_trials
+    FOLDER = '/1 - connectivity/1 - data sources'
+    DRIVERCLASSNAME = 'org.postgresql.Driver'
+    DATABASEURI = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.sec_clinical_trials.DATABASEURI}'
+    USERNAME = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.sec_clinical_trials.USERNAME}'
+    USERPASSWORD = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.sec_clinical_trials.USERPASSWORD}' ${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.sec_clinical_trials.USERPASSWORD.ENCRYPTED}
+    CLASSPATH = 'postgresql'
+    DATABASENAME = 'postgresql'
+    DATABASEVERSION = '17'
+    FETCHSIZE = 1000
+    VALIDATIONQUERY = 'Select 1'
+    INITIALSIZE = 4
+    MAXIDLE = -1
+    MINIDLE = 0
+    MAXACTIVE = 20
+    EXHAUSTEDACTION = 1
+    TESTONBORROW = true
+    TESTONRETURN = false
+    TESTWHILEIDLE = false
+    TIMEBETWEENEVICTION = -1
+    NUMTESTPEREVICTION = 3
+    MINEVICTABLETIME = 1800000
+    POOLPREPAREDSTATEMENTS = false
+    MAXOPENPREPAREDSTATEMENTS = -1
+    PROPERTIES ('reWriteBatchedInserts'='true', 'escapeSyntaxCallMode'='callIfNoReturn', 'ApplicationName'='Denodo')
+    KERBEROSPROPERTIES ('jaasLogin'='false', 'user'='<user>')
+    DATA_LOAD_CONFIGURATION (
+        BATCHINSERTSIZE = 200
+    )
+    PROCESSING_UNITS = 1
+    CPUS_PER_PROCESSING_UNIT = 1;
+
+CHOWN admin DATASOURCE JDBC sec_clinical_trials LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE DATASOURCE JDBC snowflake_pharma
+    FOLDER = '/1 - connectivity/1 - data sources'
+    DRIVERCLASSNAME = 'org.postgresql.Driver'
+    DATABASEURI = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.snowflake_pharma.DATABASEURI}'
+    USERNAME = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.snowflake_pharma.USERNAME}'
+    USERPASSWORD = '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.snowflake_pharma.USERPASSWORD}' ${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.jdbc.snowflake_pharma.USERPASSWORD.ENCRYPTED}
+    CLASSPATH = 'postgresql'
+    DATABASENAME = 'postgresql'
+    DATABASEVERSION = '17'
+    FETCHSIZE = 1000
+    VALIDATIONQUERY = 'Select 1'
+    INITIALSIZE = 4
+    MAXIDLE = -1
+    MINIDLE = 0
+    MAXACTIVE = 20
+    EXHAUSTEDACTION = 1
+    TESTONBORROW = true
+    TESTONRETURN = false
+    TESTWHILEIDLE = false
+    TIMEBETWEENEVICTION = -1
+    NUMTESTPEREVICTION = 3
+    MINEVICTABLETIME = 1800000
+    POOLPREPAREDSTATEMENTS = false
+    MAXOPENPREPAREDSTATEMENTS = -1
+    PROPERTIES ('reWriteBatchedInserts'='true', 'escapeSyntaxCallMode'='callIfNoReturn', 'ApplicationName'='Denodo')
+    KERBEROSPROPERTIES ('jaasLogin'='false', 'user'='<user>')
+    DATA_LOAD_CONFIGURATION (
+        BATCHINSERTSIZE = 200
+    )
+    PROCESSING_UNITS = 1
+    CPUS_PER_PROCESSING_UNIT = 1;
+
+CHOWN admin DATASOURCE JDBC snowflake_pharma LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE DATASOURCE JSON gp_details_service
+    FOLDER = '/1 - connectivity/1 - data sources'
+    ROUTE HTTP 'http.ApacheHttpClientConnection,120000' GET '${databases.pharm_ai.folder.1 - connectivity.folder.1 - data sources.datasources.json.gp_details_service.ROUTE.HTTP.URL}'
+    CHECKCERTIFICATES
+    GENERATE_OUTPUT_ON_EMPTY_CONTENT
+ AUTHENTICATION OFF
+    PROXY OFF
+    HTTP_ERROR_CODES_TO_IGNORE (400, 404)
+    REQUEST_RATE_LIMIT (
+      NUMBER_OF_REQUESTS = 30
+      TIME_UNIT = SECOND
+    );
+
+CHOWN admin DATASOURCE JSON gp_details_service LASTMODIFICATIONUSER admin;
+
+# #######################################
+# DATABASE CONFIGURATION
+# #######################################
+ALTER DATABASE pharm_ai
+  CHARSET DEFAULT;
+
+# #######################################
+# WRAPPERS
+# #######################################
+CREATE OR REPLACE WRAPPER JDBC ct_clinical_trials
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=sec_clinical_trials
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.ct_clinical_trials.SCHEMANAME}' 
+    RELATIONNAME='ct_clinical_trials' 
+    OUTPUTSCHEMA (
+        trial_id = 'trial_id' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='19', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_code = 'bnf_code' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='16', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        trial_name = 'trial_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='100', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        patient_sk = 'patient_sk' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='19', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        start_date_key = 'start_date_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='19', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        end_date_key = 'end_date_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='19', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        trial_status = 'status' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='20', sourcetypeid='12', sourcetypename='varchar')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC ct_clinical_trials LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC ct_patients
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=sec_clinical_trials
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.ct_patients.SCHEMANAME}' 
+    RELATIONNAME='ct_patients' 
+    OUTPUTSCHEMA (
+        patient_sk = 'patient_sk' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        patient_id = 'patient_id' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='16', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE,
+        current_addr_sk = 'current_addr_sk' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        salutation = 'salutation' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE,
+        first_name = 'first_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='20', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE,
+        last_name = 'last_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='30', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE,
+        key_patient_flag = 'key_patient_flag' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='1', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE,
+        birth_day = 'birth_day' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        birth_month = 'birth_month' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        birth_year = 'birth_year' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        birth_country = 'birth_country' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='20', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        login = 'login' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='13', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE,
+        email_address = 'email_address' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='50', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE,
+        last_review_date = 'last_review_date' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC ct_patients LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC erp_products
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=erp
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.erp_products.SCHEMANAME}' 
+    RELATIONNAME='erp_products' 
+    OUTPUTSCHEMA (
+        bnf_code = 'bnf_code' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='50', sourcetypeid='12', sourcetypename='varchar')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC erp_products LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC erp_sales_rep
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=erp
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.erp_sales_rep.SCHEMANAME}' 
+    RELATIONNAME='erp_sales_rep' 
+    OUTPUTSCHEMA (
+        sales_rep_code = 'sales_rep_code' :'java.lang.Long' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        lastname = 'lastname' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='50', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        firstname = 'firstname' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='50', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        address = 'address' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='50', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        city = 'city' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='50', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        post_code = 'post_code' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='50', sourcetypeid='12', sourcetypename='varchar')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC erp_sales_rep LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC erp_sales_rep_visits
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=erp
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.erp_sales_rep_visits.SCHEMANAME}' 
+    RELATIONNAME='erp_sales_rep_visits' 
+    OUTPUTSCHEMA (
+        date_key = 'date_key' :'java.lang.Long' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        practice_code = 'practice_code' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='50', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        sales_rep_code = 'sales_rep_code' :'java.lang.Long' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='2', sourcetypename='numeric')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC erp_sales_rep_visits LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC sf_bnf_chapter
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=snowflake_pharma
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.sf_bnf_chapter.SCHEMANAME}' 
+    RELATIONNAME='sf_bnf_chapter' 
+    OUTPUTSCHEMA (
+        bnf_chapter_key = 'bnf_chapter_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_chapter = 'bnf_chapter' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC sf_bnf_chapter LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC sf_bnf_paragraph
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=snowflake_pharma
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.sf_bnf_paragraph.SCHEMANAME}' 
+    RELATIONNAME='sf_bnf_paragraph' 
+    OUTPUTSCHEMA (
+        bnf_chapter_key = 'bnf_chapter_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_section_key = 'bnf_section_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_paragraph_key = 'bnf_paragraph_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_paragraph = 'bnf_paragraph' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC sf_bnf_paragraph LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC sf_bnf_section
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=snowflake_pharma
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.sf_bnf_section.SCHEMANAME}' 
+    RELATIONNAME='sf_bnf_section' 
+    OUTPUTSCHEMA (
+        bnf_chapter_key = 'bnf_chapter_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_section_key = 'bnf_section_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_section = 'bnf_section' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC sf_bnf_section LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC sf_common_date
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=snowflake_pharma
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.sf_common_date.SCHEMANAME}' 
+    RELATIONNAME='sf_common_date' 
+    OUTPUTSCHEMA (
+        date_key = 'date_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        actual_date = 'actual_date' :'java.time.LocalDate' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='13', sourcetypeid='91', sourcetypename='date')  SORTABLE,
+        date_name = 'date_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        year_name = 'year_name' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        quarter_name = 'quarter_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        month_name = 'month_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        month_year_name = 'month_year_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        fiscal_quarter_name = 'fiscal_quarter_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        fiscal_year_name = 'fiscal_year_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        fiscal_year_end_key = 'fiscal_year_end_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        field_0 = 'field_0' :'java.time.LocalDateTime' (OPT) (sourcetypedecimals='6', sourcetyperadix='10', sourcetypesize='29', sourcetypeid='93', sourcetypename='timestamp')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC sf_common_date LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC sf_fact_gpprescribing_sample
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=snowflake_pharma
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.sf_fact_gpprescribing_sample.SCHEMANAME}' 
+    RELATIONNAME='sf_fact_gpprescribing_sample' 
+    OUTPUTSCHEMA (
+        date_key = 'date_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        practice_code = 'practice_code' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='6', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        bnf_code = 'bnf_code' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='15', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        items = 'items' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        quantity = 'quantity' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='2', sourcetyperadix='10', sourcetypesize='22', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        nic = 'nic' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='2', sourcetyperadix='10', sourcetypesize='22', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        actual_cost = 'actual_cost' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='5', sourcetyperadix='10', sourcetypesize='24', sourcetypeid='2', sourcetypename='numeric')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC sf_fact_gpprescribing_sample LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC sf_presentation
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=snowflake_pharma
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.sf_presentation.SCHEMANAME}' 
+    RELATIONNAME='sf_presentation' 
+    OUTPUTSCHEMA (
+        bnf_code = 'bnf_code' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='16', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        brand_name = 'brand_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='255', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        generic_name = 'generic_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='255', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        bnf_drug_code = 'bnf_drug_code' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='9', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        bnf_chapter_key = 'bnf_chapter_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_section_key = 'bnf_section_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE,
+        bnf_paragraph_key = 'bnf_paragraph_key' :'java.math.BigDecimal' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='38', sourcetypeid='2', sourcetypename='numeric')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC sf_presentation LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JDBC xray_analysis_embedding
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=sec_clinical_trials
+    SCHEMANAME='${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.jdbc.xray_analysis_embedding.SCHEMANAME}' 
+    RELATIONNAME='xray_analysis_embedding' 
+    OUTPUTSCHEMA (
+        image_name = 'image_name' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='128', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        image_path = 'image_path' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='128', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        mime_type = 'mime_type' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='128', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        width_px = 'width_px' :'java.lang.Integer' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='4', sourcetypename='int4')  SORTABLE,
+        height_px = 'height_px' :'java.lang.Integer' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='4', sourcetypename='int4')  SORTABLE,
+        file_size_bytes = 'file_size_bytes' :'java.lang.Integer' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='4', sourcetypename='int4')  SORTABLE,
+        analysed_at = 'analysed_at' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='128', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        model = 'model' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='128', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        tokens_used = 'tokens_used' :'java.lang.Integer' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='10', sourcetypeid='4', sourcetypename='int4')  SORTABLE,
+        description = 'description' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2048', sourcetypeid='12', sourcetypename='varchar')  SORTABLE,
+        embedding_image_name_description = 'embedding_image_name_description' :'com.denodo.vdb.sql.FloatVector' (OPT) (sourcetyperadix='10', sourcetypesize='1536', sourcetypeid='1111', sourcetypename='vector')  NOT SORTABLE,
+        patient_id = 'patient_id' :'java.lang.String' (OPT) (sourcetypedecimals='0', sourcetyperadix='10', sourcetypesize='2147483647', sourcetypeid='1', sourcetypename='bpchar')  SORTABLE
+    );
+
+CHOWN admin WRAPPER JDBC xray_analysis_embedding LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE WRAPPER JSON gp_details_service
+    FOLDER = '/1 - connectivity/2 - base views'
+    DATASOURCENAME=gp_details_service
+    TUPLEROOT '/Organisation'
+    ROUTE HTTP 'http.ApacheHttpClientConnection,120000' GET '${databases.pharm_ai.folder.1 - connectivity.folder.2 - base views.views.json.gp_details_service.ROUTE.HTTP.URL}'
+    OUTPUTSCHEMA (organisation = 'Organisation' : REGISTER OF (
+        practice_code = 'PRACTICE_CODE' : 'java.lang.String' (OBL) (DEFAULTVALUE='G82069') EXTERN,
+        name = 'Name' : 'java.lang.String',
+        date = 'Date' : ARRAY OF (
+            date = 'Date' : REGISTER OF (
+                type = 'Type' : 'java.lang.String',
+                start = 'Start' : 'java.lang.String'
+            )
+        ),
+        orgid = 'OrgId' : REGISTER OF (
+            root = 'root' : 'java.lang.String',
+            assigningauthorityname = 'assigningAuthorityName' : 'java.lang.String',
+            extension = 'extension' : 'java.lang.String'
+        ),
+        status = 'Status' : 'java.lang.String',
+        lastchangedate = 'LastChangeDate' : 'java.lang.String',
+        orgrecordclass = 'orgRecordClass' : 'java.lang.String',
+        geoloc = 'GeoLoc' : REGISTER OF (
+            location = 'Location' : REGISTER OF (
+                addrln1 = 'AddrLn1' : 'java.lang.String',
+                town = 'Town' : 'java.lang.String',
+                county = 'County' : 'java.lang.String',
+                postcode = 'PostCode' : 'java.lang.String',
+                country = 'Country' : 'java.lang.String',
+                uprn = 'UPRN' : 'java.lang.Integer'
+            )
+        ),
+        contacts = 'Contacts' : REGISTER OF (
+            contact = 'Contact' : ARRAY OF (
+                contact = 'Contact' : REGISTER OF (
+                    type = 'type' : 'java.lang.String',
+                    value = 'value' : 'java.lang.String'
+                )
+            )
+        ),
+        roles = 'Roles' : REGISTER OF (
+            role = 'Role' : ARRAY OF (
+                role = 'Role' : REGISTER OF (
+                    id = 'id' : 'java.lang.String',
+                    uniqueroleid = 'uniqueRoleId' : 'java.lang.Integer',
+                    primaryrole = 'primaryRole' : 'java.lang.String',
+                    date = 'Date' : ARRAY OF (
+                        date = 'Date' : REGISTER OF (
+                            type = 'Type' : 'java.lang.String',
+                            start = 'Start' : 'java.lang.String'
+                        )
+                    ),
+                    status = 'Status' : 'java.lang.String'
+                )
+            )
+        ),
+        rels = 'Rels' : REGISTER OF (
+            rel = 'Rel' : ARRAY OF (
+                rel = 'Rel' : REGISTER OF (
+                    date = 'Date' : ARRAY OF (
+                        date = 'Date' : REGISTER OF (
+                            type = 'Type' : 'java.lang.String',
+                            start = 'Start' : 'java.lang.String',
+                            end = 'End' : 'java.lang.String'
+                        )
+                    ),
+                    status = 'Status' : 'java.lang.String',
+                    target = 'Target' : REGISTER OF (
+                        orgid = 'OrgId' : REGISTER OF (
+                            root = 'root' : 'java.lang.String',
+                            assigningauthorityname = 'assigningAuthorityName' : 'java.lang.String',
+                            extension = 'extension' : 'java.lang.String'
+                        ),
+                        primaryroleid = 'PrimaryRoleId' : REGISTER OF (
+                            id = 'id' : 'java.lang.String',
+                            uniqueroleid = 'uniqueRoleId' : 'java.lang.Integer'
+                        )
+                    ),
+                    id = 'id' : 'java.lang.String',
+                    uniquerelid = 'uniqueRelId' : 'java.lang.Integer'
+                )
+            )
+        )
+    )
+    );
+
+CHOWN admin WRAPPER JSON gp_details_service LASTMODIFICATIONUSER admin;
+
+# #######################################
+# STORED PROCEDURES
+# #######################################
+# No stored procedures
+# #######################################
+# TYPES
+# #######################################
+CREATE OR REPLACE TYPE gp_details_service_contacts_contact_contact AS REGISTER OF (type:text, value:text);
+
+CREATE OR REPLACE TYPE gp_details_service_date_date AS REGISTER OF (type:text, start:text);
+
+CREATE OR REPLACE TYPE gp_details_service_geoloc_location AS REGISTER OF (addrln1:text, town:text, county:text, postcode:text, country:text, uprn:int);
+
+CREATE OR REPLACE TYPE gp_details_service_orgid AS REGISTER OF (root:text, assigningauthorityname:text, extension:text);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_date_date AS REGISTER OF (type:text, start:text, end:text);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_target_orgid AS REGISTER OF (root:text, assigningauthorityname:text, extension:text);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_target_primaryroleid AS REGISTER OF (id:text, uniqueroleid:int);
+
+CREATE OR REPLACE TYPE gp_details_service_roles_role_role_date_date AS REGISTER OF (type:text, start:text);
+
+CREATE OR REPLACE TYPE gp_details_service_contacts_contact AS ARRAY OF gp_details_service_contacts_contact_contact;
+
+CREATE OR REPLACE TYPE gp_details_service_date AS ARRAY OF gp_details_service_date_date;
+
+CREATE OR REPLACE TYPE gp_details_service_geoloc AS REGISTER OF (location:gp_details_service_geoloc_location);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_date AS ARRAY OF gp_details_service_rels_rel_rel_date_date;
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_target AS REGISTER OF (orgid:gp_details_service_rels_rel_rel_target_orgid, primaryroleid:gp_details_service_rels_rel_rel_target_primaryroleid);
+
+CREATE OR REPLACE TYPE gp_details_service_roles_role_role_date AS ARRAY OF gp_details_service_roles_role_role_date_date;
+
+CREATE OR REPLACE TYPE gp_details_service_contacts AS REGISTER OF (contact:gp_details_service_contacts_contact);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel AS REGISTER OF (date:gp_details_service_rels_rel_rel_date, status:text, target:gp_details_service_rels_rel_rel_target, id:text, uniquerelid:int);
+
+CREATE OR REPLACE TYPE gp_details_service_roles_role_role AS REGISTER OF (id:text, uniqueroleid:int, primaryrole:text, date:gp_details_service_roles_role_role_date, status:text);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel AS ARRAY OF gp_details_service_rels_rel_rel;
+
+CREATE OR REPLACE TYPE gp_details_service_roles_role AS ARRAY OF gp_details_service_roles_role_role;
+
+CREATE OR REPLACE TYPE gp_details_service_rels AS REGISTER OF (rel:gp_details_service_rels_rel);
+
+CREATE OR REPLACE TYPE gp_details_service_roles AS REGISTER OF (role:gp_details_service_roles_role);
+
+# #######################################
+# MAPS
+# #######################################
+# No maps
+# #######################################
+# BASE VIEWS
+# #######################################
+CREATE OR REPLACE TYPE gp_details_service_date_date AS REGISTER OF (type:text, start:text);
+
+CREATE OR REPLACE TYPE gp_details_service_date AS ARRAY OF gp_details_service_date_date;
+
+CREATE OR REPLACE TYPE gp_details_service_orgid AS REGISTER OF (root:text, assigningauthorityname:text, extension:text);
+
+CREATE OR REPLACE TYPE gp_details_service_geoloc_location AS REGISTER OF (addrln1:text, town:text, county:text, postcode:text, country:text, uprn:int);
+
+CREATE OR REPLACE TYPE gp_details_service_geoloc AS REGISTER OF (location:gp_details_service_geoloc_location);
+
+CREATE OR REPLACE TYPE gp_details_service_contacts_contact_contact AS REGISTER OF (type:text, value:text);
+
+CREATE OR REPLACE TYPE gp_details_service_contacts_contact AS ARRAY OF gp_details_service_contacts_contact_contact;
+
+CREATE OR REPLACE TYPE gp_details_service_contacts AS REGISTER OF (contact:gp_details_service_contacts_contact);
+
+CREATE OR REPLACE TYPE gp_details_service_roles_role_role_date_date AS REGISTER OF (type:text, start:text);
+
+CREATE OR REPLACE TYPE gp_details_service_roles_role_role_date AS ARRAY OF gp_details_service_roles_role_role_date_date;
+
+CREATE OR REPLACE TYPE gp_details_service_roles_role_role AS REGISTER OF (id:text, uniqueroleid:int, primaryrole:text, date:gp_details_service_roles_role_role_date, status:text);
+
+CREATE OR REPLACE TYPE gp_details_service_roles_role AS ARRAY OF gp_details_service_roles_role_role;
+
+CREATE OR REPLACE TYPE gp_details_service_roles AS REGISTER OF (role:gp_details_service_roles_role);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_date_date AS REGISTER OF (type:text, start:text, end:text);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_date AS ARRAY OF gp_details_service_rels_rel_rel_date_date;
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_target_orgid AS REGISTER OF (root:text, assigningauthorityname:text, extension:text);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_target_primaryroleid AS REGISTER OF (id:text, uniqueroleid:int);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel_target AS REGISTER OF (orgid:gp_details_service_rels_rel_rel_target_orgid, primaryroleid:gp_details_service_rels_rel_rel_target_primaryroleid);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel_rel AS REGISTER OF (date:gp_details_service_rels_rel_rel_date, status:text, target:gp_details_service_rels_rel_rel_target, id:text, uniquerelid:int);
+
+CREATE OR REPLACE TYPE gp_details_service_rels_rel AS ARRAY OF gp_details_service_rels_rel_rel;
+
+CREATE OR REPLACE TYPE gp_details_service_rels AS REGISTER OF (rel:gp_details_service_rels_rel);
+
+CREATE OR REPLACE TABLE api_gp_details_service I18N us_pst (
+        practice_code:text (extern),
+        name:text,
+        date:gp_details_service_date,
+        orgid:gp_details_service_orgid,
+        status:text,
+        lastchangedate:text,
+        orgrecordclass:text,
+        geoloc:gp_details_service_geoloc,
+        contacts:gp_details_service_contacts,
+        roles:gp_details_service_roles,
+        rels:gp_details_service_rels
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE PARTIAL
+    BATCHSIZEINCACHE DEFAULT
+    TIMETOLIVEINCACHE NOEXPIRE
+    ONSCHEMACHANGE SYNCHRONIZE INCREMENTAL_LOAD
+    CACHE_TABLE_NAME 'c_api_gp_details_service'
+    ADD SEARCHMETHOD gp_details_service(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD practice_code (=) OBL ONE
+             ADD name NOS ZERO ()
+             ADD date NOS ZERO ()
+             ADD date NOS ZERO ()
+             ADD date.type NOS ZERO ()
+             ADD date.start NOS ZERO ()
+             ADD orgid NOS ZERO ()
+             ADD orgid.root NOS ZERO ()
+             ADD orgid.assigningauthorityname NOS ZERO ()
+             ADD orgid.extension NOS ZERO ()
+             ADD status NOS ZERO ()
+             ADD lastchangedate NOS ZERO ()
+             ADD orgrecordclass NOS ZERO ()
+             ADD geoloc NOS ZERO ()
+             ADD geoloc.location NOS ZERO ()
+             ADD geoloc.location.addrln1 NOS ZERO ()
+             ADD geoloc.location.town NOS ZERO ()
+             ADD geoloc.location.county NOS ZERO ()
+             ADD geoloc.location.postcode NOS ZERO ()
+             ADD geoloc.location.country NOS ZERO ()
+             ADD geoloc.location.uprn NOS ZERO ()
+             ADD contacts NOS ZERO ()
+             ADD contacts.contact NOS ZERO ()
+             ADD contacts.contact NOS ZERO ()
+             ADD contacts.contact.type NOS ZERO ()
+             ADD contacts.contact.value NOS ZERO ()
+             ADD roles NOS ZERO ()
+             ADD roles.role NOS ZERO ()
+             ADD roles.role NOS ZERO ()
+             ADD roles.role.id NOS ZERO ()
+             ADD roles.role.uniqueroleid NOS ZERO ()
+             ADD roles.role.primaryrole NOS ZERO ()
+             ADD roles.role.date NOS ZERO ()
+             ADD roles.role.date NOS ZERO ()
+             ADD roles.role.date.type NOS ZERO ()
+             ADD roles.role.date.start NOS ZERO ()
+             ADD roles.role.status NOS ZERO ()
+             ADD rels NOS ZERO ()
+             ADD rels.rel NOS ZERO ()
+             ADD rels.rel NOS ZERO ()
+             ADD rels.rel.date NOS ZERO ()
+             ADD rels.rel.date NOS ZERO ()
+             ADD rels.rel.date.type NOS ZERO ()
+             ADD rels.rel.date.start NOS ZERO ()
+             ADD rels.rel.date.end NOS ZERO ()
+             ADD rels.rel.status NOS ZERO ()
+             ADD rels.rel.target NOS ZERO ()
+             ADD rels.rel.target.orgid NOS ZERO ()
+             ADD rels.rel.target.orgid.root NOS ZERO ()
+             ADD rels.rel.target.orgid.assigningauthorityname NOS ZERO ()
+             ADD rels.rel.target.orgid.extension NOS ZERO ()
+             ADD rels.rel.target.primaryroleid NOS ZERO ()
+             ADD rels.rel.target.primaryroleid.id NOS ZERO ()
+             ADD rels.rel.target.primaryroleid.uniqueroleid NOS ZERO ()
+             ADD rels.rel.id NOS ZERO ()
+             ADD rels.rel.uniquerelid NOS ZERO ()
+        )
+        OUTPUTLIST (contacts, date, geoloc, lastchangedate, name, orgid, orgrecordclass, rels, roles, status
+        )
+        WRAPPER (json gp_details_service)
+    )
+    DECLARE VIEW CLUSTER INDEX gp_id ON (practice_code)
+    DECLARE CACHE INDEX idx_practice_code UNIQUE  ON (practice_code);
+
+CHOWN admin VIEW api_gp_details_service LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE ct_clinical_trials I18N us_pst (
+        trial_id:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '19'),
+        bnf_code:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '16'),
+        trial_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '100'),
+        patient_sk:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '19'),
+        start_date_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '19'),
+        end_date_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '19'),
+        trial_status:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '20')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD ct_clinical_trials(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD trial_id (any) OPT ANY
+             ADD bnf_code (any) OPT ANY
+             ADD trial_name (any) OPT ANY
+             ADD patient_sk (any) OPT ANY
+             ADD start_date_key (any) OPT ANY
+             ADD end_date_key (any) OPT ANY
+             ADD trial_status (any) OPT ANY
+        )
+        OUTPUTLIST (bnf_code, end_date_key, patient_sk, start_date_key, trial_id, trial_name, trial_status
+        )
+        WRAPPER (jdbc ct_clinical_trials)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW ct_clinical_trials LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE ct_patients I18N us_pst (
+        patient_sk:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        patient_id:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '16'),
+        current_addr_sk:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        salutation:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10'),
+        first_name:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '20'),
+        last_name:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '30'),
+        key_patient_flag:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '1'),
+        birth_day:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        birth_month:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        birth_year:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        birth_country:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '20'),
+        login:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '13'),
+        email_address:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '50'),
+        last_review_date:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD ct_patients(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD patient_sk (any) OPT ANY
+             ADD patient_id (any) OPT ANY
+             ADD current_addr_sk (any) OPT ANY
+             ADD salutation (any) OPT ANY
+             ADD first_name (any) OPT ANY
+             ADD last_name (any) OPT ANY
+             ADD key_patient_flag (any) OPT ANY
+             ADD birth_day (any) OPT ANY
+             ADD birth_month (any) OPT ANY
+             ADD birth_year (any) OPT ANY
+             ADD birth_country (any) OPT ANY
+             ADD login (any) OPT ANY
+             ADD email_address (any) OPT ANY
+             ADD last_review_date (any) OPT ANY
+        )
+        OUTPUTLIST (birth_country, birth_day, birth_month, birth_year, current_addr_sk, email_address, first_name, key_patient_flag, last_name, last_review_date, login, patient_id, patient_sk, salutation
+        )
+        WRAPPER (jdbc ct_patients)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW ct_patients LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE erp_products I18N us_pst (
+        bnf_code:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '50')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD erp_products(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD bnf_code (any) OPT ANY
+        )
+        OUTPUTLIST (bnf_code
+        )
+        WRAPPER (jdbc erp_products)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW erp_products LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE erp_sales_rep I18N us_pst (
+        sales_rep_code:long (sourcetypeid = '-5', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10'),
+        lastname:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '50'),
+        firstname:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '50'),
+        address:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '50'),
+        city:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '50'),
+        post_code:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '50')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD erp_sales_rep(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD sales_rep_code (any) OPT ANY
+             ADD lastname (any) OPT ANY
+             ADD firstname (any) OPT ANY
+             ADD address (any) OPT ANY
+             ADD city (any) OPT ANY
+             ADD post_code (any) OPT ANY
+        )
+        OUTPUTLIST (address, city, firstname, lastname, post_code, sales_rep_code
+        )
+        WRAPPER (jdbc erp_sales_rep)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW erp_sales_rep LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE erp_sales_rep_visits I18N us_pst (
+        date_key:long (sourcetypeid = '-5', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10'),
+        practice_code:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '50'),
+        sales_rep_code:long (sourcetypeid = '-5', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD erp_sales_rep_visits(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD date_key (any) OPT ANY
+             ADD practice_code (any) OPT ANY
+             ADD sales_rep_code (any) OPT ANY
+        )
+        OUTPUTLIST (date_key, practice_code, sales_rep_code
+        )
+        WRAPPER (jdbc erp_sales_rep_visits)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW erp_sales_rep_visits LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE sf_bnf_chapter I18N us_pst (
+        bnf_chapter_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        bnf_chapter:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD sf_bnf_chapter(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD bnf_chapter_key (any) OPT ANY
+             ADD bnf_chapter (any) OPT ANY
+        )
+        OUTPUTLIST (bnf_chapter, bnf_chapter_key
+        )
+        WRAPPER (jdbc sf_bnf_chapter)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW sf_bnf_chapter LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE sf_bnf_paragraph I18N us_pst (
+        bnf_chapter_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        bnf_section_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        bnf_paragraph_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        bnf_paragraph:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD sf_bnf_paragraph(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD bnf_chapter_key (any) OPT ANY
+             ADD bnf_section_key (any) OPT ANY
+             ADD bnf_paragraph_key (any) OPT ANY
+             ADD bnf_paragraph (any) OPT ANY
+        )
+        OUTPUTLIST (bnf_chapter_key, bnf_paragraph, bnf_paragraph_key, bnf_section_key
+        )
+        WRAPPER (jdbc sf_bnf_paragraph)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW sf_bnf_paragraph LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE sf_bnf_section I18N us_pst (
+        bnf_chapter_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        bnf_section_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        bnf_section:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD sf_bnf_section(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD bnf_chapter_key (any) OPT ANY
+             ADD bnf_section_key (any) OPT ANY
+             ADD bnf_section (any) OPT ANY
+        )
+        OUTPUTLIST (bnf_chapter_key, bnf_section, bnf_section_key
+        )
+        WRAPPER (jdbc sf_bnf_section)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW sf_bnf_section LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE sf_common_date I18N us_pst (
+        date_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        actual_date:localdate (sourcetypeid = '91', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '13'),
+        date_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647'),
+        year_name:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        quarter_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647'),
+        month_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647'),
+        month_year_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647'),
+        fiscal_quarter_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647'),
+        fiscal_year_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647'),
+        fiscal_year_end_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        field_0:timestamp (sourcetypeid = '93', sourcetyperadix = '10', sourcetypedecimals = '6', sourcetypesize = '29')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD sf_common_date(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD date_key (any) OPT ANY
+             ADD actual_date (any) OPT ANY
+             ADD date_name (any) OPT ANY
+             ADD year_name (any) OPT ANY
+             ADD quarter_name (any) OPT ANY
+             ADD month_name (any) OPT ANY
+             ADD month_year_name (any) OPT ANY
+             ADD fiscal_quarter_name (any) OPT ANY
+             ADD fiscal_year_name (any) OPT ANY
+             ADD fiscal_year_end_key (any) OPT ANY
+             ADD field_0 (any) OPT ANY
+        )
+        OUTPUTLIST (actual_date, date_key, date_name, field_0, fiscal_quarter_name, fiscal_year_end_key, fiscal_year_name, month_name, month_year_name, quarter_name, year_name
+        )
+        WRAPPER (jdbc sf_common_date)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW sf_common_date LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE sf_fact_gpprescribing_sample I18N us_pst (
+        date_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        practice_code:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '6'),
+        bnf_code:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '15'),
+        items:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        quantity:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '2', sourcetypesize = '22'),
+        nic:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '2', sourcetypesize = '22'),
+        actual_cost:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '5', sourcetypesize = '24')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD sf_fact_gpprescribing_sample(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD date_key (any) OPT ANY
+             ADD practice_code (any) OPT ANY
+             ADD bnf_code (any) OPT ANY
+             ADD items (any) OPT ANY
+             ADD quantity (any) OPT ANY
+             ADD nic (any) OPT ANY
+             ADD actual_cost (any) OPT ANY
+        )
+        OUTPUTLIST (actual_cost, bnf_code, date_key, items, nic, practice_code, quantity
+        )
+        WRAPPER (jdbc sf_fact_gpprescribing_sample)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW sf_fact_gpprescribing_sample LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE sf_presentation I18N us_pst (
+        bnf_code:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '16'),
+        brand_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '255'),
+        generic_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '255'),
+        bnf_drug_code:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '9'),
+        bnf_chapter_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        bnf_section_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38'),
+        bnf_paragraph_key:decimal (sourcetypeid = '2', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '38')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD sf_presentation(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD bnf_code (any) OPT ANY
+             ADD brand_name (any) OPT ANY
+             ADD generic_name (any) OPT ANY
+             ADD bnf_drug_code (any) OPT ANY
+             ADD bnf_chapter_key (any) OPT ANY
+             ADD bnf_section_key (any) OPT ANY
+             ADD bnf_paragraph_key (any) OPT ANY
+        )
+        OUTPUTLIST (bnf_chapter_key, bnf_code, bnf_drug_code, bnf_paragraph_key, bnf_section_key, brand_name, generic_name
+        )
+        WRAPPER (jdbc sf_presentation)
+    )
+    SMART_THEN_ATSOURCE_THROUGH_VDP;
+
+CHOWN admin VIEW sf_presentation LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE TABLE xray_analysis_embedding I18N us_pst (
+        image_name:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '128', description = 'Human-readable name or identifier of the image file used for analysis and indexing.'),
+        image_path:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '128', description = 'Location reference to where the image is stored, enabling retrieval and traceability across systems.'),
+        mime_type:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '128', description = 'Media type of the stored image (e.g., image/png or image/jpeg) to support correct handling and rendering.'),
+        width_px:int (sourcetypeid = '4', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10', description = 'Image width in pixels, describing the horizontal resolution used during processing and quality checks.'),
+        height_px:int (sourcetypeid = '4', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10', description = 'Image height in pixels, describing the vertical resolution relevant for processing and quality assessment.'),
+        file_size_bytes:int (sourcetypeid = '4', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10', description = 'Size of the image file in bytes, useful for monitoring storage footprint and processing efficiency.'),
+        analysed_at:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '128', description = 'Timestamp indicating when the image analysis was performed, supporting auditability and result freshness tracking.'),
+        model:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '128', description = 'Identifier of the AI model version used to generate the analysis outputs, enabling reproducibility and comparison over time.'),
+        tokens_used:int (sourcetypeid = '4', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '10', description = 'Number of tokens consumed during the analysis run, supporting operational monitoring and cost/performance reporting.'),
+        description:text (sourcetypeid = '-9', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2048', description = 'Textual summary of the image content or analysis findings, intended for search, review, and downstream interpretation.'),
+        embedding_image_name_description:vector<float,1536> (embeddingmodel = 'text-embedding-3-small', sourcetypeid = '10006', sourcetyperadix = '10', description = 'Vector representation derived from the image name and description to enable semantic similarity,This contains the "text-embedding-3-small" embedding of the textual summary of the image content or analysis findings, intended for search, review, and downstream interpretation.'),
+        patient_id:text (sourcetypeid = '1', sourcetyperadix = '10', sourcetypedecimals = '0', sourcetypesize = '2147483647')
+    )
+    FOLDER = '/1 - connectivity/2 - base views'
+    DESCRIPTION = 'The xray_analysis_embedding view stores metadata and AI-generated analysis outputs for X-ray images, linking each image to a patient when available. It includes identifying and storage details (image_name, image_path, mime_type), image properties (width_px, height_px, file_size_bytes), and processing/audit information (analysed_at, model, tokens_used). The core analytical result is a free-text description summarizing the image content or findings, alongside embedding_image_name_description, a vector embedding of the image name/description that enables semantic search and similarity-based retrieval. The view is associated to the patients view via patient_id, allowing image analyses to be connected back to the corresponding patient record. This view can be used to power semantic search and retrieval of X-ray analyses (for example, finding similar cases or searching by described findings), to cluster or deduplicate studies using embedding similarity, and to monitor AI processing runs through model/version tracking, token consumption, and analysis timestamps. It also supports patient-centric clinical and audit workflows by enabling joins from image analyses to patient records for review and reporting.
+
+When using this data product, you are not allowed to perform SQL filter search on the description column
+You can only perfrom searched on the embedding_image_name_description
+
+Make sure that this rule is systematicly verified!'
+    TAGS (medixit_ai)
+    CACHE OFF
+    TIMETOLIVEINCACHE DEFAULT
+    ADD SEARCHMETHOD xray_analysis_embedding(
+        I18N us_pst
+        CONSTRAINTS (
+             ADD image_name (any) OPT ANY
+             ADD image_path (any) OPT ANY
+             ADD mime_type (any) OPT ANY
+             ADD width_px (any) OPT ANY
+             ADD height_px (any) OPT ANY
+             ADD file_size_bytes (any) OPT ANY
+             ADD analysed_at (any) OPT ANY
+             ADD model (any) OPT ANY
+             ADD tokens_used (any) OPT ANY
+             ADD description (any) OPT ANY
+             ADD embedding_image_name_description (any) OPT ANY
+             ADD patient_id (any) OPT ANY
+        )
+        OUTPUTLIST (analysed_at, description, embedding_image_name_description, file_size_bytes, height_px, image_name, image_path, mime_type, model, patient_id, tokens_used, width_px
+        )
+        WRAPPER (jdbc xray_analysis_embedding)
+    );
+
+CHOWN admin VIEW xray_analysis_embedding LASTMODIFICATIONUSER admin;
+
+# #######################################
+# VIEWS
+# #######################################
+CREATE OR REPLACE INTERFACE VIEW bnf_chapter (
+        bnf_chapter_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Decimal field called ''bnf_chapter_key''. It represents a unique key associated with each distinct chapter of the British National Formulary (BNF), a pharmaceutical reference book widely used in the UK healthcare sector.', sourcetypeid = '2'),
+        bnf_chapter:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'It is a text field called ''bnf_chapter''. It contains the name or title of the chapters in the British National Formulary (BNF). Each chapter corresponds to a specific category of drugs or medical treatments.', sourcetypeid = '-9')
+    )
+    SET IMPLEMENTATION sf_bnf_chapter
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The ''bnf_chapter'' view consists of two fields: ''bnf_chapter_key'' and ''bnf_chapter''. The ''bnf_chapter_key'' is a unique identifier for each distinct chapter of the British National Formulary (BNF), a pharmaceutical reference book widely used in the UK healthcare sector. The ''bnf_chapter'' field contains the name or title of the chapters in the BNF, with each chapter corresponding to a specific category of drugs or medical treatments. This view can be a valuable resource for pharmaceutical companies as it enables categorization and tracking of medical treatments or drugs based on the BNF chapters. It offers significant insights for pharmaceutical research, devising sales strategies for representatives visiting UK general practitioners, and planning patient clinical trials.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW bnf_paragraph (
+        bnf_chapter_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Refers to the unique key identifying the specific chapter of the British National Formulary (BNF) in which a pharmaceutical drug is categorized.', sourcetypeid = '2'),
+        bnf_section_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Represents the identifying key for the specific section within a chapter of the British National Formulary (BNF) where a certain pharmaceutical drug is classified.', sourcetypeid = '2'),
+        bnf_paragraph_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'A unique key referring to the particular paragraph within a section of the British National Formulary (BNF) where a specific pharmaceutical drug is detailed.', sourcetypeid = '2'),
+        bnf_paragraph:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'Contains the exact text of the paragraph within the British National Formulary (BNF) where a particular pharmaceutical drug is described or defined.', sourcetypeid = '-9')
+    )
+    SET IMPLEMENTATION sf_bnf_paragraph
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The "bnf_paragraph" view is a representation of data from the British National Formulary (BNF), a medical reference used by UK healthcare professionals. It includes fields like ''bnf_chapter_key'', ''bnf_section_key'', ''bnf_paragraph_key'', and ''bnf_paragraph''. These fields refer to the unique key identifying the specific chapter, section, and paragraph of the BNF where a particular pharmaceutical drug is categorized, classified, and described, respectively. As a pharmaceutical drug manufacturer that manages data on patients'' clinical trials, products, and sales representatives visits to the UK GP, this view could be utilized for cross-referencing and enriching their internal data. It could provide insight into how their products are categorized and described in the BNF, which could ultimately assist in improving their marketing, sales, production, and research efforts.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW bnf_section (
+        bnf_chapter_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'This field holds the unique key corresponding to a specific chapter in the British National Formulary (BNF), which provides guidelines on the selection and clinical use of medicines.', sourcetypeid = '2'),
+        bnf_section_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'This field contains the unique key that refers to a particular section within a BNF chapter, assisting in categorizing and locating specific areas of medical information.', sourcetypeid = '2'),
+        bnf_section:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'This field represents the name or title of a specific section within a BNF chapter, offering a brief summary of the content found in that section.', sourcetypeid = '-9')
+    )
+    SET IMPLEMENTATION sf_bnf_section
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The bnf_section view primarily comprises three fields that provide a structured way to access and navigate the information in the British National Formulary (BNF). The bnf_chapter_key field holds a unique key for each BNF chapter, while the bnf_section_key refers to a unique key for each section within these chapters. The third field, bnf_section, gives a name or title to each section, summarizing the content covered in it. All these fields are nullable, suggesting that not every record may contain data. This view can be a crucial asset for pharmaceutical companies, especially in carrying out research and development activities, as well as training sales representatives. It allows for a systematic exploration of the BNF, aiding in the study of distribution of medical information across various chapters and sections. It may also facilitate identification of prevalent themes or areas of focus in the medical field.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW clinical_trials (
+        trial_id:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '19', description = 'Denotes a unique numerical identifier for each clinical trial conducted by the pharmaceutical company.', sourcetypeid = '2'),
+        bnf_code:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '16', description = 'Represents the British National Formulary code associated with the particular drug involved in the clinical trial.', sourcetypeid = '-9'),
+        trial_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '100', description = 'Indicates the specific name given to the clinical trial, which could represent a drug or a particular study.', sourcetypeid = '-9'),
+        patient_sk:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '19', description = 'Acts as an unique numerical identifier for each patient participating in a clinical trial.', sourcetypeid = '2'),
+        start_date_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '19', description = 'Signifies the date key when the clinical trial begins for a particular patient or a group of patients.', sourcetypeid = '2'),
+        end_date_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '19', description = 'Denotes the date key when the clinical trial ends for a particular patient or a group of patients.', sourcetypeid = '2'),
+        trial_status:text (description = 'Depicts the current status of the clinical trial, be it active, completed, terminated, etc.')
+    )
+    SET IMPLEMENTATION ct_clinical_trials(
+        trial_id = trial_id,
+        bnf_code = bnf_code,
+        trial_name = trial_name,
+        patient_sk = patient_sk,
+        start_date_key = start_date_key,
+        end_date_key = end_date_key,
+        trial_status = trial_status    
+)
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The ''clinical_trials'' view provides detailed data about clinical trials conducted by a pharmaceutical company. It includes unique identifiers for each trial and participant, British National Formulary codes for the drugs involved, names assigned to the trials, and keys for the beginning and ending dates of the trials. Moreover, it displays the current status of each trial. This view can be instrumental for the manufacturers to keep track of all clinical trials, analyze their outcomes, and monitor patient participation. Furthermore, its association with other views could provide an extensive understanding of various facets of clinical trials, drug prescriptions by UK GPs, drug presentations, and the products under trial.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW common_date (
+        date_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'A unique identifier for a specific date, assisting in tracking and organizing data across various data sources.', sourcetypeid = '2'),
+        actual_date:localdate (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '13', description = 'Refers to the exact calendar date, aiding in establishing a precise timeline of events.', sourcetypeid = '91'),
+        date_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'Provides the written form of the date, which enhances the readability of the date data and facilitates communication.', sourcetypeid = '-9'),
+        year_name:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Represents the year as a numerical value, crucial for annual-level analysis and comparisons.', sourcetypeid = '2'),
+        quarter_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'Indicates the quarter of the year, beneficial for quarterly reviews and evaluations.', sourcetypeid = '-9'),
+        month_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'Denotes the month, which is crucial for monthly tracking and reporting purposes.', sourcetypeid = '-9'),
+        month_year_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'An amalgamation of the month and year, facilitating a more detailed timeline of events.', sourcetypeid = '-9'),
+        fiscal_quarter_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'Details the fiscal quarter, important for financial planning and accounting.', sourcetypeid = '-9'),
+        fiscal_year_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '2147483647', description = 'Indicates the fiscal year, which is key for financial analysis and forecasting.', sourcetypeid = '-9'),
+        fiscal_year_end_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Represents the end of the fiscal year, essential for closing books and annual financial reporting.', sourcetypeid = '2'),
+        month:timestamp (description = 'A timestamp field, capturing the precise moment of an event occurrence, crucial in time-sensitive analyses.')
+    )
+    SET IMPLEMENTATION sf_common_date(
+        date_key = date_key,
+        actual_date = actual_date,
+        date_name = date_name,
+        year_name = year_name,
+        quarter_name = quarter_name,
+        month_name = month_name,
+        month_year_name = month_year_name,
+        fiscal_quarter_name = fiscal_quarter_name,
+        fiscal_year_name = fiscal_year_name,
+        fiscal_year_end_key = fiscal_year_end_key,
+        month = field_0    
+)
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The ''common_date'' view is a structured dataset providing comprehensive date-related details. It includes unique identifiers, actual calendar dates, textual representations of dates, numerical values for years, quarters, months, and fiscal years. It also includes a timestamp field for capturing precise moments of event occurrences. Being associated with three views: ''uk_gp_prescribing'', ''sales_rep_visits'', and ''clinical_trials'', the common_date view serves a critical role in tracking and organising pharmaceutical data ranging from UK doctor prescriptions, patient clinical trials, to sales representative visits. Additionally, the fiscal year and quarter fields could aid in financial planning and accounting, making this view particularly useful for a pharmaceutical company dealing with such diverse data.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE VIEW dv_gp_prescibing FOLDER = '/2 - integration views' AS SELECT sf_fact_gpprescribing_sample.date_key AS date_key, sf_fact_gpprescribing_sample.practice_code AS practice_code, sf_fact_gpprescribing_sample.bnf_code AS bnf_code, sf_fact_gpprescribing_sample.items AS items, sf_fact_gpprescribing_sample.quantity AS quantity, sf_fact_gpprescribing_sample.nic AS nic, sf_fact_gpprescribing_sample.actual_cost AS actual_cost, api_gp_details_service.name AS name, api_gp_details_service.status AS status FROM api_gp_details_service AS api_gp_details_service INNER JOIN sf_fact_gpprescribing_sample AS sf_fact_gpprescribing_sample ON api_gp_details_service.practice_code = sf_fact_gpprescribing_sample.practice_code ;
+
+ALTER VIEW dv_gp_prescibing
+ LAYOUT (api_gp_details_service = [227, 1, 200, 200], sf_fact_gpprescribing_sample = [587, 19, 200, 200]);
+
+ALTER VIEW dv_gp_prescibing
+
+     DECLARE CACHE INDEX gp_pkid ON (practice_code ASC);
+
+CHOWN admin VIEW dv_gp_prescibing LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE INTERFACE VIEW fact_gpprescribing_sample (
+        date_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Refers to a specific point in time pertinent to prescription data, represented numerically.', sourcetypeid = '2'),
+        practice_code:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '6', description = 'Indicates the unique identifier associated with a specific medical practice, tracking prescription origins.', sourcetypeid = '-9'),
+        bnf_code:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '15', description = 'Represents the British National Formulary (BNF) code of the prescribed drug, allowing categorisation and identification of medication.', sourcetypeid = '-9'),
+        items:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Quantifies the number of items prescribed during a given period, providing insights into prescription volumes.', sourcetypeid = '2'),
+        quantity:decimal (sourcetypedecimals = '2', sourcetyperadix = '10', sourcetypesize = '22', description = 'Measures the total amount of prescribed drug, offering data on the overall volume of medication prescribed.', sourcetypeid = '2'),
+        nic:decimal (sourcetypedecimals = '2', sourcetyperadix = '10', sourcetypesize = '22', description = 'Calculates the net ingredient cost, which is the basic cost of a drug before discounts and excluding dispensing costs or fees.', sourcetypeid = '2'),
+        actual_cost:decimal (sourcetypedecimals = '5', sourcetyperadix = '10', sourcetypesize = '24', description = 'Reports the real-world cost borne by the healthcare service, taking into account discounts and additional fees.', sourcetypeid = '2')
+    )
+    SET IMPLEMENTATION sf_fact_gpprescribing_sample
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The fact_gpprescribing_sample view is an aggregation of various fields that provide detailed information on the UK doctors'' prescriptions. These fields include the date key, practice code, BNF code, items, quantity, net ingredient cost, and actual cost. The data captured in this view can provide valuable insights for pharmaceutical manufacturers and other healthcare stakeholders. It can help in tracking prescription trends, understanding the volume and costs associated with different medications, and monitoring the performance of sales representatives. This view can also support the planning and execution of clinical trials, as it provides real-world data on medication usage and costs.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE VIEW iv_xray_images FOLDER = '/2 - integration views' DESCRIPTION = 'The iv_xray_images view stores references to X‑ray images along with minimal patient linkage and an AI-friendly representation of the image’s textual metadata. 
+
+It includes the image location (xray_url) for retrieval and traceability, an associated patient identifier (patient_id), and a vector embedding (embedding_image_name_description) generated from the image name and description to support semantic similarity and intelligent retrieval of images based on meaning rather than exact keywords. 
+
+The iv_xray_images view can be used to power semantic search and recommendation workflows over X‑ray image records (e.g., finding similar studies based on described findings).
+
+WHEN searching in this view you must systematically use the VECTOR_DISTANCE function over the embedding_image_name_description column
+
+VECTOR_DISTANCE(embedding_image_name_description, ''<The description in natural language you are searching for>'') ' 
+    TAGS (ai_ready) (
+    xray_url (description = 'Stores the reference location on a HTTP server for the X-ray image, enabling the image to be retrieved, viewed, or linked from downstream applications. 
+
+To get the public URL replace http://localhost:8080 with the connection host name. if the connection is localhost with no port then just remove the port number.'),
+    patient_id (description = 'Identifies the patient associated with the X-ray image record. It provides the business key used to connect imaging references to the corresponding patient context, supporting consistent grouping, tracking, and integration of imaging information with patient-level data across systems.'),
+    embedding_image_name_description (description = 'Contains an AI-ready numeric vector that represents the meaning of the image’s name and descriptive text (such as a textual summary of content or findings). This embedding enables semantic comparison between records—supporting similarity matching, clustering, and intelligent retrieval based on concept-level relatedness rather than exact wording.')
+ )
+ AS SELECT ('http://localhost:8080/xray-images/processed/'||xray_analysis_embedding.image_name) AS xray_url, xray_analysis_embedding.patient_id AS patient_id, xray_analysis_embedding.embedding_image_name_description AS embedding_image_name_description FROM xray_analysis_embedding;
+
+CHOWN admin VIEW iv_xray_images LASTMODIFICATIONUSER admin;
+
+ALTER VIEW iv_xray_images
+ LAYOUT (xray_analysis_embedding = [0, 0, 200, 200]);
+
+CREATE OR REPLACE INTERFACE VIEW patients (
+        patient_sk:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Represents a unique surrogate key for each patient.', sourcetypeid = '2'),
+        patient_id:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '16', description = 'Specifies a unique identifier for each patient.', sourcetypeid = '1'),
+        current_addr_sk:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Denotes a unique surrogate key for the current address of the patient.', sourcetypeid = '2'),
+        salutation:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '10', description = 'Includes the greeting used before the patient''s name.', sourcetypeid = '1'),
+        first_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '20', description = 'Contains the first name of the patient.', sourcetypeid = '1'),
+        last_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '30', description = 'Contains the last name of the patient.', sourcetypeid = '1'),
+        key_patient_flag:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '1', description = 'Indicates if the patient is a key participant in trials or treatments.', sourcetypeid = '1'),
+        birth_day:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Refers to the day of the month when the patient was born.', sourcetypeid = '2'),
+        birth_month:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Refers to the month when the patient was born.', sourcetypeid = '2'),
+        birth_year:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'Refers to the year when the patient was born.', sourcetypeid = '2'),
+        birth_country:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '20', description = 'Specifies the country where the patient was born.', sourcetypeid = '-9'),
+        login:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '13', description = 'Contains the login identifier for the patient''s digital account.', sourcetypeid = '1'),
+        email_address:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '50', description = 'Includes the patient''s email address for communications.', sourcetypeid = '1'),
+        last_review_date:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '10', description = 'Refers to the last date when the patient''s record was reviewed or updated.', sourcetypeid = '1')
+    )
+    SET IMPLEMENTATION ct_patients
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The `patients` view provides a comprehensive set of information regarding individuals within a pharmaceutical manufacturing context. It includes unique identifiers for each patient, full names with salutations, and essential contact details such as email addresses and digital account login IDs. Furthermore, the view stores demographic information, including detailed birth information (day, month, year, and country) and a surrogate key for their current address. It also maintains a flag to identify key participants in clinical trials and tracks the last date the record was reviewed. This view is intended for managing and tracking patient data, facilitating patient categorization, and performing demographic research. Its integration with clinical trial and imaging analysis data makes it useful for tracing patient participation in trials and supporting AI-driven medical research.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW presentation (
+        bnf_code:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '16', description = 'The ''bnf_code'' is a textual identifier used in British National Formulary to denote a specific drug or medication.', sourcetypeid = '-9'),
+        brand_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '255', description = 'The ''brand_name'' represents the commercial name under which a drug or a medication is marketed.', sourcetypeid = '-9'),
+        generic_name:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '255', description = 'The ''generic_name'' corresponds to the official medical name for the active ingredient of the drug, different from its brand name.', sourcetypeid = '-9'),
+        bnf_drug_code:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '9', description = 'The ''bnf_drug_code'' is another textual identifier used within the British National Formulary to distinguish a specific drug or medication.', sourcetypeid = '-9'),
+        bnf_chapter_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'The ''bnf_chapter_key'' is a numerical key which represents the specific chapter in the British National Formulary where the drug is categorized.', sourcetypeid = '2'),
+        bnf_section_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'The ''bnf_section_key'' is a numerical key which refers to the section within a chapter of the British National Formulary where the drug is listed.', sourcetypeid = '2'),
+        bnf_paragraph_key:decimal (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '38', description = 'The ''bnf_paragraph_key'' is a numerical key that points to the specific paragraph within a section of the British National Formulary where information about the drug can be found.', sourcetypeid = '2')
+    )
+    SET IMPLEMENTATION sf_presentation
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The "presentation" view serves as a comprehensive record of various drugs and medications as per the British National Formulary (BNF). It includes fields like ''bnf_code'', ''brand_name'', ''generic_name'', ''bnf_drug_code'', ''bnf_chapter_key'', ''bnf_section_key'', and ''bnf_paragraph_key'', providing detailed information about each drug and its location within the BNF. This database is beneficial for tracking details about different drugs and their specific categorization in the BNF. Furthermore, with associated views like ''clinical_trials'', ''products'', and ''uk_gp_prescribing'', it''s possible to contextualize these drugs in relation to their clinical trials, manufactured products, and prescriptions by UK general practitioners, offering a broad perspective on their lifecycle from development to distribution.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW products (
+        bnf_code:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '50', description = 'The bnf_code field in the products view represents a unique identifier that correlates the product with the British National Formulary (BNF) code. This code signifies a specific pharmaceutical drug. This field serves as a link between the products, prescriptions from UK General Practitioners, clinical trials, and their respective presentations.', sourcetypeid = '-9')
+    )
+    SET IMPLEMENTATION erp_products
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The "products" view is a comprehensive repository of the company''s pharmaceutical product data. It primarily consists of a unique ''bnf_code'' that identifies each product and links it to its corresponding British National Formulary (BNF) code. This view is critical for associating products with UK General Practitioner prescriptions and the respective clinical trials. The ''products'' view is part of multiple associations with views like ''uk_gp_prescribing'', ''presentation'', and ''clinical_trials'', underscoring its extensive usage in managing the company''s data. The data housed in this view can serve multiple purposes, especially in tracking the usage of different pharmaceutical products, their prescription rates, and the progress of their clinical trials. It can help correlate the success of a product with its prescription rate and the results of clinical trials, contributing significantly to strategic decision-making in product development and understanding market trends.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW sales_rep (
+        sales_rep_code:long (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '10', description = 'Represents the unique code assigned to each sales representative within our pharmaceutical company.', sourcetypeid = '-5'),
+        lastname:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '50', description = 'Contains the surname of each sales representative. This helps us to identify and manage our personnel more effectively.', sourcetypeid = '-9'),
+        firstname:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '50', description = 'Contains the first name of each sales representative. This information is essential for personalized communication within our team.', sourcetypeid = '-9'),
+        address:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '50', description = 'Includes the residential address of each sales representative. This is useful for record-keeping and to ensure well-organized distribution of resources.', sourcetypeid = '-9'),
+        city:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '50', description = 'Specifies the city in which the sales representative resides. This helps us understand our team''s geographic distribution and plan accordingly.', sourcetypeid = '-9'),
+        post_code:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '50', description = 'Indicates the postal code of the sales representative''s residence. This is crucial for formal correspondence and logistics planning within our company.', sourcetypeid = '-9')
+    )
+    SET IMPLEMENTATION erp_sales_rep
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The "sales_rep" view represents data related to sales representatives within a pharmaceutical company. It contains six fields: "sales_rep_code", "lastname", "firstname", "address", "city", and "post_code". The "sales_rep_code" is a unique code assigned to each sales representative, and the "lastname" and "firstname" fields contain the names of the sales representatives. The "address", "city", and "post_code" fields provide residential address information, which helps in understanding the geographical distribution of sales representatives and in coordinating resource distribution. Additionally, this view is associated with the "sales_rep_visits" view, facilitating the tracking of sales visits and analysis of sales performance. Hence, the "sales_rep" view is a crucial resource for managing sales representative data and their sales visit information.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW sales_rep_visits (
+        date_key:long (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '10', description = 'The date_key field represents a numerical identifier corresponding to a specific date. In the context of pharmaceutical sales visits, it could be used to track the exact dates of sales representative visits to UK General Practitioners.', sourcetypeid = '-5'),
+        practice_code:text (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '50', description = 'The practice_code field consists of text identifiers for General Practitioner practices in the UK. This could potentially be used to track which locations sales representatives have visited, or to organize prescribing data by practice.', sourcetypeid = '-9'),
+        sales_rep_code:long (sourcetypedecimals = '0', sourcetyperadix = '10', sourcetypesize = '10', description = 'The sales_rep_code field is a numerical identifier for individual sales representatives. This enables tracking and organization of visits, prescriptions, and other data on a per-representative basis.', sourcetypeid = '-5')
+    )
+    SET IMPLEMENTATION erp_sales_rep_visits
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'The "sales_rep_visits" view represents a dataset specifically designed for managing and analyzing the pharmaceutical sales operations within the UK. It consists of detailed fields like "date_key", "practice_code", and "sales_rep_code" providing critical information about each visit made by a sales representative to a General Practitioner (GP) in the UK. This information can be used to track the frequency and pattern of these visits, and organize prescribing data in a way that helps to analyze the effectiveness of sales strategies. The associated views: "uk_gp_prescribing", "sales_rep", and "common_date" further enhance the depth of analysis by providing the ability to cross-reference related data.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE INTERFACE VIEW uk_gp_prescribing (
+        date_key:decimal,
+        practice_code:text,
+        bnf_code:text,
+        items:decimal,
+        quantity:decimal,
+        nic:decimal,
+        actual_cost:decimal,
+        name:text,
+        status:text
+    )
+    SET IMPLEMENTATION dv_gp_prescibing
+    FOLDER = '/3 - data products'
+    DESCRIPTION = 'This table contains the detailed list of the UK GPs Drug and Medicine prescriptions measures by GP''s Practice Code for a BNF code, including Items, Quantity, NIC and Actual Cost.' 
+    TAGS (ai_ready, medixit_ai);
+
+CREATE OR REPLACE VIEW v_clinical_trials_patient_start_date_detail FOLDER = '/4 - report views' DESCRIPTION = 'v_clinical_trials_patient_start_date_detail provides patient-level start-date details for clinical trials. It links each participant to a clinical trial identifier, trial name, and trial status, and includes participant identity and demographic information such as patient identifier, first and last name, key patient indicator, birth country, and email address. The view also captures patient record review information and detailed start-date attributes, including the actual start date, a readable date label, start year, and start month. Example data indicates trials involving medications such as Amoxicillin, Metformin, Paracetamol, and Simvastatin, with statuses such as Canceled, Completed, Ongoing, and Unknown, and patient starts concentrated in October, November, and December 2022. This view can be used to analyze and report when patients begin participation in clinical trials, monitor enrollment timing by trial and status, segment starts by month or year, identify key participants, and support operational follow-up or participant tracking using patient and trial-level context.'  (
+    clinical_trial_identifier (description = 'Identifies the clinical trial associated with the patient start-date information, enabling trial-level organization and linkage across clinical study records.'),
+    clinical_trial_name (description = 'Contains the business name of the clinical trial, typically reflecting the treatment, drug, or study being conducted. It includes values like "Amoxicillin 500mg ca...", "Metformin 500mg tabl...", "Paracetamol 500mg ta...", and "Simvastatin 40mg tab...".'),
+    clinical_trial_status (description = 'Describes the current lifecycle state of the clinical trial, supporting interpretation of whether study activity is active, finished, stopped, or not clearly classified. It includes values like "Canceled", "Completed", "Ongoing", and "Unknown".'),
+    patient_identifier (description = 'Represents the patient-level identifier used to distinguish an individual participant within clinical trial records. It includes values like "AAAAAAAABPFLAAAA", "AAAAAAAADBHDAAAA", "AAAAAAAADNPKAAAA", and "AAAAAAAAGEOGBAAA".'),
+    patient_first_name (description = 'Stores the patient’s given name as part of participant identity information. It includes values like "Brandon", "Jim", "John", and "Leona".'),
+    patient_last_name (description = 'Stores the patient’s family name or surname as part of participant identity information. It includes values like "Chapman", "Fritz", "Kraft", and "Lackey".'),
+    key_patient_indicator (description = 'Indicates whether the patient is considered a key participant for clinical trial or treatment tracking purposes. It includes values like "N" and "Y".'),
+    patient_birth_country (description = 'Specifies the country of birth recorded for the patient, supporting demographic understanding of the clinical trial population. It includes values like "ANGOLA", "BAHAMAS", "BERMUDA", and "ESTONIA".'),
+    patient_email_address (description = 'Contains the patient’s email address used as contact information for trial-related communications and participant correspondence.'),
+    patient_record_last_review_date (description = 'Captures the most recent review reference recorded for the patient’s information, helping indicate how recently the participant record was checked or maintained. It includes values like "2452374", "2452387", "2452402", and "2452447".'),
+    patient_start_actual_date (description = 'Specifies the exact calendar date when the patient’s participation or relevant start event began, supporting precise timeline tracking within the clinical trial.'),
+    patient_start_date_name (description = 'Provides a readable written version of the patient start date, including day of week, month, day, and year for easier interpretation. It includes values like "Friday, December 16...", "Friday, December 30...", "Friday, November 11...", and "Friday, October 28...".'),
+    patient_start_year (description = 'Represents the year of the patient start event, enabling annual grouping and time-based reporting for clinical trial participation.'),
+    patient_start_month (description = 'Represents the month of the patient start event, supporting monthly tracking and reporting of participant starts. It includes values like "December", "November", and "October".')
+ )
+ AS SELECT ct.trial_id AS clinical_trial_identifier, ct.trial_name AS clinical_trial_name, ct.trial_status AS clinical_trial_status, p.patient_id AS patient_identifier, p.first_name AS patient_first_name, p.last_name AS patient_last_name, p.key_patient_flag AS key_patient_indicator, p.birth_country AS patient_birth_country, p.email_address AS patient_email_address, p.last_review_date AS patient_record_last_review_date, cd.actual_date AS patient_start_actual_date, cd.date_name AS patient_start_date_name, cd.year_name AS patient_start_year, cd.month_name AS patient_start_month FROM (clinical_trials AS ct INNER JOIN patients AS p ON ct.patient_sk = p.patient_sk ) INNER JOIN common_date AS cd ON ct.start_date_key = cd.date_key ;
+
+CHOWN admin VIEW v_clinical_trials_patient_start_date_detail LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE VIEW v_clinical_trials_patients_start_date FOLDER = '/4 - report views' DESCRIPTION = 'v_clinical_trials_patients_start_date provides patient-level information linked to clinical trials and their start dates. It includes trial identifiers, trial names, lifecycle status values such as canceled, completed, ongoing, or unknown, and patient identity details such as patient ID, first name, last name, birth country, email address, and key patient indicator. The view also contains patient record review date information and detailed trial start timing, including the exact start date, a readable date label, the start year, and the start month. The sample data indicates trials for medicines such as Amoxicillin, Metformin, and Paracetamol, with trial start dates concentrated in October, November, and December 2022. This view could be used to analyze clinical trial participation by patient, monitor trial timelines, group trials by start month or year, review trial status distribution, and support reporting on key patients and participant demographics. It may also help clinical operations teams track which patients are associated with specific trials and when those trials began.'  (
+    clinical_trial_id (description = 'Numerical identifier that distinguishes a clinical trial within the organization, enabling the trial to be referenced consistently across patient, study, and timeline information.'),
+    clinical_trial_name (description = 'Contains the official name of the clinical trial, often reflecting the medicine, dosage, or study focus being evaluated. It includes values like "Metformin 500mg tabl...", "Paracetamol 500mg ta..." and "Simvastatin 40mg tab...".'),
+    clinical_trial_status (description = 'Describes the current lifecycle state of the clinical trial, indicating whether the study is progressing, finished, or no longer proceeding. It includes values like "Canceled", "Completed" and "Ongoing".'),
+    patient_id (description = 'Identifies an individual patient associated with a clinical trial while supporting consistent patient tracking across trial-related records. It includes values like "AAAAAAAAFLGGBAAA", "AAAAAAAAIEOCBAAA", "AAAAAAAALOGFBAAA" and "AAAAAAAAMEEDBAAA".'),
+    patient_first_name (description = 'Stores the patient’s given name as part of the patient identity information maintained for clinical trial participation. It includes values like "Alexander", "Augusta", "Diane" and "George".'),
+    patient_last_name (description = 'Stores the patient’s family name or surname as part of the patient identity information maintained for clinical trial participation. It includes values like "Bond", "Cole", "Gonzalez" and "Hines".'),
+    key_patient_indicator (description = 'Indicates whether the patient is designated as a key participant for trial or treatment oversight purposes. It includes values like "N" and "Y".'),
+    patient_birth_country (description = 'Specifies the country where the patient was born, supporting demographic context for trial participant information. It includes values like "CAMBODIA", "MONACO", "NETHERLANDS" and "NEW CALEDONIA".'),
+    patient_email_address (description = 'Stores the patient’s email address for communication-related patient contact information.'),
+    patient_last_review_date (description = 'Captures the most recent date or date code associated with review or update of the patient’s record. It includes values like "2452310", "2452369", "2452406" and "2452443".'),
+    trial_start_date (description = 'Specifies the exact calendar date on which the clinical trial began, providing a precise starting point for the trial timeline.'),
+    trial_start_date_name (description = 'Provides a readable written version of the trial start date, including the weekday, month, day, and year. It includes values like "Friday, November 18 ...", "Monday, December 26 ...", "Monday, November 14 ..." and "Tuesday, November 1 ...".'),
+    trial_start_year (description = 'Represents the calendar year in which the clinical trial started, supporting year-level grouping and comparison of trial timelines.'),
+    trial_start_month (description = 'Indicates the calendar month in which the clinical trial started, supporting month-level tracking of trial timelines. It includes values like "December", "November" and "October".')
+ )
+ AS SELECT ct.trial_id AS clinical_trial_id, ct.trial_name AS clinical_trial_name, ct.trial_status AS clinical_trial_status, p.patient_id AS patient_id, p.first_name AS patient_first_name, p.last_name AS patient_last_name, p.key_patient_flag AS key_patient_indicator, p.birth_country AS patient_birth_country, p.email_address AS patient_email_address, p.last_review_date AS patient_last_review_date, cd.actual_date AS trial_start_date, cd.date_name AS trial_start_date_name, cd.year_name AS trial_start_year, cd.month_name AS trial_start_month FROM (clinical_trials AS ct INNER JOIN patients AS p ON ct.patient_sk = p.patient_sk ) INNER JOIN common_date AS cd ON ct.start_date_key = cd.date_key ;
+
+CHOWN admin VIEW v_clinical_trials_patients_start_date LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE VIEW v_clinical_trials_patients_start_date_joined FOLDER = '/4 - report views' DESCRIPTION = 'The v_clinical_trials_patients_start_date_joined view combines clinical trial information with patient participation details and trial start-date attributes. It includes trial identifiers, medication-related clinical trial names, trial lifecycle statuses such as canceled, completed, ongoing, or unknown, and participant-level identifiers and names. It also contains patient context such as whether the participant is marked as a key patient, birth country, contact email field, and the last recorded patient review date. The view adds structured start-date information for each trial, including the exact start date, a readable date label, the start year, and the start month, with observed trial starts occurring in October, November, and December 2022. This view could be used to analyze clinical trial participation alongside trial timing, monitor patient involvement by trial status and launch month, support operational reporting on trial starts, identify key participants, and segment trial populations by demographic or geographic attributes such as birth country.'  (
+    clinical_trial_identifier (description = 'Identifies the clinical trial using a numerical trial reference, allowing patient participation records to be associated with the correct study.'),
+    clinical_trial_name (description = 'Contains the formal name of the clinical trial, typically reflecting the medication, treatment, or study being conducted. It includes values like "Amoxicillin 500mg ca...", "Metformin 500mg tabl..." and "Paracetamol 500mg ta...".'),
+    clinical_trial_status (description = 'Describes the current lifecycle state of the clinical trial, helping distinguish whether a study is active, finished, stopped, or otherwise classified. It includes values like "Canceled", "Completed", "Ongoing" and "Unknown".'),
+    patient_identifier (description = 'Represents the patient reference used to distinguish one trial participant from another across clinical trial records. It includes values like "AAAAAAAABDCAAAAA", "AAAAAAAABOLNAAAA", "AAAAAAAACIMEAAAA" and "AAAAAAAACOAPAAAA".'),
+    patient_first_name (description = 'Stores the patient’s given name as part of the participant identity details. It includes values like "Brent", "Doris", "James" and "Jessica".'),
+    patient_last_name (description = 'Stores the patient’s family name or surname as part of the participant identity details. It includes values like "Burks", "Hicks", "Huggins" and "King".'),
+    key_patient_indicator (description = 'Indicates whether the patient is marked as a key participant within the clinical trial context. It includes values like "N" and "Y".'),
+    patient_birth_country (description = 'Specifies the country where the patient was born, supporting geographic and demographic understanding of trial participants. It includes values like "ANGOLA", "BOTSWANA", "CHINA" and "EQUATORIAL GUINEA".'),
+    patient_email_address (description = 'Contains the patient’s email address intended for participant contact and communication records.'),
+    patient_record_last_review_date (description = 'Captures the recorded date reference for the most recent review or update of the patient’s record. It includes values like "2452399", "2452410", "2452417" and "2452443".'),
+    trial_start_date (description = 'Specifies the exact calendar date when the clinical trial began, supporting precise tracking of the trial timeline.'),
+    trial_start_date_label (description = 'Provides a readable written version of the trial start date for easier interpretation in reports and communications. It includes values like "Saturday, December 1...", "Saturday, December 3...", "Thursday, December 2..." and "Wednesday, November ...".'),
+    trial_start_year (description = 'Represents the year in which the clinical trial started, enabling annual grouping and comparison of trial activity.'),
+    trial_start_month (description = 'Indicates the month in which the clinical trial started, supporting month-level tracking of trial launches. It includes values like "December", "November" and "October".')
+ )
+ AS SELECT clinical_trials_alias.trial_id AS clinical_trial_identifier, clinical_trials_alias.trial_name AS clinical_trial_name, clinical_trials_alias.trial_status AS clinical_trial_status, patients_alias.patient_id AS patient_identifier, patients_alias.first_name AS patient_first_name, patients_alias.last_name AS patient_last_name, patients_alias.key_patient_flag AS key_patient_indicator, patients_alias.birth_country AS patient_birth_country, patients_alias.email_address AS patient_email_address, patients_alias.last_review_date AS patient_record_last_review_date, common_date_alias.actual_date AS trial_start_date, common_date_alias.date_name AS trial_start_date_label, common_date_alias.year_name AS trial_start_year, common_date_alias.month_name AS trial_start_month FROM (clinical_trials AS clinical_trials_alias INNER JOIN patients AS patients_alias ON clinical_trials_alias.patient_sk = patients_alias.patient_sk ) INNER JOIN common_date AS common_date_alias ON clinical_trials_alias.start_date_key = common_date_alias.date_key ;
+
+CHOWN admin VIEW v_clinical_trials_patients_start_date_joined LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE INTERFACE VIEW i_clinical_trials_patients_start_date (
+        clinical_trial_id:decimal,
+        clinical_trial_name:text,
+        clinical_trial_status:text,
+        patient_id:text,
+        patient_first_name:text,
+        patient_last_name:text,
+        key_patient_indicator:text,
+        patient_birth_country:text,
+        patient_email_address:text,
+        patient_last_review_date:text,
+        trial_start_date:localdate,
+        trial_start_date_name:text,
+        trial_start_year:decimal,
+        trial_start_month:text
+    )
+    SET IMPLEMENTATION v_clinical_trials_patients_start_date
+    FOLDER = '/3 - data products';
+
+# #######################################
+# ASSOCIATIONS
+# #######################################
+CREATE OR REPLACE ASSOCIATION clinical_trials_pharm_ai_common_date REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT common_date clinical_trials (0,*)
+    ENDPOINT clinical_trials common_date PRINCIPAL (1)
+    ADD MAPPING end_date_key=date_key;
+
+ALTER ASSOCIATION clinical_trials_pharm_ai_common_date
+ LAYOUT (clinical_trials = [10, 10, 200, 200], common_date = [361, 23, 200, 200]);
+
+CHOWN admin ASSOCIATION clinical_trials_pharm_ai_common_date LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION clinical_trials_pharm_ai_patients REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT patients clinical_trials (0,*)
+    ENDPOINT clinical_trials patients PRINCIPAL (1)
+    ADD MAPPING patient_sk=patient_sk;
+
+ALTER ASSOCIATION clinical_trials_pharm_ai_patients
+ LAYOUT (clinical_trials = [10, 10, 200, 200], patients = [398, 23, 200, 200]);
+
+CHOWN admin ASSOCIATION clinical_trials_pharm_ai_patients LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION clinical_trials_pharm_ai_presentation REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT presentation clinical_trials (0,*)
+    ENDPOINT clinical_trials presentation PRINCIPAL (1)
+    ADD MAPPING bnf_code=bnf_code;
+
+ALTER ASSOCIATION clinical_trials_pharm_ai_presentation
+ LAYOUT (clinical_trials = [10, 10, 200, 200], presentation = [344, 48, 200, 200]);
+
+CHOWN admin ASSOCIATION clinical_trials_pharm_ai_presentation LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION clinical_trials_pharm_ai_products REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT products clinical_trials (0,*)
+    ENDPOINT clinical_trials products PRINCIPAL (0,1)
+    ADD MAPPING bnf_code=bnf_code;
+
+ALTER ASSOCIATION clinical_trials_pharm_ai_products
+ LAYOUT (clinical_trials = [10, 10, 200, 200], products = [409, 36, 200, 200]);
+
+CHOWN admin ASSOCIATION clinical_trials_pharm_ai_products LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION clinical_trials_pharm_ai_uk_gp_prescribing REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT uk_gp_prescribing clinical_trials (0,*)
+    ENDPOINT clinical_trials uk_gp_prescribing PRINCIPAL (0,1)
+    ADD MAPPING bnf_code=bnf_code;
+
+ALTER ASSOCIATION clinical_trials_pharm_ai_uk_gp_prescribing
+ LAYOUT (clinical_trials = [10, 10, 200, 200], uk_gp_prescribing = [387, 35, 200, 200]);
+
+CHOWN admin ASSOCIATION clinical_trials_pharm_ai_uk_gp_prescribing LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION fact_gpprescribing_sample_j_organisation_data_service_pharm_ai_common_date REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT common_date uk_gp_prescribing PRINCIPAL (0,1)
+    ENDPOINT fact_gpprescribing_sample_j_organisation_data_service common_date (0,*)
+    ADD MAPPING date_key=date_key;
+
+ALTER ASSOCIATION fact_gpprescribing_sample_j_organisation_data_service_pharm_ai_common_date
+ LAYOUT (uk_gp_prescribing = [621, 75, 200, 200], common_date = [556, 59, 200, 200]);
+
+CHOWN admin ASSOCIATION fact_gpprescribing_sample_j_organisation_data_service_pharm_ai_common_date LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION fact_gpprescribing_sample_j_organisation_data_service_pharm_ai_presentation REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT presentation uk_gp_prescribing PRINCIPAL (0,1)
+    ENDPOINT fact_gpprescribing_sample_j_organisation_data_service presentation (0,1)
+    ADD MAPPING bnf_code=bnf_code;
+
+ALTER ASSOCIATION fact_gpprescribing_sample_j_organisation_data_service_pharm_ai_presentation
+ LAYOUT (uk_gp_prescribing = [330, 53, 200, 200], presentation = [585, 62, 200, 200]);
+
+CHOWN admin ASSOCIATION fact_gpprescribing_sample_j_organisation_data_service_pharm_ai_presentation LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION pharm_ai_visits_pharm_ai_common_date REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT common_date sales_rep_visits PRINCIPAL (0,1)
+    ENDPOINT pharm_ai_visits common_date (0,1)
+    ADD MAPPING date_key=date_key;
+
+ALTER ASSOCIATION pharm_ai_visits_pharm_ai_common_date
+ LAYOUT (sales_rep_visits = [739, 99, 200, 200], common_date = [843, 70, 200, 200]);
+
+CHOWN admin ASSOCIATION pharm_ai_visits_pharm_ai_common_date LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION pharm_ai_visits_pharm_ai_pharm_ai_sales_rep REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT pharm_ai_sales_rep sales_rep_visits PRINCIPAL (0,1)
+    ENDPOINT pharm_ai_visits sales_rep (0,1)
+    ADD MAPPING sales_rep_code=sales_rep_code;
+
+ALTER ASSOCIATION pharm_ai_visits_pharm_ai_pharm_ai_sales_rep
+ LAYOUT (sales_rep_visits = [703, 71, 200, 200], sales_rep = [585, 105, 200, 200]);
+
+CHOWN admin ASSOCIATION pharm_ai_visits_pharm_ai_pharm_ai_sales_rep LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION presentation_pharm_ai_pharm_ai_products REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT pharm_ai_products presentation (0,1)
+    ENDPOINT presentation products PRINCIPAL (0,1)
+    ADD MAPPING bnf_code=bnf_code;
+
+ALTER ASSOCIATION presentation_pharm_ai_pharm_ai_products
+ LAYOUT (presentation = [4, 66, 200, 200], products = [731, 67, 200, 200]);
+
+CHOWN admin ASSOCIATION presentation_pharm_ai_pharm_ai_products LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION products_pharm_ai_uk_gp_prescribing REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT uk_gp_prescribing products PRINCIPAL (0,1)
+    ENDPOINT products uk_gp_prescribing (0,*)
+    ADD MAPPING bnf_code=bnf_code;
+
+ALTER ASSOCIATION products_pharm_ai_uk_gp_prescribing
+ LAYOUT (products = [10, 10, 200, 200], uk_gp_prescribing = [593, 76, 200, 200]);
+
+CHOWN admin ASSOCIATION products_pharm_ai_uk_gp_prescribing LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION sales_rep_visits_pharm_ai_uk_gp_prescribing REFERENTIAL CONSTRAINT 
+FOLDER = '/6 - associations'
+    ENDPOINT uk_gp_prescribing sales_rep_visits PRINCIPAL (0,1)
+    ENDPOINT sales_rep_visits uk_gp_prescribing (0,1)
+    ADD MAPPING practice_code=practice_code;
+
+ALTER ASSOCIATION sales_rep_visits_pharm_ai_uk_gp_prescribing
+ LAYOUT (sales_rep_visits = [10, 10, 200, 200], uk_gp_prescribing = [759, 57, 200, 200]);
+
+CHOWN admin ASSOCIATION sales_rep_visits_pharm_ai_uk_gp_prescribing LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE ASSOCIATION xray_analysis_embedding_medixit_patients
+FOLDER = '/6 - associations'
+    ENDPOINT patients xray_analysis_embedding (0,1)
+    ENDPOINT xray_analysis_embedding patients (0,*)
+    ADD MAPPING patient_id=patient_id;
+
+ALTER ASSOCIATION xray_analysis_embedding_medixit_patients
+ LAYOUT (xray_analysis_embedding = [10, 10, 200, 200], patients = [518, 42, 200, 200]);
+
+CHOWN admin ASSOCIATION xray_analysis_embedding_medixit_patients LASTMODIFICATIONUSER admin;
+
+# #######################################
+# METRIC VIEWS
+# #######################################
+CREATE OR REPLACE METRIC VIEW mv_clinical_trials
+    FOLDER = '/3 - data products/metrics views'
+    TAGS (ai_ready)
+    SOURCES (
+        presentation AS presentation,
+        clinical_trials AS clinical_trials,
+        patients AS patients,
+        common_date AS common_date,
+        products AS products    
+    )
+    ASSOCIATIONS (
+        clinical_trials patients clinical_trials_pharm_ai_patients,
+        clinical_trials products clinical_trials_pharm_ai_products,
+        clinical_trials presentation clinical_trials_pharm_ai_presentation,
+        clinical_trials common_date clinical_trials_pharm_ai_common_date    
+    )
+    DIMENSIONS (
+        clinical_trials(
+            trial_id AS clinical_trials.trial_id,
+            end_date_key AS clinical_trials.end_date_key,
+            trial_name AS clinical_trials.trial_name,
+            start_date_key AS clinical_trials.start_date_key,
+            trial_status AS clinical_trials.trial_status
+        ),
+        patients(
+            birth_month AS patients.birth_month,
+            last_name AS patients.last_name,
+            login AS patients.login,
+            last_review_date AS patients.last_review_date,
+            birth_country AS patients.birth_country,
+            birth_year AS patients.birth_year,
+            key_patient_flag AS patients.key_patient_flag,
+            birth_day AS patients.birth_day,
+            patient_sk AS patients.patient_sk,
+            email_address AS patients.email_address,
+            patient_id AS patients.patient_id,
+            salutation AS patients.salutation,
+            first_name AS patients.first_name,
+            current_addr_sk AS patients.current_addr_sk
+        ),
+        products(
+            bnf_code AS products.bnf_code
+        ),
+        presentation(
+            bnf_drug_code AS presentation.bnf_drug_code,
+            bnf_section_key AS presentation.bnf_section_key,
+            bnf_paragraph_key AS presentation.bnf_paragraph_key,
+            generic_name AS presentation.generic_name,
+            brand_name AS presentation.brand_name,
+            bnf_chapter_key AS presentation.bnf_chapter_key
+        ),
+        common_date(
+            month_year_name AS common_date.month_year_name,
+            month_name AS common_date.month_name,
+            fiscal_year_end_key AS common_date.fiscal_year_end_key,
+            actual_date AS common_date.actual_date,
+            fiscal_year_name AS common_date.fiscal_year_name,
+            fiscal_quarter_name AS common_date.fiscal_quarter_name,
+            date_name AS common_date.date_name,
+            date_key AS common_date.date_key,
+            year_name AS common_date.year_name,
+            quarter_name AS common_date.quarter_name
+        )    
+    )
+    METRICS (
+        num_trials AS count(clinical_trials.trial_status),
+        completion_reliability_rate AS round(((100.0*count(case WHEN (clinical_trials.trial_status = 'Completed') THEN 1 END))/nullif(count(case WHEN (clinical_trials.trial_status not in ('Ongoing', 'Recruting')) THEN 1 END), 0))),
+        percentage_of_portfolio AS round(((100*count(clinical_trials.trial_id))/sum(count(clinical_trials.trial_id)) OVER ( )))    
+    )
+;
+
+ALTER VIEW mv_clinical_trials
+ LAYOUT (presentation = [652, 389, 40, 80], clinical_trials = [273, 320, 40, 80], patients = [114, 91, 40, 80], common_date = [114, 481, 40, 80], products = [718, 106, 40, 80]);
+
+# #######################################
+# WEBSERVICES
+# #######################################
+# #######################################
+# WEBSERVICES
+# #######################################
+# No web services
+# #######################################
+# WEBCONTAINER WEB SERVICE DEPLOYMENTS
+# #######################################
+# No deployed web services
+# #######################################
+# VIEW STATISTICS
+# #######################################
+# No statistics
+# #######################################
+# USER PRIVILEGES
+# #######################################
+# No user
+# #######################################
+# ROLE PRIVILEGES
+# #######################################
+ALTER ROLE denodooneclickrole
+GRANT ROLE use_large_language_model,assignprivileges
+GRANT ADMIN ON DATABASE;
+
+ALTER ROLE enduser_executeonly
+GRANT CONNECT, METADATA, EXECUTE ON DATABASE;
+
+# #######################################
+# Closing connection with database pharm_ai
+# #######################################
+CLOSE;
+
+
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+EXIT SINGLE USER MODE;

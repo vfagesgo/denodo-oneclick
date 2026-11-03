@@ -1,0 +1,180 @@
+﻿# REQUIRES-PROPERTIES-FILE - # Do not remove this comment!
+# 
+# Generated with Denodo Platform 9.6.0 BETA.
+
+ENTER SINGLE USER MODE;
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+# #######################################
+# USER CREATION
+# #######################################
+# No users
+# #######################################
+# ROLE CREATION
+# #######################################
+CREATE OR REPLACE ROLE denodooneclickrole '';
+
+
+# 0 ====================================================================
+
+# #######################################
+# DATABASE
+# #######################################
+CONNECT DATABASE admin;
+
+# #######################################
+# RESOURCES
+# #######################################
+# No resources
+# #######################################
+# LISTENERS JMS
+# #######################################
+# No listeners jms
+# #######################################
+# LISTENERS KAFKA
+# #######################################
+# No listeners kafka
+# #######################################
+# DATASOURCES
+# #######################################
+CREATE OR REPLACE DATASOURCE JDBC vdpcachedatasource
+    DRIVERCLASSNAME = 'org.postgresql.Driver'
+    DATABASEURI = '${databases.admin.datasources.jdbc.vdpcachedatasource.DATABASEURI}'
+    USERNAME = '${databases.admin.datasources.jdbc.vdpcachedatasource.USERNAME}'
+    USERPASSWORD = '${databases.admin.datasources.jdbc.vdpcachedatasource.USERPASSWORD}' ${databases.admin.datasources.jdbc.vdpcachedatasource.USERPASSWORD.ENCRYPTED}
+    CLASSPATH = 'postgresql'
+    DATABASENAME = 'postgresql'
+    DATABASEVERSION = '17'
+    FETCHSIZE = 1000
+    VALIDATIONQUERY = 'Select 1'
+    INITIALSIZE = 4
+    MAXIDLE = -1
+    MINIDLE = 0
+    MAXACTIVE = 20
+    EXHAUSTEDACTION = 1
+    TESTONBORROW = true
+    TESTONRETURN = false
+    TESTWHILEIDLE = false
+    TIMEBETWEENEVICTION = -1
+    NUMTESTPEREVICTION = 3
+    MINEVICTABLETIME = 1800000
+    POOLPREPAREDSTATEMENTS = false
+    MAXOPENPREPAREDSTATEMENTS = -1
+    PROPERTIES ('reWriteBatchedInserts'='true', 'escapeSyntaxCallMode'='callIfNoReturn', 'ApplicationName'='Denodo')
+    KERBEROSPROPERTIES ('jaasLogin'='false', 'user'='<user>')
+    DATA_LOAD_CONFIGURATION (
+        USE_FOR_QUERY_OPTIMIZATION = DATA_MOVEMENT
+        BATCHINSERTSIZE = 200
+    )
+    PROCESSING_UNITS = 1
+    CPUS_PER_PROCESSING_UNIT = 1;
+
+CHOWN admin DATASOURCE JDBC vdpcachedatasource LASTMODIFICATIONUSER admin;
+
+CREATE OR REPLACE DATASOURCE JDBC vdpvectorialdatasource
+    DRIVERCLASSNAME = 'org.postgresql.Driver'
+    DATABASEURI = '${databases.admin.datasources.jdbc.vdpvectorialdatasource.DATABASEURI}'
+    USERNAME = '${databases.admin.datasources.jdbc.vdpvectorialdatasource.USERNAME}'
+    USERPASSWORD = '${databases.admin.datasources.jdbc.vdpvectorialdatasource.USERPASSWORD}' ${databases.admin.datasources.jdbc.vdpvectorialdatasource.USERPASSWORD.ENCRYPTED}
+    CLASSPATH = 'postgresql'
+    DATABASENAME = 'postgresql'
+    DATABASEVERSION = '17'
+    FETCHSIZE = 1000
+    VALIDATIONQUERY = 'Select 1'
+    INITIALSIZE = 4
+    MAXIDLE = -1
+    MINIDLE = 0
+    MAXACTIVE = 20
+    EXHAUSTEDACTION = 1
+    TESTONBORROW = true
+    TESTONRETURN = false
+    TESTWHILEIDLE = false
+    TIMEBETWEENEVICTION = -1
+    NUMTESTPEREVICTION = 3
+    MINEVICTABLETIME = 1800000
+    POOLPREPAREDSTATEMENTS = false
+    MAXOPENPREPAREDSTATEMENTS = -1
+    PROPERTIES ('reWriteBatchedInserts'='true', 'escapeSyntaxCallMode'='callIfNoReturn', 'ApplicationName'='Denodo')
+    KERBEROSPROPERTIES ('jaasLogin'='false', 'user'='<user>')
+    DATA_LOAD_CONFIGURATION (
+        BATCHINSERTSIZE = 200
+    )
+    PROCESSING_UNITS = 1
+    CPUS_PER_PROCESSING_UNIT = 1;
+
+CHOWN admin DATASOURCE JDBC vdpvectorialdatasource LASTMODIFICATIONUSER admin;
+
+# #######################################
+# DATABASE CONFIGURATION
+# #######################################
+ALTER DATABASE admin
+  CHARSET DEFAULT;
+
+ALTER DATABASE admin
+  AUTHENTICATION LOCAL;
+
+# #######################################
+# WRAPPERS
+# #######################################
+# No wrappers
+# #######################################
+# STORED PROCEDURES
+# #######################################
+# No stored procedures
+# #######################################
+# TYPES
+# #######################################
+# No types
+# #######################################
+# MAPS
+# #######################################
+# No maps
+# #######################################
+# BASE VIEWS
+# #######################################
+# No base views
+# #######################################
+# VIEWS
+# #######################################
+# No views
+# #######################################
+# ASSOCIATIONS
+# #######################################
+# No associations
+# #######################################
+# WEBSERVICES
+# #######################################
+# #######################################
+# WEBSERVICES
+# #######################################
+# No web services
+# #######################################
+# WEBCONTAINER WEB SERVICE DEPLOYMENTS
+# #######################################
+# No deployed web services
+# #######################################
+# VIEW STATISTICS
+# #######################################
+# No statistics
+# #######################################
+# USER PRIVILEGES
+# #######################################
+# No user
+# #######################################
+# ROLE PRIVILEGES
+# #######################################
+ALTER ROLE denodooneclickrole
+GRANT ROLE use_large_language_model,assignprivileges
+GRANT ADMIN ON DATABASE;
+
+# #######################################
+# Closing connection with database admin
+# #######################################
+CLOSE;
+
+
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+EXIT SINGLE USER MODE;

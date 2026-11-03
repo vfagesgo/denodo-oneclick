@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Finance",
+    "description": "<p>💰 <b>Finance</b></p><p>Financial planning & analysis, accounting, budgeting and treasury data.</p>",
+    "subdomains": [
+      {
+        "name": "Accounting",
+        "description": "<p>🧾 <b>Accounting</b></p><p>General ledger, accounts payable/receivable and bookkeeping.</p>"
+      },
+      {
+        "name": "FP&A",
+        "description": "<p>📉 <b>FP&A</b></p><p>Financial planning, budgeting and forecasting.</p>"
+      },
+      {
+        "name": "Treasury",
+        "description": "<p>🏦 <b>Treasury</b></p><p>Cash management, investments and liquidity.</p>"
+      },
+      {
+        "name": "Tax",
+        "description": "<p>📑 <b>Tax</b></p><p>Tax filings, compliance and reporting.</p>"
+      }
+    ]
+  }
+]

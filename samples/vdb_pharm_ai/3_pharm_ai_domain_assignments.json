@@ -1,0 +1,95 @@
+[
+  {
+    "domain": ["Pharma / Life Sciences", "Clinical Trials"],
+    "views": [
+      "pharm_ai.clinical_trials",
+      "pharm_ai.patients",
+      "pharm_ai.i_clinical_trials_patients_start_date",
+      "pharm_ai.mv_clinical_trials"
+    ],
+    "webservices": [],
+    "assets": []
+  },
+  {
+    "domain": ["Pharma / Life Sciences"],
+    "assets": []
+  },
+  {
+    "domain": ["Pharma / Life Sciences", "R&D – Pharma"],
+    "views": ["pharm_ai.iv_xray_images"]
+  },
+  {
+    "domain": ["Sales & Commercial", "Sales Analytics"],
+    "views": [
+      "pharm_ai.fact_gpprescribing_sample",
+      "pharm_ai.sales_rep_visits",
+      "pharm_ai.sales_rep",
+      "bank_demo.loan_officers",
+      "bank_demo.bv_loanofficers",
+      "bank_demo.metric_view_loan_officer_performance"
+    ],
+    "assets": []
+  },
+  {
+    "domain": ["Marketing", "Market Research"],
+    "assets": []
+  },
+  {
+    "domain": ["IT & Technology", "Data & Analytics"],
+    "views": ["pharm_ai.common_date"],
+    "assets": []
+  },
+  {
+    "domain": ["Sales & Commercial", "Account Management"],
+    "views": [
+      "bank_demo.customers",
+      "bank_demo.bv_customers",
+      "bank_demo.accounts",
+      "bank_demo.bv_accounts",
+      "bank_demo.customer_payments"
+    ],
+    "webservices": ["bank_demo.bank_demo_rest_ws"]
+  },
+  {
+    "domain": ["Sales & Commercial", "Pricing"],
+    "views": ["bank_demo.loan_rates", "bank_demo.bv_rates"]
+  },
+  {
+    "domain": ["Finance", "FP&A"],
+    "views": [
+      "bank_demo.loans",
+      "bank_demo.bv_loans",
+      "bank_demo.metric_view_loan_portfolio"
+    ]
+  },
+  {
+    "domain": ["Finance", "Accounting"],
+    "views": [
+      "bank_demo.loan_payments",
+      "bank_demo.bv_payments",
+      "bank_demo.metric_view_loan_payments"
+    ]
+  },
+  {
+    "domain": ["Legal & Compliance", "Risk Management"],
+    "views": [
+      "bank_demo.loan_underwriting",
+      "bank_demo.bv_underwriting",
+      "bank_demo.properties",
+      "bank_demo.bv_properties",
+      "bank_demo.bank_properties_loans",
+      "bank_demo.iv_bank_properties_loans",
+      "bank_demo.bank_properties_per_state",
+      "bank_demo.iv_banks_properties_per_state",
+      "bank_demo.bank_west_properties",
+      "bank_demo.iv_bank_west_properties"
+    ]
+  },
+  {
+    "domain": ["Legal & Compliance", "Regulatory Compliance"],
+    "views": [
+      "bank_demo.loan_policy_knowledge",
+      "bank_demo.bv_loan_policy_knowledge"
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Pharma / Life Sciences",
+    "description": "<p>💊 <b>Pharma / Life Sciences</b></p><p>Clinical trials, drug development, regulatory submissions, pharmacovigilance and other life-sciences-specific data.</p>",
+    "subdomains": [
+      {
+        "name": "Clinical Trials",
+        "description": "<p>🧪 <b>Clinical Trials</b></p><p>Trial design, patient recruitment and clinical study data.</p>"
+      },
+      {
+        "name": "Drug Safety / Pharmacovigilance",
+        "description": "<p>⚠️ <b>Drug Safety / Pharmacovigilance</b></p><p>Adverse event reporting and ongoing safety monitoring.</p>"
+      },
+      {
+        "name": "Regulatory Affairs",
+        "description": "<p>📋 <b>Regulatory Affairs</b></p><p>Regulatory submissions, approvals and compliance filings.</p>"
+      },
+      {
+        "name": "R&D – Pharma",
+        "description": "<p>🔬 <b>Research & Development</b></p><p>Early-stage research, discovery and product development data.</p>"
+      }
+    ]
+  }
+]

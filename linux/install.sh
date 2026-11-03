@@ -2,9 +2,6 @@
 set -euo pipefail
 
 # Resolve paths relative to this script instead of hardcoding an install
-# location. Previously Section 15/16 hardcoded /opt/denodo-pi or referenced
-# $INSTALL_DIR without ever setting it, which failed regardless of where
-# the repo was actually cloned.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
@@ -58,21 +55,21 @@ dl_end() {
 # without duplicating the logic.
 RUN_DIR="/var/run/denodo-oneclick"
 
-# Optional - only used directly (as an env var) by Section 13, to write a
+# Optional - only used directly (as an env var) by Section 12, to write a
 # freshly-passed value into the AI SDK's config files during install/upgrade.
 # Default it here so `set -u` doesn't crash on it in the gates below, which
-# run before Section 13 and don't need the raw value at all - see
+# run before Section 12 and don't need the raw value at all - see
 # aisdk_has_openai_key() just below for why.
 OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 
-# Defaulted here (rather than only in Section 12) so install_denodo_license()
+# Defaulted here (rather than only in Section 10) so install_denodo_license()
 # below can be called from the refresh action too, which runs long before
-# Section 12 and wouldn't otherwise have this set under `set -u`.
+# Section 10 and wouldn't otherwise have this set under `set -u`.
 DENODO_LIC="${DENODO_LIC:-denodo-developer-lic-9.lic}"
 
 # Resolves a Denodo license source from $DENODO_LIC and copies it to $1 if
 # found. Returns 1 (and copies nothing) if no source is found at all - the
-# caller decides whether that's fatal (Section 12, on a fresh install) or
+# caller decides whether that's fatal (Section 10, on a fresh install) or
 # just means "nothing new to refresh" (the refresh action).
 install_denodo_license() {
   local dest="$1"
@@ -113,14 +110,14 @@ install_denodo_license() {
 # persist an updated env var into an already-created container, so a plain
 # `docker start`/`docker restart` (the services-only fast path below) never
 # sees a value added later via `--upgrade --OPENAI_API_KEY ...` - but
-# sdk_config.env itself (written by Section 13, and part of the persisted
+# sdk_config.env itself (written by Section 12, and part of the persisted
 # /data volume via the /opt/denodo symlink) reliably reflects whatever the
 # last successful install/upgrade actually configured, regardless of how -
 # or whether - OPENAI_API_KEY was passed to this specific run.
-# Moved up here (rather than only in Section 13) so it's available under
+# Moved up here (rather than only in Section 12) so it's available under
 # `set -u` to both aisdk_has_openai_key() and configure_aisdk_openai_key()
 # below, which the refresh action (further down) now also calls - refresh
-# never reaches Section 13 itself (it exits well before it).
+# never reaches Section 12 itself (it exits well before it).
 AISDK_INSTALL_DIR=${AISDK_INSTALL_DIR:-"/opt/denodo/denodo-aisdk"}
 AISDK_SDK_CONFIG="$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
 aisdk_has_openai_key() {
@@ -131,13 +128,13 @@ aisdk_has_openai_key() {
 }
 
 # Writes $OPENAI_API_KEY into the AI SDK/chatbot config files. Used by both
-# Section 13 (install/upgrade) and the refresh action.
+# Section 12 (install/upgrade) and the refresh action.
 #
 # Only touches the OPENAI_API_KEY line when a *new*, non-empty value was
 # actually passed to this run - a plain `sed` unconditionally rewriting it
 # to whatever $OPENAI_API_KEY happens to be would blank out a key
 # configured on an earlier run every time install/upgrade runs without
-# --OPENAI_API_KEY repassed (Section 13 used to do exactly that, silently
+# --OPENAI_API_KEY repassed (Section 12 used to do exactly that, silently
 # undoing a previously working AI SDK key on every plain --upgrade).
 configure_aisdk_openai_key() {
   local sdk_config="$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
@@ -380,7 +377,7 @@ start_denodo_services() {
 # than one call starting both) because they have different preconditions:
 # denodo-mcp (the Denodo VDP MCP server) only depends on denodo-vdp-server
 # and always starts fine, while denodo-aisdk needs a valid OPENAI_API_KEY
-# (baked into sdk_config.env/chatbot_config.env in Section 13) or it just
+# (baked into sdk_config.env/chatbot_config.env in Section 12) or it just
 # crashes on start - callers should only call start_denodo_ai_services when
 # OPENAI_API_KEY is actually set, but must still call start_denodo_mcp_service
 # unconditionally.
@@ -550,12 +547,12 @@ start_cloudflare_tunnel() {
 #                 always re-fetches the AI SDK and MCP server. Triggered
 #                 on demand via `install.sh --upgrade`.
 #
-# The PostgreSQL sample-DB restore (Section 09/10) and the AI SDK/MCP
-# server install (Section 13/15) only ever run for "install" and "upgrade"
+# The PostgreSQL sample-DB restore (Section 06/07) and the AI SDK/MCP
+# server install (Section 12/14) only ever run for "install" and "upgrade"
 # - not because of any explicit check on those two, but because
 # services-only/refresh/cloudflare-refresh all `exit 0` above, well before
 # reaching those sections. Keep that in mind if this dispatch block is ever
-# restructured: moving Section 03+ above these early exits would silently
+# restructured: moving Section 01+ above these early exits would silently
 # make a plain --refresh re-run the sample DB restore and AI SDK/MCP
 # install too.
 #   cloudflare-refresh - restarts *only* the Cloudflare tunnel, nothing
@@ -609,7 +606,7 @@ if [ "$DENODO_ACTION" = "refresh" ]; then
   configure_aisdk_openai_key || true
   # /opt/denodo/denodo-platform/conf/denodo.lic is where the already-running
   # platform actually reads its license from at runtime - a fresh install
-  # (Section 12) never needs to touch it directly since installer_cli.sh
+  # (Section 10) never needs to touch it directly since installer_cli.sh
   # places it there itself from $DENODO_INSTALL/denodo-developer-lic-9.lic.
   if install_denodo_license "/opt/denodo/denodo-platform/conf/denodo.lic"; then
     log_step "Refreshed the Denodo license from the value/mount passed to this run"
@@ -641,13 +638,13 @@ if [ "$DENODO_ACTION" = "upgrade" ]; then
   FORCE_REFRESH=1
 fi
 
-# Section 03:
+# Section 01:
 # Install the cloudflared package if it isn't already, so a Cloudflare
 # Tunnel can be started later if CLOUDFLARE_TUNNEL_KEY is set. Only the
 # binary is installed here - the tunnel itself is started at the very end
 # of this script by start_cloudflare_tunnel(), see the comment on that call
 # for why it can't start this early.
-log_section "03" "Install Cloudflare"
+log_section "01" "Install Cloudflare"
 
 log_step "Adding the Cloudflare GPG key"
 sudo mkdir -p --mode=0755 /usr/share/keyrings
@@ -659,21 +656,21 @@ echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudf
 log_step "Installing cloudflared"
 sudo apt-get update && sudo apt-get install cloudflared
 
-# Section 03.5:
+# Section 02:
 # Running directly as root would hide which user should own the installed
 # files. This check enforces the expected pattern: regular user + sudo.
-log_section "03.5" "Validate the install user"
+log_section "02" "Validate the install user"
 user="${USER:-$(id -un 2>/dev/null || echo "#$(id -u)")}"
 if [ "$user" = "root" ] || [ "$user" = "#0" ]; then
   log_step "This script must be run as a regular user with sudo privileges"
   exit 1
 fi
 
-# Section 04:
+# Section 03:
 # Start from an up-to-date operating system before adding product-specific
 # dependencies. This block refreshes package indexes and installs the base
 # toolchain used by the later bootstrap steps.
-log_section "04" "Refresh apt metadata and install base dependencies"
+log_section "03" "Refresh apt metadata and install base dependencies"
 dl_begin
 sudo apt update -y
 sudo apt upgrade -y
@@ -689,10 +686,10 @@ sudo apt install -y wget gnupg ca-certificates lsb-release curl
 dl_end
 
 
-# Section 05:
+# Section 04:
 # PostgreSQL is installed from the upstream PGDG repository so the target
 # version stays available regardless of the base Raspberry Pi OS defaults.
-log_section "05" "Configure the PostgreSQL apt repository"
+log_section "04" "Configure the PostgreSQL apt repository"
 # Import the PostgreSQL signing key.
 dl_begin
 wget -qO- https://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc \
@@ -704,10 +701,10 @@ dl_end
 echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
   | sudo tee /etc/apt/sources.list.d/pgdg.list
 
-# Section 06:
+# Section 05:
 # Install the database, web server, networking tools, and Python/system
 # libraries that the final Denodo environment depends on.
-log_section "06" "Install PostgreSQL and runtime packages"
+log_section "05" "Install PostgreSQL and runtime packages"
 # Refresh package indexes after adding PostgreSQL and install runtime packages.
 dl_begin
 sudo apt update
@@ -721,17 +718,13 @@ sudo apt install python3-pip -y
 sudo apt install dnsmasq network-manager -y
 dl_end
 
-# Section 09:
-# (Sections 07-08 no longer exist - consolidated into earlier sections over
-# time. Numbering intentionally jumps 06 -> 09 rather than being renumbered,
-# so section numbers already seen in old logs/notes keep meaning the same
-# thing.)
+# Section 06:
 # PostgreSQL needs two kinds of access for this deployment:
 # 1. Local trusted access for the bootstrap steps.
 # 2. Remote access for the Denodo application user on the project subnet.
 # This section updates both the authentication rules and the listener
 # settings, then restarts PostgreSQL so the changes take effect.
-log_section "09" "Configure PostgreSQL access for Denodo"
+log_section "06" "Configure PostgreSQL access for Denodo"
 
 pg_hba_files=(/etc/postgresql/*/main/pg_hba.conf)
 
@@ -756,7 +749,7 @@ fi
 
 # Add a network rule for the application user if it is not already present.
 
-DENODO_SUBNET="172.17.0.0/16"
+DENODO_SUBNET="0.0.0.0/0"
 DENODO_USER=${DENODO_PG_USER:-"denodo"}
 
 remote_denodopi=$(sudo grep -cE \
@@ -816,11 +809,11 @@ for conf in "${pg_hba_files[@]}"; do
   sudo pg_ctlcluster "$version" "$name" restart
 done
 
-# Section 10:
+# Section 07:
 # Create the PostgreSQL role and database expected by Denodo. Re-running the
 # script should converge on the same state, so existing roles are updated
 # instead of treated as a failure.
-log_section "10" "Create or update the Denodo database"
+log_section "07" "Create or update the Denodo database"
 DENODO_PG_USER=${DENODO_PG_USER:-"denodo"}
 DENODO_PG_PWD=${DENODO_PG_PWD:-"password"}
 
@@ -848,57 +841,25 @@ sudo -u postgres psql -c "ALTER ROLE $DENODO_PG_USER CREATEDB"
 sudo -u postgres psql -d denodo -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Restore the sample DBs
-#
-# pg_restore exits non-zero whenever it *ignores* any errors while
-# restoring (e.g. "role ... does not exist" for ownership/ACL statements
-# skipped by --no-owner) - even when the restore itself completes fine.
-# Under `set -e` that non-zero exit would kill the whole install over
-# warnings pg_restore already decided were safe to skip, so it's
-# explicitly tolerated here with `|| true`.
-log_step "Restoring sample database: pharma (ignored-error warnings from pg_restore are expected and non-fatal)"
-sudo -u postgres psql -d denodo -c "DROP SCHEMA IF EXISTS pharma CASCADE;"
-sudo -u postgres pg_restore --jobs=4 --no-owner -d denodo /opt/denodo-oneclick/samples/dump-pharma.dump || true
-
-log_step "Restoring sample database: bank (ignored-error warnings from pg_restore are expected and non-fatal)"
-sudo -u postgres psql -d denodo -c "DROP SCHEMA IF EXISTS bank CASCADE;"
-sudo -u postgres pg_restore --jobs=4 --no-owner -d denodo /opt/denodo-oneclick/samples/dump-bank.dump || true
-
-log_step "Restoring sample database: c_api_gp_details_service (ignored-error warnings from pg_restore are expected and non-fatal)"
-sudo -u postgres pg_restore --jobs=4 --no-owner --clean --if-exists -d denodo /opt/denodo-oneclick/samples/c_api_gp_details_service.dump || true
-
-
 sudo -u postgres psql -d denodo <<'SQL'
-GRANT ALL ON SCHEMA pharma TO denodo;
 GRANT ALL ON SCHEMA public TO denodo;
-GRANT ALL ON SCHEMA bank TO denodo;
 
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA pharma TO denodo;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO denodo;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA bank TO denodo;
 
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA pharma TO denodo;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO denodo;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA bank TO denodo;
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA pharma
-    GRANT ALL ON TABLES TO denodo;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT ALL ON TABLES TO denodo;
-ALTER DEFAULT PRIVILEGES IN SCHEMA bank
-    GRANT ALL ON TABLES TO denodo;
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA pharma
-    GRANT ALL ON SEQUENCES TO denodo;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT ALL ON SEQUENCES TO denodo;
-ALTER DEFAULT PRIVILEGES IN SCHEMA bank
-    GRANT ALL ON SEQUENCES TO denodo;
+
 SQL
 
-# Section 11:
+# Section 08:
 # Denodo 9 requires Java 21. This block registers the Azul repository and
 # installs Zulu JDK 21 so the installer has a supported JVM.
-log_section "11" "Configure Zulu Java 21"
+log_section "08" "Configure Zulu Java 21"
 dl_begin
 curl -s https://repos.azul.com/azul-repo.key \
 | sudo gpg --yes --dearmor -o /usr/share/keyrings/azul.gpg
@@ -912,9 +873,9 @@ sudo apt update -y
 sudo apt install -y zulu21-jdk
 dl_end
 
-# Section 11.5:
+# Section 09:
 # Fetch the Denodo Support CLI tool, then use it to download the Denodo
-# platform installer and update archives needed by Section 12.
+# platform installer and update archives needed by Section 10.
 #
 # On "upgrade", only touch the platform install if DENODO_UPDATE actually
 # changed since the last successful install - otherwise there is nothing to
@@ -923,7 +884,7 @@ dl_end
 # early so the whole section (including the multi-GB downloads) can be
 # skipped outright.
 # Defined here (not inside the NEED_PLATFORM_INSTALL block below) because
-# Section 15 (MCP server) also needs $TARGET_DIR regardless of whether the
+# Section 14 (MCP server) also needs $TARGET_DIR regardless of whether the
 # platform itself gets reinstalled this run.
 TARGET_DIR="/home/denodo/"
 DENODO_INSTALL="/home/denodo/denodo-install-9"
@@ -954,7 +915,7 @@ if [ "$DENODO_ACTION" = "upgrade" ]; then
   fi
 fi
 
-log_section "11.5" "Install Denodo Support Tools"
+log_section "09" "Install Denodo Support Tools"
 # denodo_config.env defines this as DENODO_UTILS_URL. The script previously
 # referenced $GITHUB_DENODO_UTILS, which was never set anywhere and crashed
 # here under `set -u`.
@@ -981,7 +942,7 @@ chmod +x denodo-support
 
 if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
 
-  # Section 11.5+12 involve multi-GB downloads (installer + update archives).
+  # Section 09+10 involve multi-GB downloads (installer + update archives).
   # Everything below is guarded to skip work that a previous, failed run
   # already completed, so re-running install.sh after a crash doesn't
   # re-download or re-extract from scratch.
@@ -1038,7 +999,7 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
     log_step "Update $DENODO_UPDATE already staged, skipping unzip"
   else
     # A previously staged update (a different $DENODO_UPDATE version, or the
-    # jre/jre-linux symlink tree Section 12 creates inside this same folder)
+    # jre/jre-linux symlink tree Section 10 creates inside this same folder)
     # can leave behind files/dirs that clash with what the new zip wants to
     # extract - `unzip -o` overwrites individual files but can't reconcile a
     # symlink or directory sitting where the new archive expects something
@@ -1069,10 +1030,10 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
     echo "$DENODO_UPDATE" > "$DENODO_UPDATE_MARKER"
   fi
 
-  # Section 12:
+  # Section 10:
   # Prepare the Denodo installer directory, link the detected JVM, place the
   # license file, and run the unattended platform installation.
-  log_section "12" "Install Denodo 9"
+  log_section "10" "Install Denodo 9"
 
   unset DISPLAY
   cd "$DENODO_INSTALL"
@@ -1099,14 +1060,16 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
   sudo mkdir -p /opt/denodo
   sudo chown -R denodo:denodo /opt/denodo
 
-  log_step "Faking the Java JRE in Denodo Home"
-  # -f/-n so re-running after a failed install doesn't crash on "File exists".
-  ln -sfn "$JAVA_HOME" jre
-  cd denodo-update
-  rm -rf jre
-  mkdir -p jre
-  cd jre
-  ln -sfn "$JAVA_HOME" jre-linux
+  #####VFG
+  # Remove Faking JRE
+  #log_step "Faking the Java JRE in Denodo Home"
+  ### -f/-n so re-running after a failed install doesn't crash on "File exists".
+  #ln -sfn "$JAVA_HOME" jre
+  #cd denodo-update
+  #rm -rf jre
+  #mkdir -p jre
+  #cd jre
+  #ln -sfn "$JAVA_HOME" jre-linux
   cd "$DENODO_INSTALL"
 
   ###### Start Denodo Install
@@ -1162,7 +1125,7 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
 
 fi # NEED_PLATFORM_INSTALL
 
-# Section 12.5:
+# Section 11:
 # An upgrade patches the already-installed platform in place via
 # denodo-update.jar - it must not go through installer_cli.sh's full
 # install, which would instead try to reinstall the base platform from
@@ -1171,7 +1134,7 @@ fi # NEED_PLATFORM_INSTALL
 # above); stop_denodo_services is called again right before applying the
 # update below as cheap insurance in case that ever changes.
 if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; then
-  log_section "12.5" "Apply Denodo update"
+  log_section "11" "Apply Denodo update"
 
   # Downloaded while cwd is still $TARGET_DIR/denodo-support-utils/bin (set
   # unconditionally above) - "./denodo-support" is a relative path.
@@ -1195,7 +1158,7 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
     log_step "Update $DENODO_UPDATE already staged, skipping unzip"
   else
     # A previously staged update (a different $DENODO_UPDATE version, or the
-    # jre/jre-linux symlink tree Section 12 creates inside this same folder)
+    # jre/jre-linux symlink tree Section 10 creates inside this same folder)
     # can leave behind files/dirs that clash with what the new zip wants to
     # extract - `unzip -o` overwrites individual files but can't reconcile a
     # symlink or directory sitting where the new archive expects something
@@ -1245,14 +1208,14 @@ if [ "$NEED_PLATFORM_UPGRADE" = "1" ] && [ "$NEED_PLATFORM_INSTALL" = "0" ]; the
   echo "$DENODO_UPDATE" > "$DENODO_APPLIED_UPDATE_FILE"
 fi
 
-# Section 13:
+# Section 12:
 # The AI SDK lives in its own Git repository. On first install it is cloned;
 # on later runs it is refreshed so the workspace matches the remote branch.
-log_section "13" "Install Denodo AI SDK"
+log_section "12" "Install Denodo AI SDK"
 GITHUB_REPO_URL="https://github.com/denodo/denodo-ai-sdk.git"
 # AISDK_INSTALL_DIR is defaulted near the top of this script now (both
 # aisdk_has_openai_key() and configure_aisdk_openai_key() need it under
-# `set -u` before Section 13 ever runs). Lives under /opt/denodo (not a
+# `set -u` before Section 12 ever runs). Lives under /opt/denodo (not a
 # separate /opt/denodo-aisdk) so it's covered by the same persisted-data
 # symlink as the rest of the Denodo install. Must match
 # denodo-aisdk.service's WorkingDirectory.
@@ -1317,11 +1280,11 @@ cp -a /opt/denodo-oneclick/samples/chatbot_agent/custom/. \
       /opt/denodo/denodo-aisdk/api/agents/custom/
 chown -R denodo:denodo /opt/denodo/denodo-aisdk/api/agents/custom/
 
-# Section 14:
+# Section 13:
 # The AI SDK depends on a fairly large native/Python build toolchain on
 # Raspberry Pi. This section installs apt dependencies, bootstraps pyenv,
 # and builds the Python runtime used by the project.
-log_section "14" "Configure the Python environment"
+log_section "13" "Configure the Python environment"
 cd ~
 
 log_step "Installing Debian packages that reduce Python build time on Raspberry Pi"
@@ -1550,10 +1513,10 @@ configure_aisdk_openai_key || true
 
 
 
-# Section 15:
+# Section 14:
 # Download and install the Denodo VDP MCP server (a separate component from
 # the AI SDK's own MCP endpoint - see www/mcp-api.md for the difference).
-log_section "15" "Configure Denodo MCP Services"
+log_section "14" "Configure Denodo MCP Services"
 
 log_step "Installing Denodo MCP Services"
 cd $TARGET_DIR/denodo-support-utils/bin/
@@ -1595,10 +1558,10 @@ else
 fi
 
 
-# Section 16:
+# Section 15:
 # Install this repo's nginx site config, then make sure nginx (running as
 # www-data) can actually read the files it's proxying/serving.
-log_section "16" "Configure nginx"
+log_section "15" "Configure nginx"
 
 log_step "Installing nginx configuration file"
 
@@ -1618,18 +1581,18 @@ sudo usermod -aG www-data www-data
 # environment such as a plain Docker container.
 nginx_restart
 
-# Section 17:
+# Section 16:
 # Start the Denodo services, either via systemd (regular Linux install) or
 # as supervised background processes (no systemd available, e.g. inside a
 # Docker container). Defined up top as start_denodo_services() so the
 # services-only fast path can call the exact same logic.
-log_section "17" "Configuring the different services"
+log_section "16" "Configuring the different services"
 
 
 start_denodo_services
 # denodo-mcp (Denodo VDP MCP server) only depends on denodo-vdp-server, not
 # on OPENAI_API_KEY, so it always starts here. denodo-aisdk is started
-# further down, conditionally, in the AI SDK metadata section of Section 17.5.
+# further down, conditionally, in the AI SDK metadata step later in this script.
 start_denodo_mcp_service
 
 log_step "Waiting for Denodo VDP to start"
@@ -1649,100 +1612,13 @@ done
 
 log_step "Denodo VDP is listening on TCP port 9999"
 
-# Section 17.5:
-# Import the sample metadata (the pharma/bank/etc. demo databases) into
-# Denodo VDP now that it's confirmed up.
-log_step "Denodo VDP is running"
-log_section "17.5" "Import Denodo Metadata"
-
-export_properties="/opt/denodo-oneclick/samples/full_export/fullExport.properties"
-sed -i "s|<OpenAI_apiKey>|$OPENAI_API_KEY|g" $export_properties
-
-#Copy assets extensions samples
-unzip -o /opt/denodo-oneclick/samples/asset_extensions.zip -d /opt/denodo/denodo-platform/samples/
-unzip -o /opt/denodo-oneclick/samples/skills.zip -d /opt/denodo/denodo-platform/samples/
-
-/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/full_export/fullExport.vql --properties-file $export_properties --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password 
-#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/admin_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
-#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/asset_extensions_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
-#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/pharm_ai_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
-#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/bank_demo_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
-#/opt/denodo/denodo-platform/bin/import.sh --singleuser --file /opt/denodo-oneclick/samples/aws_tpcds_export.zip --server localhost:9999/admin?admin@$DENODO_VDP_PWD --metadata-password=password
-
-
-log_step "Waiting for Denodo DM to start"
-until curl -fsS "http://localhost:9090/denodo-data-catalog/#/" >/dev/null 2>&1; do
-  if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
-    log_step "ERROR: Denodo Data Marketplace did not start within ${VDP_TIMEOUT} seconds"
-    exit 1
-  fi
-
-  sleep 2
-  VDP_WAITED=$((VDP_WAITED + 2))
-done
-
-# Section 17.6:
-# Now that Denodo Data Marketplace is confirmed up, tell it to synchronize
-# with VDP - both the full metadata sync and the ai_ready tag sync that the
-# AI SDK relies on later.
-log_step "Denodo Data Marketplace is running"
-log_section "17.6" "Synchronizing Denodo Metadata"
-
-# NOTE: the sync must run as `if response=$(curl ...); then ... else ... fi`
-# (the curl call as the if's own condition), not `response=$(curl ...)`
-# followed by a separate `if [ $? -eq 0 ]`: under `set -e`, a plain
-# assignment statement's command substitution failing exits the script
-# immediately, right there, before a later `if [ $? -eq 0 ]` is ever
-# reached - making that "gentle failure" branch dead code and turning any
-# sync hiccup into a hard install failure. Putting the assignment directly
-# in the if's condition is exempt from `set -e` by design, so a failure
-# here is just logged as a warning and the install continues.
-if response=$(curl --silent --show-error --fail  \
-  --request 'POST' \
-  --header 'accept: */*' \
-  --user "admin:$DENODO_VDP_PWD" \
-  --header 'Content-Type: application/json' \
-  --header 'uri: //localhost:9999/admin' \
-  --header 'serverId: 1' \
-  --data '{
-    "allServers": "true",
-    "priority": "server"
-  }' \
-"http://localhost:9090/denodo-data-catalog/public/api/element-management/all/synchronize/all-servers"); then
-  log_step "Data Marketplace sync (all-servers): SUCCESS"
-else
-  log_step "WARNING: Data Marketplace sync (all-servers) failed - continuing anyway"
-  echo "$response" | tee -a "$LOG"
-fi
-
-if response=$(curl --silent --show-error --fail  \
-  --request 'POST' \
-  --header 'accept: */*' \
-  --user "admin:$DENODO_VDP_PWD" \
-  --header 'Content-Type: application/json' \
-  --header 'uri: //localhost:9999/admin' \
-  --header 'serverId: 1' \
-  --data '{
-  "vdpTags": [
-    "ai_ready"
-  ]
-}' \
-"http://localhost:9090/denodo-data-catalog/public/api/tags/vdp/synchronize"); then
-  log_step "Data Marketplace sync (tags): SUCCESS"
-else
-  log_step "WARNING: Data Marketplace sync (tags) failed - continuing anyway"
-  echo "$response" | tee -a "$LOG"
-fi
-
-
-### import data marketplace metadata
-#/opt/denodo/denodo-platform/tools/data-catalog/import.sh -h localhost -override -p 9090 -l admin -P admin -f /opt/denodo-oneclick/samples/data_marketplace.zip
-#/opt/denodo/denodo-platform/tools/data-catalog/import.sh -h localhost -override -pw password -p 9090 -l admin -P admin -f /opt/denodo-oneclick/samples/dc-metadata.zip
-
+###VFG 
+### Remove install VQL
+### Remove DM deploy
 
 # Load the AI SDK's metadata into its vector DB, so it can answer natural-
 # language questions about the sample data. The AI SDK needs a valid
-# OPENAI_API_KEY to start at all (Section 13 just wrote whatever was passed
+# OPENAI_API_KEY to start at all (Section 12 just wrote whatever was passed
 # on this run into sdk_config.env/chatbot_config.env) - without one it would
 # just crash on start, and the "Waiting for AI SDK to start" loop below
 # would spend the full timeout waiting for something that's never coming up
@@ -1763,32 +1639,38 @@ if aisdk_has_openai_key; then
     sleep 2
     VDP_WAITED=$((VDP_WAITED + 2))
   done
-  log_step "Denodo AI SDK is running"
-  log_section "17.7" "Synchronizing AI SDK Metadata"
-  # Same `if var=$(curl ...); then` pattern as the Data Marketplace sync
-  # above, and for the same reason: keeps a sync failure from being a hard
-  # `set -e` exit instead of the warning it's meant to be.
-  if response=$(curl --silent --show-error --fail \
-    --request GET \
-    --header 'accept: */*' \
-    --user "admin:$DENODO_VDP_PWD" \
-    --header 'Content-Type: application/json' \
-    "http://localhost:8008/getMetadata?vdp_tag_names=ai_ready"); then
-    log_step "AI SDK metadata sync: SUCCESS"
-  else
-    log_step "WARNING: AI SDK metadata sync failed - continuing anyway"
-    echo "$response" | tee -a "$LOG"
-  fi
 else
   log_step "No OPENAI_API_KEY configured for the AI SDK - skipping its start and vector DB metadata sync"
 fi
 
+#########################################
+# Loading Sample models on the platform
+#########################################
+log_section "17" "Import Metadata"
+
+# The sample import scripts run as separate processes, so export the
+# parameters they rely on into their environment. Each script also has safe
+# defaults, but exporting here keeps a single source of truth. Paths are
+# resolved from $REPO_ROOT (this repo's root) rather than hardcoded.
+export DENODO_VDP_PWD="${DENODO_VDP_PWD:-admin}"
+export OPENAI_API_KEY="${OPENAI_API_KEY:-}"
+
+log_step "Importing admin VDB"
+"$REPO_ROOT/samples/vdb_admin/vdb_admin_install.sh"
+
+log_step "Importing asset_extensions VDB"
+"$REPO_ROOT/samples/vdb_asset_extensions/vdb_asset_extensions_install.sh"
+
+log_step "Importing bank_demo VDB"
+"$REPO_ROOT/samples/vdb_bank_demo/vdb_bank_demo_install.sh"
+
+log_step "Importing pharm_ai VDB"
+"$REPO_ROOT/samples/vdb_pharm_ai/vdb_pharm_ai_install.sh"
 
 
-
-# Started here, at the very end, rather than back in Section 03 right after
+# Started here, at the very end, rather than back in Section 01 right after
 # cloudflared is installed: a full install still has a lot of network-
-# affecting work left to do after that point (Section 06 installs
+# affecting work left to do after that point (Section 05 installs
 # network-manager/dnsmasq, still a leftover from this script's Raspberry Pi
 # origins - installing NetworkManager inside a container can make it think
 # it should manage the container's network interface, resetting/renegotiating

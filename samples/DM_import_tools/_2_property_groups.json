@@ -1,0 +1,157 @@
+[
+  {
+    "name": "Data Product Owners",
+    "description": "Accountable and responsible contacts for this Data Product.",
+    "descriptionType": "TEXT",
+    "placeToShow": "SUMMARY_TAB",
+    "aiUsageEnabled": true,
+    "properties": [
+      {
+        "name": "Business Owner",
+        "description": "The person accountable for this Data Product's business value and lifecycle decisions.",
+        "descriptionType": "TEXT",
+        "type": "RICH_TEXT",
+        "interpolable": false,
+        "defaultValue": "📧 <a href=\"mailto:business.owner@yourcompany.com\">business.owner@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000000\">+10000000000</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=business.owner@yourcompany.com\">Chat on Teams</a>"
+      },
+      {
+        "name": "Technical Owner / Data Steward",
+        "description": "The engineer or steward responsible for the pipelines, schema and data quality.",
+        "descriptionType": "TEXT",
+        "type": "RICH_TEXT",
+        "interpolable": false,
+        "defaultValue": "📧 <a href=\"mailto:data.steward@yourcompany.com\">data.steward@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000001\">+10000000001</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data.steward@yourcompany.com\">Chat on Teams</a>"
+      },
+      {
+        "name": "Department / Domain Team",
+        "description": "The business unit or team this Data Product belongs to.",
+        "descriptionType": "TEXT",
+        "type": "TEXT",
+        "interpolable": false,
+        "defaultValue": "e.g. Commercial Analytics"
+      },
+      {
+        "name": "Support Contact",
+        "description": "Primary channel for questions or issues with this Data Product.",
+        "descriptionType": "TEXT",
+        "type": "RICH_TEXT",
+        "interpolable": false,
+        "defaultValue": "📧 <a href=\"mailto:data-support@yourcompany.com\">data-support@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000002\">+10000000002</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data-support@yourcompany.com\">Chat on Teams</a>"
+      },
+      {
+        "name": "Escalation Contact",
+        "description": "Secondary contact for incidents or SLA breaches.",
+        "descriptionType": "TEXT",
+        "type": "RICH_TEXT",
+        "interpolable": false,
+        "defaultValue": "📧 <a href=\"mailto:data-escalation@yourcompany.com\">data-escalation@yourcompany.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;📞 <a href=\"tel:+10000000003\">+10000000003</a>&nbsp;&nbsp;|&nbsp;&nbsp;💬 <a href=\"https://teams.microsoft.com/l/chat/0/0?users=data-escalation@yourcompany.com\">Chat on Teams</a>"
+      }
+    ]
+  },
+  {
+    "name": "Data Product Details",
+    "description": "Classification, lifecycle and operational metadata for this Data Product.",
+    "descriptionType": "TEXT",
+    "placeToShow": "SUMMARY_TAB",
+    "aiUsageEnabled": true,
+    "properties": [
+      {
+        "name": "Domain",
+        "description": "Business domain this Data Product belongs to.",
+        "descriptionType": "TEXT",
+        "type": "TEXT",
+        "interpolable": false,
+        "defaultValue": "e.g. Pharma / Clinical Trials"
+      },
+      {
+        "name": "Version",
+        "description": "Semantic version of this Data Product / its contract.",
+        "descriptionType": "TEXT",
+        "type": "TEXT",
+        "interpolable": false,
+        "defaultValue": "1.0.0"
+      },
+      {
+        "name": "Status",
+        "description": "Lifecycle status of this Data Product.",
+        "descriptionType": "TEXT",
+        "type": "ENUMERATION",
+        "interpolable": false,
+        "possibleValues": [
+          "🟢 Active",
+          "🟡 Draft",
+          "🟠 Deprecated",
+          "🔴 Retired"
+        ],
+        "defaultValue": "🟡 Draft"
+      },
+      {
+        "name": "Data Classification",
+        "description": "Sensitivity level of the data exposed by this Data Product.",
+        "descriptionType": "TEXT",
+        "type": "ENUMERATION",
+        "interpolable": false,
+        "possibleValues": [
+          "🌐 Public",
+          "🏢 Internal",
+          "🔒 Confidential",
+          "🛡️ PII / Sensitive"
+        ],
+        "defaultValue": "🏢 Internal"
+      },
+      {
+        "name": "Refresh Frequency",
+        "description": "How often the underlying data is refreshed (SLA).",
+        "descriptionType": "TEXT",
+        "type": "ENUMERATION",
+        "interpolable": false,
+        "possibleValues": [
+          "⚡ Real-time",
+          "⏱️ Hourly",
+          "📅 Daily",
+          "🗓️ Weekly",
+          "🐢 Monthly",
+          "✋ Manual"
+        ],
+        "defaultValue": "📅 Daily"
+      },
+      {
+        "name": "Certification Tier",
+        "description": "Quality/trust tier assigned to this Data Product.",
+        "descriptionType": "TEXT",
+        "type": "ENUMERATION",
+        "interpolable": false,
+        "possibleValues": [
+          "🥇 Gold - Verified",
+          "🥈 Silver - Reviewed",
+          "🥉 Bronze - Experimental"
+        ],
+        "defaultValue": "🥉 Bronze - Experimental"
+      },
+      {
+        "name": "Source Systems",
+        "description": "Originating systems feeding this Data Product.",
+        "descriptionType": "TEXT",
+        "type": "TEXT",
+        "interpolable": false,
+        "defaultValue": "e.g. ERP, Clinical Trials DB, BNF reference data"
+      },
+      {
+        "name": "Usage Terms / License",
+        "description": "Restrictions or terms of use for this Data Product.",
+        "descriptionType": "TEXT",
+        "type": "RICH_TEXT",
+        "interpolable": false,
+        "defaultValue": "⚠️ <b>Internal use only</b> unless otherwise approved by Data Governance."
+      },
+      {
+        "name": "Retention Period",
+        "description": "How long the underlying data is retained.",
+        "descriptionType": "TEXT",
+        "type": "TEXT",
+        "interpolable": false,
+        "defaultValue": "e.g. 7 years"
+      }
+    ]
+  }
+]
