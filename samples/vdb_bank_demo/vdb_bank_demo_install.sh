@@ -122,10 +122,10 @@ fi
 log_section "4.5" "Update Data Marketplace metadata"
 
 python "$SCRIPT_DIR/../DM_import_tools/1_import_domains.py"         --file "$SCRIPT_DIR/1_${vdb_name}_domains.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
-#python $SCRIPT_DIR/../DM_import_tools/2_import_property_groups.py"  --file "$SCRIPT_DIR/2_${vdb_name}_property_groups.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
-python $SCRIPT_DIR/../DM_import_tools/3_assign_domains.py"          --file "$SCRIPT_DIR/3_${vdb_name}_domain_assignments.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
-python $SCRIPT_DIR/../DM_import_tools/4_assign_property_groups.py"  --file "$SCRIPT_DIR/4_${vdb_name}_property_assignments.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
-python $SCRIPT_DIR/../DM_import_tools/5_import_asset_extensions.py" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1  --no-import --sync
+#python "$SCRIPT_DIR/../DM_import_tools/2_import_property_groups.py"  --file "$SCRIPT_DIR/2_${vdb_name}_property_groups.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
+python "$SCRIPT_DIR/../DM_import_tools/3_assign_domains.py"          --file "$SCRIPT_DIR/3_${vdb_name}_domain_assignments.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
+python "$SCRIPT_DIR/../DM_import_tools/4_assign_property_groups.py"  --file "$SCRIPT_DIR/4_${vdb_name}_property_assignments.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
+python "$SCRIPT_DIR/../DM_import_tools/5_import_asset_extensions.py" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1  --no-import --sync
 
 # ---------------------------------------------------------------------------
 log_section "5" "Wait for Denodo AI SDK to start"
