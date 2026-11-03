@@ -124,6 +124,7 @@ log_section "4.5" "Update Data Marketplace metadata"
 PYENV_ROOT="$(pyenv root)"
 PYTHON_VERSION="$(pyenv version-name)"
 PYTHON="$PYENV_ROOT/versions/$PYTHON_VERSION/bin/python"
+"$PYTHON" -m pip install requests
 
 "$PYTHON" "$SCRIPT_DIR/../DM_import_tools/1_import_domains.py"         --file "$SCRIPT_DIR/1_${vdb_name}_domains.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
 #"$PYTHON" "$SCRIPT_DIR/../DM_import_tools/2_import_property_groups.py"  --file "$SCRIPT_DIR/2_${vdb_name}_property_groups.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
