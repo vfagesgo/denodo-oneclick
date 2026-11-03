@@ -1664,8 +1664,8 @@ log_step "Importing asset_extensions VDB"
 #log_step "Importing bank_demo VDB"
 #"$REPO_ROOT/samples/vdb_bank_demo/vdb_bank_demo_install.sh"
 
-log_step "Importing pharm_ai VDB"
-"$REPO_ROOT/samples/vdb_pharm_ai/vdb_pharm_ai_install.sh"
+#log_step "Importing pharm_ai VDB"
+#"$REPO_ROOT/samples/vdb_pharm_ai/vdb_pharm_ai_install.sh"
 
 
 # Started here, at the very end, rather than back in Section 01 right after
