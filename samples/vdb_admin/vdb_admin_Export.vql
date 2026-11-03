@@ -16,7 +16,299 @@ ENTER SINGLE USER MODE;
 # #######################################
 CREATE OR REPLACE ROLE denodooneclickrole '';
 
+CREATE OR REPLACE ROLE execute_only 'Server-wide metadata and execute access';
 
+# #######################################
+# CONFIGURATION PROPERTIES
+# #######################################
+
+CONNECT DATABASE admin;
+
+SET 'com.denodo.security.file.privilege.generalaccess' = '${config.PROPERTY.com.denodo.security.file.privilege.generalaccess}' ${config.PROPERTY.com.denodo.security.file.privilege.generalaccess.ENCRYPTED};
+
+SET 'com.denodo.vdb.cache.cacheMaintainerPeriodInSecs' = '${config.PROPERTY.com.denodo.vdb.cache.cacheMaintainerPeriodInSecs}' ${config.PROPERTY.com.denodo.vdb.cache.cacheMaintainerPeriodInSecs.ENCRYPTED};
+
+SET 'com.denodo.vdb.cache.cacheMaintenance' = '${config.PROPERTY.com.denodo.vdb.cache.cacheMaintenance}' ${config.PROPERTY.com.denodo.vdb.cache.cacheMaintenance.ENCRYPTED};
+
+SET 'com.denodo.vdb.cache.cacheStatus' = '${config.PROPERTY.com.denodo.vdb.cache.cacheStatus}' ${config.PROPERTY.com.denodo.vdb.cache.cacheStatus.ENCRYPTED};
+
+SET 'com.denodo.vdb.cache.jdbc.customCacheDataSourceName' = '${config.PROPERTY.com.denodo.vdb.cache.jdbc.customCacheDataSourceName}' ${config.PROPERTY.com.denodo.vdb.cache.jdbc.customCacheDataSourceName.ENCRYPTED};
+
+SET 'com.denodo.vdb.cache.jdbc.derbyCachePort' = '${config.PROPERTY.com.denodo.vdb.cache.jdbc.derbyCachePort}' ${config.PROPERTY.com.denodo.vdb.cache.jdbc.derbyCachePort.ENCRYPTED};
+
+SET 'com.denodo.vdb.cache.jdbc.derbyCacheRemoteAccess' = '${config.PROPERTY.com.denodo.vdb.cache.jdbc.derbyCacheRemoteAccess}' ${config.PROPERTY.com.denodo.vdb.cache.jdbc.derbyCacheRemoteAccess.ENCRYPTED};
+
+SET 'com.denodo.vdb.cache.jdbc.serverCacheDataSource' = '${config.PROPERTY.com.denodo.vdb.cache.jdbc.serverCacheDataSource}' ${config.PROPERTY.com.denodo.vdb.cache.jdbc.serverCacheDataSource.ENCRYPTED};
+
+SET 'com.denodo.vdb.cache.timeToLiveInSecs' = '${config.PROPERTY.com.denodo.vdb.cache.timeToLiveInSecs}' ${config.PROPERTY.com.denodo.vdb.cache.timeToLiveInSecs.ENCRYPTED};
+
+SET 'com.denodo.vdb.catalog.database.identifiersCharset' = '${config.PROPERTY.com.denodo.vdb.catalog.database.identifiersCharset}' ${config.PROPERTY.com.denodo.vdb.catalog.database.identifiersCharset.ENCRYPTED};
+
+SET 'com.denodo.vdb.engine.RowQueueSizeInMB' = '${config.PROPERTY.com.denodo.vdb.engine.RowQueueSizeInMB}' ${config.PROPERTY.com.denodo.vdb.engine.RowQueueSizeInMB.ENCRYPTED};
+
+SET 'com.denodo.vdb.engine.resource.queryMemoryLimit' = '${config.PROPERTY.com.denodo.vdb.engine.resource.queryMemoryLimit}' ${config.PROPERTY.com.denodo.vdb.engine.resource.queryMemoryLimit.ENCRYPTED};
+
+SET 'com.denodo.vdb.engine.session.restriction.ResourceManagerEngine.resourceManagerStatus' = '${config.PROPERTY.com.denodo.vdb.engine.session.restriction.ResourceManagerEngine.resourceManagerStatus}' ${config.PROPERTY.com.denodo.vdb.engine.session.restriction.ResourceManagerEngine.resourceManagerStatus.ENCRYPTED};
+
+SET 'com.denodo.vdb.engine.swap.SwapManager.maxBlockSizeInKB' = '${config.PROPERTY.com.denodo.vdb.engine.swap.SwapManager.maxBlockSizeInKB}' ${config.PROPERTY.com.denodo.vdb.engine.swap.SwapManager.maxBlockSizeInKB.ENCRYPTED};
+
+SET 'com.denodo.vdb.engine.swap.SwapManager.swappingResultMaxSizeInMB' = '${config.PROPERTY.com.denodo.vdb.engine.swap.SwapManager.swappingResultMaxSizeInMB}' ${config.PROPERTY.com.denodo.vdb.engine.swap.SwapManager.swappingResultMaxSizeInMB.ENCRYPTED};
+
+SET 'com.denodo.vdb.engine.swap.SwapManager.swappingStatus' = '${config.PROPERTY.com.denodo.vdb.engine.swap.SwapManager.swappingStatus}' ${config.PROPERTY.com.denodo.vdb.engine.swap.SwapManager.swappingStatus.ENCRYPTED};
+
+SET 'com.denodo.vdb.engine.wrapper.raw.ldap.LDAPAccess.LDAPDefaultPageSize' = '${config.PROPERTY.com.denodo.vdb.engine.wrapper.raw.ldap.LDAPAccess.LDAPDefaultPageSize}' ${config.PROPERTY.com.denodo.vdb.engine.wrapper.raw.ldap.LDAPAccess.LDAPDefaultPageSize.ENCRYPTED};
+
+SET 'com.denodo.vdb.interpreter.execution.SelectAction.costoptimization' = '${config.PROPERTY.com.denodo.vdb.interpreter.execution.SelectAction.costoptimization}' ${config.PROPERTY.com.denodo.vdb.interpreter.execution.SelectAction.costoptimization.ENCRYPTED};
+
+SET 'com.denodo.vdb.interpreter.execution.SelectAction.dataMovement' = '${config.PROPERTY.com.denodo.vdb.interpreter.execution.SelectAction.dataMovement}' ${config.PROPERTY.com.denodo.vdb.interpreter.execution.SelectAction.dataMovement.ENCRYPTED};
+
+SET 'com.denodo.vdb.interpreter.execution.SelectAction.simplify' = '${config.PROPERTY.com.denodo.vdb.interpreter.execution.SelectAction.simplify}' ${config.PROPERTY.com.denodo.vdb.interpreter.execution.SelectAction.simplify.ENCRYPTED};
+
+SET 'com.denodo.vdb.interpreter.execution.SelectAction.summaryRewrite' = '${config.PROPERTY.com.denodo.vdb.interpreter.execution.SelectAction.summaryRewrite}' ${config.PROPERTY.com.denodo.vdb.interpreter.execution.SelectAction.summaryRewrite.ENCRYPTED};
+
+SET 'com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.concurrentQueriesLimit' = '${config.PROPERTY.com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.concurrentQueriesLimit}' ${config.PROPERTY.com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.concurrentQueriesLimit.ENCRYPTED};
+
+SET 'com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.maxConcurrentQueries' = '${config.PROPERTY.com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.maxConcurrentQueries}' ${config.PROPERTY.com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.maxConcurrentQueries.ENCRYPTED};
+
+SET 'com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.maxWaitingQueries' = '${config.PROPERTY.com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.maxWaitingQueries}' ${config.PROPERTY.com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.maxWaitingQueries.ENCRYPTED};
+
+SET 'com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.waitingQueriesLimit' = '${config.PROPERTY.com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.waitingQueriesLimit}' ${config.PROPERTY.com.denodo.vdb.interpreter.execution.processor.VDBActionProcessor.waitingQueriesLimit.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.chatbot.executeQueryToolMaxResults' = '${config.PROPERTY.com.denodo.vdb.llm.chatbot.executeQueryToolMaxResults}' ${config.PROPERTY.com.denodo.vdb.llm.chatbot.executeQueryToolMaxResults.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.chatbot.useThinkingModelForChatbot' = '${config.PROPERTY.com.denodo.vdb.llm.chatbot.useThinkingModelForChatbot}' ${config.PROPERTY.com.denodo.vdb.llm.chatbot.useThinkingModelForChatbot.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.chatbot.useThinkingModelForToolExecution' = '${config.PROPERTY.com.denodo.vdb.llm.chatbot.useThinkingModelForToolExecution}' ${config.PROPERTY.com.denodo.vdb.llm.chatbot.useThinkingModelForToolExecution.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.apiConfUri' = '${config.PROPERTY.com.denodo.vdb.llm.integration.apiConfUri}' ${config.PROPERTY.com.denodo.vdb.llm.integration.apiConfUri.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.apiKey.secret' = '${config.PROPERTY.com.denodo.vdb.llm.integration.apiKey.secret}' ${config.PROPERTY.com.denodo.vdb.llm.integration.apiKey.secret.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.apiType' = '${config.PROPERTY.com.denodo.vdb.llm.integration.apiType}' ${config.PROPERTY.com.denodo.vdb.llm.integration.apiType.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.authenticationEnabled' = '${config.PROPERTY.com.denodo.vdb.llm.integration.authenticationEnabled}' ${config.PROPERTY.com.denodo.vdb.llm.integration.authenticationEnabled.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.authenticationType' = '${config.PROPERTY.com.denodo.vdb.llm.integration.authenticationType}' ${config.PROPERTY.com.denodo.vdb.llm.integration.authenticationType.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.customHeaders' = '${config.PROPERTY.com.denodo.vdb.llm.integration.customHeaders}' ${config.PROPERTY.com.denodo.vdb.llm.integration.customHeaders.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.customInstructionsEnabled' = '${config.PROPERTY.com.denodo.vdb.llm.integration.customInstructionsEnabled}' ${config.PROPERTY.com.denodo.vdb.llm.integration.customInstructionsEnabled.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.enabled' = '${config.PROPERTY.com.denodo.vdb.llm.integration.enabled}' ${config.PROPERTY.com.denodo.vdb.llm.integration.enabled.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.maxOutputTokens' = '${config.PROPERTY.com.denodo.vdb.llm.integration.maxOutputTokens}' ${config.PROPERTY.com.denodo.vdb.llm.integration.maxOutputTokens.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.maxTokens' = '${config.PROPERTY.com.denodo.vdb.llm.integration.maxTokens}' ${config.PROPERTY.com.denodo.vdb.llm.integration.maxTokens.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.modelName' = '${config.PROPERTY.com.denodo.vdb.llm.integration.modelName}' ${config.PROPERTY.com.denodo.vdb.llm.integration.modelName.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.organizationId' = '${config.PROPERTY.com.denodo.vdb.llm.integration.organizationId}' ${config.PROPERTY.com.denodo.vdb.llm.integration.organizationId.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.proxyMode' = '${config.PROPERTY.com.denodo.vdb.llm.integration.proxyMode}' ${config.PROPERTY.com.denodo.vdb.llm.integration.proxyMode.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.sampleDataSize' = '${config.PROPERTY.com.denodo.vdb.llm.integration.sampleDataSize}' ${config.PROPERTY.com.denodo.vdb.llm.integration.sampleDataSize.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.apiKey.secret' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.apiKey.secret}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.apiKey.secret.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.apiType' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.apiType}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.apiType.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.authenticationType' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.authenticationType}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.authenticationType.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.customHeaders' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.customHeaders}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.customHeaders.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.enabled' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.enabled}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.enabled.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.maxOutputTokens' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.maxOutputTokens}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.maxOutputTokens.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.maxTokens' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.maxTokens}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.maxTokens.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.modelName' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.modelName}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.modelName.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.organizationId' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.organizationId}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.organizationId.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.reasoningEffort' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.reasoningEffort}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.reasoningEffort.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.reuseLlmCredentials' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.reuseLlmCredentials}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.reuseLlmCredentials.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.thinking.useResponsesApi' = '${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.useResponsesApi}' ${config.PROPERTY.com.denodo.vdb.llm.integration.thinking.useResponsesApi.ENCRYPTED};
+
+SET 'com.denodo.vdb.llm.integration.useResponsesApi' = '${config.PROPERTY.com.denodo.vdb.llm.integration.useResponsesApi}' ${config.PROPERTY.com.denodo.vdb.llm.integration.useResponsesApi.ENCRYPTED};
+
+SET 'com.denodo.vdb.misc.I18nParametersManager.i18nDefault' = '${config.PROPERTY.com.denodo.vdb.misc.I18nParametersManager.i18nDefault}' ${config.PROPERTY.com.denodo.vdb.misc.I18nParametersManager.i18nDefault.ENCRYPTED};
+
+SET 'com.denodo.vdb.proxy.proxyHost' = '${config.PROPERTY.com.denodo.vdb.proxy.proxyHost}' ${config.PROPERTY.com.denodo.vdb.proxy.proxyHost.ENCRYPTED};
+
+SET 'com.denodo.vdb.proxy.proxyPacUri' = '${config.PROPERTY.com.denodo.vdb.proxy.proxyPacUri}' ${config.PROPERTY.com.denodo.vdb.proxy.proxyPacUri.ENCRYPTED};
+
+SET 'com.denodo.vdb.proxy.proxyPassword.secret' = '${config.PROPERTY.com.denodo.vdb.proxy.proxyPassword.secret}' ${config.PROPERTY.com.denodo.vdb.proxy.proxyPassword.secret.ENCRYPTED};
+
+SET 'com.denodo.vdb.proxy.proxyPort' = '${config.PROPERTY.com.denodo.vdb.proxy.proxyPort}' ${config.PROPERTY.com.denodo.vdb.proxy.proxyPort.ENCRYPTED};
+
+SET 'com.denodo.vdb.proxy.proxyStatus' = '${config.PROPERTY.com.denodo.vdb.proxy.proxyStatus}' ${config.PROPERTY.com.denodo.vdb.proxy.proxyStatus.ENCRYPTED};
+
+SET 'com.denodo.vdb.proxy.proxyUser' = '${config.PROPERTY.com.denodo.vdb.proxy.proxyUser}' ${config.PROPERTY.com.denodo.vdb.proxy.proxyUser.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.DndTokenAuthenticator.AddAllUsersRole' = '${config.PROPERTY.com.denodo.vdb.security.DndTokenAuthenticator.AddAllUsersRole}' ${config.PROPERTY.com.denodo.vdb.security.DndTokenAuthenticator.AddAllUsersRole.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.DndTokenAuthenticator.LDAPRoleBaseList' = '${config.PROPERTY.com.denodo.vdb.security.DndTokenAuthenticator.LDAPRoleBaseList}' ${config.PROPERTY.com.denodo.vdb.security.DndTokenAuthenticator.LDAPRoleBaseList.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.DndTokenAuthenticator.LDAPUserBaseList' = '${config.PROPERTY.com.denodo.vdb.security.DndTokenAuthenticator.LDAPUserBaseList}' ${config.PROPERTY.com.denodo.vdb.security.DndTokenAuthenticator.LDAPUserBaseList.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.DndTokenAuthenticator.roleExtraction' = '${config.PROPERTY.com.denodo.vdb.security.DndTokenAuthenticator.roleExtraction}' ${config.PROPERTY.com.denodo.vdb.security.DndTokenAuthenticator.roleExtraction.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.KerberosAuthenticator.LDAPDBName' = '${config.PROPERTY.com.denodo.vdb.security.KerberosAuthenticator.LDAPDBName}' ${config.PROPERTY.com.denodo.vdb.security.KerberosAuthenticator.LDAPDBName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.KerberosAuthenticator.LDAPDatasourceName' = '${config.PROPERTY.com.denodo.vdb.security.KerberosAuthenticator.LDAPDatasourceName}' ${config.PROPERTY.com.denodo.vdb.security.KerberosAuthenticator.LDAPDatasourceName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.AddAllUsersRole' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.AddAllUsersRole}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.AddAllUsersRole.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.JSONDatabaseName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.JSONDatabaseName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.JSONDatabaseName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.JSONDatasourceName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.JSONDatasourceName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.JSONDatasourceName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPDBName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPDBName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPDBName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPDatasourceName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPDatasourceName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPDatasourceName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPDomainMapping' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPDomainMapping}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPDomainMapping.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPRoleBaseList' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPRoleBaseList}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPRoleBaseList.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPRoleName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPRoleName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPRoleName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPRoleSearch' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPRoleSearch}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPRoleSearch.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPUserBaseList' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPUserBaseList}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPUserBaseList.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPUserName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPUserName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPUserName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.LDAPUserSearch' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPUserSearch}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.LDAPUserSearch.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.accessTokenVariableName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.accessTokenVariableName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.accessTokenVariableName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.algorithmName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.algorithmName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.algorithmName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.checkjwtIdEnable' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.checkjwtIdEnable}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.checkjwtIdEnable.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.jwkURL' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.jwkURL}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.jwkURL.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.jwtAudience' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.jwtAudience}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.jwtAudience.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.jwtId' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.jwtId}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.jwtId.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.jwtIssuer' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.jwtIssuer}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.jwtIssuer.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.oauthToken.addAllUsersRole' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.oauthToken.addAllUsersRole}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.oauthToken.addAllUsersRole.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.roleExtraction' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.roleExtraction}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.roleExtraction.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.roleExtractionIsNone' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.roleExtractionIsNone}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.roleExtractionIsNone.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.scopeField' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.scopeField}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.scopeField.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.subField' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.subField}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.subField.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.useGlobalProxyConfig' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.useGlobalProxyConfig}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.useGlobalProxyConfig.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.useJWT' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.useJWT}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.useJWT.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.useOAuth2' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.useOAuth2}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.useOAuth2.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.virtualViewDbName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.virtualViewDbName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.virtualViewDbName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.OauthAuthenticator.virtualViewName' = '${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.virtualViewName}' ${config.PROPERTY.com.denodo.vdb.security.OauthAuthenticator.virtualViewName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.SAMLAuthenticator.LDAPDBName' = '${config.PROPERTY.com.denodo.vdb.security.SAMLAuthenticator.LDAPDBName}' ${config.PROPERTY.com.denodo.vdb.security.SAMLAuthenticator.LDAPDBName.ENCRYPTED};
+
+SET 'com.denodo.vdb.security.SAMLAuthenticator.LDAPDatasourceName' = '${config.PROPERTY.com.denodo.vdb.security.SAMLAuthenticator.LDAPDatasourceName}' ${config.PROPERTY.com.denodo.vdb.security.SAMLAuthenticator.LDAPDatasourceName.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.VDBManagerImpl.factoryPort' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.factoryPort}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.factoryPort.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.VDBManagerImpl.odbcPort' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.odbcPort}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.odbcPort.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.VDBManagerImpl.port' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.port}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.port.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryPort' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryPort}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryPort.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryURL' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryURL}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryURL.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.VDBManagerImpl.shutdownPort' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.shutdownPort}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.VDBManagerImpl.shutdownPort.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.environment' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.environment}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.environment.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.localRepositoriesHome' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.localRepositoriesHome}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.localRepositoriesHome.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.password.secret' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.password.secret}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.password.secret.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.system' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.system}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.system.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.url' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.url}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.url.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.useUserAndPassword' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.useUserAndPassword}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.useUserAndPassword.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.useVCS' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.useVCS}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.useVCS.ENCRYPTED};
+
+SET 'com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.user' = '${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.user}' ${config.PROPERTY.com.denodo.vdb.vdbinterface.server.vcs.VCSConfigurationManager.user.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.embeddingModelConfiguration.apiKey.secret' = '${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.apiKey.secret}' ${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.apiKey.secret.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.embeddingModelConfiguration.authenticationType' = '${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.authenticationType}' ${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.authenticationType.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.embeddingModelConfiguration.complexCustomHeaders' = '${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.complexCustomHeaders}' ${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.complexCustomHeaders.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.embeddingModelConfiguration.embeddingModelProvider' = '${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.embeddingModelProvider}' ${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.embeddingModelProvider.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.embeddingModelConfiguration.maxTokens' = '${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.maxTokens}' ${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.maxTokens.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.embeddingModelConfiguration.modelName' = '${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.modelName}' ${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.modelName.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.embeddingModelConfiguration.proxy.mode' = '${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.proxy.mode}' ${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.proxy.mode.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.embeddingModelConfiguration.vectorizationFeatures.disabled' = '${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.vectorizationFeatures.disabled}' ${config.PROPERTY.com.denodo.vdb.vector.integration.embeddingModelConfiguration.vectorizationFeatures.disabled.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.indexConfig.batchSize' = '${config.PROPERTY.com.denodo.vdb.vector.integration.indexConfig.batchSize}' ${config.PROPERTY.com.denodo.vdb.vector.integration.indexConfig.batchSize.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.indexConfig.enabled' = '${config.PROPERTY.com.denodo.vdb.vector.integration.indexConfig.enabled}' ${config.PROPERTY.com.denodo.vdb.vector.integration.indexConfig.enabled.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.indexConfig.refreshMetadataInterval' = '${config.PROPERTY.com.denodo.vdb.vector.integration.indexConfig.refreshMetadataInterval}' ${config.PROPERTY.com.denodo.vdb.vector.integration.indexConfig.refreshMetadataInterval.ENCRYPTED};
+
+SET 'com.denodo.vdb.vector.integration.serverVectorDatasource' = '${config.PROPERTY.com.denodo.vdb.vector.integration.serverVectorDatasource}' ${config.PROPERTY.com.denodo.vdb.vector.integration.serverVectorDatasource.ENCRYPTED};
+
+SET 'com.denodo.wsgenerator.restfulws.timezone' = '${config.PROPERTY.com.denodo.wsgenerator.restfulws.timezone}' ${config.PROPERTY.com.denodo.wsgenerator.restfulws.timezone.ENCRYPTED};
+
+SET 'java.env.DENODO_OPTS_START' = '${config.PROPERTY.java.env.DENODO_OPTS_START}' ${config.PROPERTY.java.env.DENODO_OPTS_START.ENCRYPTED};
+
+SET 'java.env.DENODO_OPTS_STOP' = '${config.PROPERTY.java.env.DENODO_OPTS_STOP}' ${config.PROPERTY.java.env.DENODO_OPTS_STOP.ENCRYPTED};
+
+SET 'queryOptimization.parallelProcessing.customDataSource.dataSourceName' = '${config.PROPERTY.queryOptimization.parallelProcessing.customDataSource.dataSourceName}' ${config.PROPERTY.queryOptimization.parallelProcessing.customDataSource.dataSourceName.ENCRYPTED};
+
+SET 'queryOptimization.parallelProcessing.customDataSource.databaseName' = '${config.PROPERTY.queryOptimization.parallelProcessing.customDataSource.databaseName}' ${config.PROPERTY.queryOptimization.parallelProcessing.customDataSource.databaseName.ENCRYPTED};
+
+SET 'queryOptimization.parallelProcessing.dataSource' = '${config.PROPERTY.queryOptimization.parallelProcessing.dataSource}' ${config.PROPERTY.queryOptimization.parallelProcessing.dataSource.ENCRYPTED};
+
+SET 'queryOptimization.parallelProcessing.enabled' = '${config.PROPERTY.queryOptimization.parallelProcessing.enabled}' ${config.PROPERTY.queryOptimization.parallelProcessing.enabled.ENCRYPTED};
+
+SET 'sso.token-enabled' = '${config.PROPERTY.sso.token-enabled}' ${config.PROPERTY.sso.token-enabled.ENCRYPTED};
+
+SET 'storedProcedures.defaultChunkSize' = '${config.PROPERTY.storedProcedures.defaultChunkSize}' ${config.PROPERTY.storedProcedures.defaultChunkSize.ENCRYPTED};
+
+SET 'storedProcedures.defaultChunkTimeout' = '${config.PROPERTY.storedProcedures.defaultChunkTimeout}' ${config.PROPERTY.storedProcedures.defaultChunkTimeout.ENCRYPTED};
+
+SET 'storedProcedures.defaultQueryTimeout' = '${config.PROPERTY.storedProcedures.defaultQueryTimeout}' ${config.PROPERTY.storedProcedures.defaultQueryTimeout.ENCRYPTED};
+
+WEBCONTAINER SET 'com.denodo.tomcat.http.port' = '${config.WEBCONTAINER.PROPERTY.com.denodo.tomcat.http.port}' ${config.WEBCONTAINER.PROPERTY.com.denodo.tomcat.http.port.ENCRYPTED};
+
+WEBCONTAINER SET 'com.denodo.tomcat.jmx.port' = '${config.WEBCONTAINER.PROPERTY.com.denodo.tomcat.jmx.port}' ${config.WEBCONTAINER.PROPERTY.com.denodo.tomcat.jmx.port.ENCRYPTED};
+
+WEBCONTAINER SET 'com.denodo.tomcat.jmx.rmi.port' = '${config.WEBCONTAINER.PROPERTY.com.denodo.tomcat.jmx.rmi.port}' ${config.WEBCONTAINER.PROPERTY.com.denodo.tomcat.jmx.rmi.port.ENCRYPTED};
+
+WEBCONTAINER SET 'com.denodo.tomcat.shutdown.port' = '${config.WEBCONTAINER.PROPERTY.com.denodo.tomcat.shutdown.port}' ${config.WEBCONTAINER.PROPERTY.com.denodo.tomcat.shutdown.port.ENCRYPTED};
+
+WEBCONTAINER SET 'java.env.DENODO_OPTS_START' = '${config.WEBCONTAINER.PROPERTY.java.env.DENODO_OPTS_START}' ${config.WEBCONTAINER.PROPERTY.java.env.DENODO_OPTS_START.ENCRYPTED};
+
+UPDATE SCRIPTS;
+
+CLOSE;
 # 0 ====================================================================
 
 # #######################################
