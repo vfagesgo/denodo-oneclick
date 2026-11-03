@@ -4,393 +4,303 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/button.css">
   <link rel="stylesheet" href="css/fonts.css">
-  <link rel="stylesheet" href="css/input.css">
   <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/Common.css">
-  <link rel="stylesheet" href="css/Login.css">
   <link rel="shortcut icon" href="images/favicon.ico">
-  <title>Try Denodo Developer V9</title>
+  <title>Welcome to your Denodo trial</title>
   <style>
-    /* Layout and look defined in .claude/rules/index.html.md:
-       dark sidebar (current landing-page identity) + light main pane. */
-    html, body {
-      height: auto;
-      min-height: 100%;
-    }
+    /* Layout mirrors www/denodo_trial_welcome.svg.
+       Content source: www/index.md. Icons: images/icons/*.svg (recolored via CSS mask). */
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body { height: auto; min-height: 100%; }
 
     body {
       margin: 0;
-      overflow: auto;
-      background-color: var(--light-grey-b);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #f7f9fd, #edf2f9);
       color: var(--midnight-blue);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .app {
-      display: flex;
-      min-height: 100vh;
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: var(--s8) var(--s8) var(--s9);
     }
 
-    /* ---------- Sidebar ---------- */
-    .sidebar {
-      flex: 0 0 260px;
-      display: flex;
-      flex-direction: column;
-      padding: var(--s7) var(--s4);
-      box-sizing: border-box;
-      background-color: var(--midnight-blue);
-      background-image: url(images/login-background.jpg);
-      background-size: cover;
-      background-position: center bottom;
-      background-repeat: no-repeat;
-      color: var(--white);
-    }
-
-    .brand {
-      padding: 0 var(--s3);
-      margin-bottom: var(--s8);
-    }
-
-    .brand img {
-      display: block;
-      height: 40px;
-    }
-
-    .brand .denodo-product-name {
-      display: block;
-      margin-top: var(--s2);
-      font-size: 14px;
-      color: var(--light-blue);
-      white-space: normal;
-    }
-
-    .nav-toggle {
-      display: none;
-    }
-
-    .nav ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .nav li + li {
-      margin-top: var(--s2);
-    }
-
-    .nav a {
-      display: block;
-      padding: var(--s3) var(--s3);
-      border-radius: var(--border-radius);
-      color: var(--white);
-      font-size: 16px;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .nav a:hover {
-      background-color: rgba(255, 255, 255, 0.08);
-    }
-
-    .nav a:focus-visible {
-      outline: 2px solid var(--light-blue);
-      outline-offset: 2px;
-    }
-
-    .nav a.active,
-    .nav a.active:hover {
-      background-color: var(--warning-red);
-    }
-
-    /* ---------- Main pane ---------- */
-    .main {
-      flex: 1 1 auto;
-      display: flex;
-      flex-direction: column;
-      padding: var(--s8) var(--s8) 0;
-      box-sizing: border-box;
-      min-width: 0;
-    }
-
+    /* ---------- Header ---------- */
     .page-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: var(--s6);
     }
 
     .page-header h1 {
       margin: 0 0 var(--s3);
-      font-size: 34px;
-      font-weight: 700;
-      color: var(--midnight-blue);
+      font-size: 38px;
+      font-weight: 760;
+      letter-spacing: -1px;
+      color: #14213d;
     }
 
     .page-header p {
       margin: 0;
       font-size: 17px;
-      color: var(--gunmetal);
+      color: #66758f;
     }
 
-    .acl-image {
-      flex: 0 0 auto;
-      width: 200px;
-      height: 200px;
+    .brand img {
+      display: block;
+      height: 52px;
+      width: auto;
     }
 
-    .main h2 {
-      margin: var(--s7) 0 var(--s4);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--midnight-blue);
+    h2.section {
+      margin: var(--s8) 0 var(--s5);
+      font-size: 23px;
+      font-weight: 740;
+      color: #172541;
     }
 
-    .grid {
+    /* ---------- Grids ---------- */
+    .grid-personas {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: var(--s5);
     }
 
-    /* Guided tour cards */
-    .tours {
-      margin-top: var(--s7);
+    .grid-usecases {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--s5);
     }
 
-    .tour-card {
+    /* ---------- Cards ---------- */
+    .card {
       display: flex;
       flex-direction: column;
-      background-color: var(--white);
-      border: 1px solid var(--light-grey);
-      border-radius: 8px;
-      box-shadow: var(--shadow-dialog);
-      overflow: hidden;
-      text-decoration: none;
-      transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-
-    .tour-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
-    }
-
-    .tour-card:focus-visible {
-      outline: 0;
-      box-shadow: var(--shadow-input);
-    }
-
-    .tour-band {
-      padding: var(--s4) var(--s5);
-      font-size: 19px; /* bold >= 18.66px counts as large text for WCAG contrast */
-      font-weight: 700;
-      color: var(--white);
-    }
-
-    .tour-card--red .tour-band { background-color: var(--warning-red); }
-    .tour-card--blue .tour-band { background-color: var(--peacock-blue); }
-    .tour-card--teal .tour-band { background-color: var(--accent-teal); }
-
-    .tour-body {
+      background: var(--white);
+      border: 1px solid #dce5f1;
+      border-radius: 18px;
       padding: var(--s5);
-      min-height: 150px;
+      box-shadow: 0 4px 14px rgba(20, 33, 61, 0.10);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .tour-body h3 {
-      margin: 0 0 var(--s5);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--midnight-blue);
-    }
-
-    .tour-body p {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.5;
-      color: var(--gunmetal);
-    }
-
-    /* Component tiles: same look as the current index buttons */
-    .tile {
+    .card-badge {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 64px;
-      padding: var(--s3) var(--s4);
-      border-radius: var(--border-radius);
-      background-color: var(--peacock-blue);
+      margin-bottom: var(--s4);
+    }
+
+    .ico {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      background-color: currentColor;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+    }
+
+    .ico-database { -webkit-mask-image: url(images/icons/database.svg); mask-image: url(images/icons/database.svg); }
+    .ico-sparkle  { -webkit-mask-image: url(images/icons/sparkle.svg);  mask-image: url(images/icons/sparkle.svg); }
+    .ico-users    { -webkit-mask-image: url(images/icons/users.svg);    mask-image: url(images/icons/users.svg); }
+    .ico-bot      { -webkit-mask-image: url(images/icons/bot.svg);      mask-image: url(images/icons/bot.svg); }
+    .ico-network  { -webkit-mask-image: url(images/icons/network.svg);  mask-image: url(images/icons/network.svg); }
+    .ico-cube     { -webkit-mask-image: url(images/icons/cube.svg);     mask-image: url(images/icons/cube.svg); }
+    .ico-grid     { -webkit-mask-image: url(images/icons/grid.svg);     mask-image: url(images/icons/grid.svg); }
+    .ico-link     { -webkit-mask-image: url(images/icons/link.svg);     mask-image: url(images/icons/link.svg); }
+    .ico-book     { -webkit-mask-image: url(images/icons/book.svg);     mask-image: url(images/icons/book.svg); }
+
+    .card h3 {
+      margin: 0 0 var(--s3);
+      font-size: 19px;
+      font-weight: 740;
+      color: #172541;
+    }
+
+    .card p {
+      margin: 0 0 var(--s5);
+      font-size: 14px;
+      line-height: 1.5;
+      flex: 1 1 auto;
+    }
+
+    /* Accent palettes (match SVG) */
+    .accent-blue  .card-badge { background: #e8f2ff; } .accent-blue  .ico { color: #1672dc; } .accent-blue  p { color: #176bd0; }
+    .accent-violet .card-badge { background: #f0ebff; } .accent-violet .ico { color: #7547e8; } .accent-violet p { color: #7547e8; }
+    .accent-teal  .card-badge { background: #e5f8f2; } .accent-teal  .ico { color: #0c9f79; } .accent-teal  p { color: #079b77; }
+    .accent-orange .card-badge { background: #fff0e6; } .accent-orange .ico { color: #e87935; } .accent-orange p { color: #64738d; }
+
+    /* Use-case cards keep neutral body copy */
+    .grid-usecases .card p { color: #64738d; }
+
+    .btn-tour {
+      display: block;
+      padding: var(--s3);
+      border-radius: 7px;
+      background: #176bd6;
       color: var(--white);
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 700;
       text-align: center;
       text-decoration: none;
-      transition: background-color 0.15s ease-in-out;
+      transition: background 0.15s ease;
     }
 
-    .tile:hover { background-color: var(--peacock-blue-hover); }
-    .tile:active { background-color: var(--peacock-blue-active); }
-    .tile:focus-visible { outline: 0; box-shadow: var(--shadow-input); }
+    .btn-tour:hover { background: #125bb8; }
+    .btn-tour:focus-visible { outline: 2px solid #176bd6; outline-offset: 2px; }
 
-    /* Placeholder tile (target not defined yet) */
-    .tile[aria-disabled="true"],
-    .tile[aria-disabled="true"]:hover {
-      background-color: var(--peacock-blue);
-      opacity: 0.55;
-      cursor: default;
+    .card[data-disabled] { }
+    .btn-tour[aria-disabled="true"] { opacity: 0.55; cursor: default; }
+    .btn-tour[aria-disabled="true"]:hover { background: #176bd6; }
+
+    /* ---------- Tools row ---------- */
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s5) var(--s9);
+      align-items: center;
+      background: #f7f9fc;
+      border: 1px solid #e5ebf3;
+      border-radius: 16px;
+      padding: var(--s6) var(--s7);
     }
 
-    /* Override Login.css absolute footer */
+    .tool {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s3);
+      color: #293752;
+      font-size: 15px;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .tool .ico { color: #43536d; width: 26px; height: 26px; }
+    .tool:hover { color: #176bd6; }
+    .tool:hover .ico { color: #176bd6; }
+    .tool:focus-visible { outline: 2px solid #176bd6; outline-offset: 3px; border-radius: 4px; }
+
     footer.page-footer {
-      position: static;
-      margin-top: auto;
-      padding: var(--s7) 0 var(--s5);
-      color: var(--gunmetal);
+      margin-top: var(--s8);
+      font-size: 13px;
+      color: #66758f;
     }
 
     /* ---------- Responsive ---------- */
-    @media (max-width: 1100px) {
-      .acl-image { display: none; }
+    @media (max-width: 1200px) {
+      .grid-usecases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
-    @media (max-width: 900px) {
-      .app { flex-direction: column; }
-
-      .sidebar {
-        flex: 0 0 auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        padding: var(--s4);
-      }
-
-      .brand { margin-bottom: 0; padding: 0; }
-      .brand img { height: 32px; }
-
-      .nav-toggle {
-        display: inline-flex;
-        background: none;
-        border: 1px solid var(--light-blue);
-        border-radius: var(--border-radius);
-        color: var(--white);
-        font-size: 20px;
-        padding: var(--s1) var(--s3);
-        cursor: pointer;
-      }
-
-      .nav {
-        display: none;
-        flex: 1 0 100%;
-        margin-top: var(--s4);
-      }
-
-      .nav.open { display: block; }
-
-      .main { padding: var(--s6) var(--s4) 0; }
-      .page-header h1 { font-size: 26px; }
-      .grid { grid-template-columns: 1fr; }
+    @media (max-width: 820px) {
+      .page { padding: var(--s6) var(--s4) var(--s8); }
+      .page-header { flex-direction: column-reverse; align-items: flex-start; }
+      .page-header h1 { font-size: 30px; }
+      .grid-personas, .grid-usecases { grid-template-columns: 1fr; }
+      .tools { gap: var(--s5); flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand">
-        <img src="images/denodo_logo.svg" alt="Denodo">
-        <span class="denodo-product-name">Try Denodo Developer V9</span>
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1>Welcome to your Denodo trial</h1>
+        <p>Choose a guided tour. Start by role, or jump straight into a use case.</p>
       </div>
-      <button class="nav-toggle" type="button" aria-controls="main-nav" aria-expanded="false"
-        aria-label="Toggle navigation">&#9776;</button>
-      <nav class="nav" id="main-nav" aria-label="Main">
-        <ul>
-          <li><a href="index.html" class="active" aria-current="page">Home</a></li>
-          <li data-demo><a href="#guided-tours">Guided tours</a></li>
-          <li><a href="#" aria-disabled="true">Data models</a></li>
-          <li><a href="mcp-api.html">MCP &amp; APIs</a></li>
-          <li><a href="#" aria-disabled="true">Upgrade</a></li>
-        </ul>
-      </nav>
-    </aside>
+      <div class="brand">
+        <img src="images/denodo_logo_black.png" alt="Denodo">
+      </div>
+    </header>
 
-    <main class="main">
-      <header class="page-header">
-        <div>
-          <h1 id="welcome">Welcome, pick a guided tour</h1>
-          <p>Live Denodo Platform with sample data, ready to explore. No setup needed.</p>
-        </div>
-        <img class="acl-image" src="images/activecontextlayer.webp" alt="">
-      </header>
+    <!-- ===== Start by persona ===== -->
+    <h2 class="section">Start by persona</h2>
+    <section class="grid-personas" aria-label="Start by persona">
+      <div class="card accent-blue">
+        <div class="card-badge"><span class="ico ico-database"></span></div>
+        <h3>Data Engineer</h3>
+        <p>Integrate, manage and deliver data for AI and analytics, optimize your Lakehouse, and publish reusable data products.</p>
+        <a class="btn-tour" href="/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login">Start tour</a>
+      </div>
+      <div class="card accent-violet">
+        <div class="card-badge"><span class="ico ico-sparkle"></span></div>
+        <h3>AI Builder</h3>
+        <p>Connect to governed enterprise data and leverage active context to power AI agents and applications.</p>
+        <a class="btn-tour" href="/chatbot/">Start tour</a>
+      </div>
+      <div class="card accent-teal">
+        <div class="card-badge"><span class="ico ico-users"></span></div>
+        <h3>Business Analyst / End User</h3>
+        <p>Discover and use trusted data products and other self-service data assets for analytics and decision-making.</p>
+        <a class="btn-tour" href="/denodo-data-catalog/#/">Start tour</a>
+      </div>
+    </section>
 
-      <section id="guided-tours" class="tours" data-demo aria-label="Guided tours">
-        <div class="grid">
-          <a class="tour-card tour-card--red" href="#">
-            <div class="tour-band">15 min</div>
-            <div class="tour-body">
-              <h3>Connect &amp; combine</h3>
-              <p>Join Retail Bank sources in one logical view</p>
-            </div>
-          </a>
-          <a class="tour-card tour-card--blue" href="#">
-            <div class="tour-band">10 min</div>
-            <div class="tour-body">
-              <h3>Publish a data product</h3>
-              <p>Govern and share it in Data Marketplace</p>
-            </div>
-          </a>
-          <a class="tour-card tour-card--teal" href="#">
-            <div class="tour-band">20 min</div>
-            <div class="tour-body">
-              <h3>AWS SageMaker &amp; Denodo MCP</h3>
-              <p>Making Enterprise Data Agent-Ready with AWS SageMaker and Denodo MCP</p>
-            </div>
-          </a>
-        </div>
-      </section>
+    <!-- ===== By use case ===== -->
+    <h2 class="section">Or choose a tour by use case</h2>
+    <section class="grid-usecases" aria-label="Choose a tour by use case">
+      <div class="card accent-violet">
+        <div class="card-badge"><span class="ico ico-sparkle"></span></div>
+        <h3>Deliver Active Context for AI</h3>
+        <p>Build and deliver governed, real-time context for AI Agents.</p>
+        <a class="btn-tour" href="mcp-api.html">Start tour</a>
+      </div>
+      <div class="card accent-blue">
+        <div class="card-badge"><span class="ico ico-database"></span></div>
+        <h3>Optimize your Lakehouse</h3>
+        <p>Learn how Denodo enhances your Lakehouse with live data access, unified semantics, and performance optimizations.</p>
+        <a class="btn-tour" href="documentation.html">Start tour</a>
+      </div>
+      <div class="card accent-orange">
+        <div class="card-badge"><span class="ico ico-network"></span></div>
+        <h3>Use and Share Data Products</h3>
+        <p>Discover, consume and securely share governed data products.</p>
+        <a class="btn-tour" href="/denodo-data-catalog/#/">Start tour</a>
+      </div>
+      <div class="card accent-violet">
+        <div class="card-badge"><span class="ico ico-bot"></span></div>
+        <h3>AWS SageMaker &amp; Denodo MCP</h3>
+        <p>Deploy trusted AI Agents faster with Denodo and AWS SageMaker.</p>
+        <a class="btn-tour" href="mcp-api.html">Start tour</a>
+      </div>
+    </section>
 
-      <section aria-labelledby="components-title">
-        <h2 id="components-title">Your components</h2>
-        <div class="grid">
-          <a class="tile" href="/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login"
-            target="_blank" rel="noopener">Design Studio</a>
-          <a class="tile" href="/denodo-data-catalog/#/" target="_blank" rel="noopener">Data Marketplace</a>
-          <a class="tile" href="mcp-api.html#mcp">MCP servers</a>
-          <!-- TODO (open question): GEO Services target not defined yet -->
-          <a class="tile" href="#" aria-disabled="true">GEO Services</a>
-          <a class="tile" href="/chatbot/" target="_blank" rel="noopener">AI Sample chatbot</a>
-          <a class="tile" href="mcp-api.html#rest">API quick start</a>
-        </div>
-      </section>
+    <!-- ===== Tools direct access ===== -->
+    <h2 class="section">Tools direct access</h2>
+    <nav class="tools" aria-label="Tools direct access">
+      <a class="tool" href="/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login" target="_blank" rel="noopener">
+        <span class="ico ico-cube"></span>Design Studio</a>
+      <a class="tool" href="/denodo-data-catalog/#/" target="_blank" rel="noopener">
+        <span class="ico ico-grid"></span>Data Marketplace</a>
+      <a class="tool" href="/chatbot/" target="_blank" rel="noopener">
+        <span class="ico ico-sparkle"></span>AI Chatbot</a>
+      <a class="tool" href="mcp-api.html">
+        <span class="ico ico-link"></span>MCP &amp; API</a>
+      <a class="tool" href="documentation.html">
+        <span class="ico ico-book"></span>Documentation</a>
+    </nav>
 
-      <footer class="page-footer">Property of Denodo. © Copyright Denodo <span>2026</span></footer>
-    </main>
+    <footer class="page-footer">Property of Denodo. © Copyright Denodo <span>2026</span></footer>
   </div>
 
   <script>
-    // Root-relative hrefs already follow the current protocol/host/port
-    // (works for localhost and the Cloudflare tunnel alike) - no URL building needed.
-
-    // Optional personalised greeting: index.html?name=Jane (open question: real source TBD)
-    (function () {
-      var name = new URLSearchParams(window.location.search).get('name');
-      if (name) {
-        document.getElementById('welcome').textContent = 'Welcome ' + name + ', pick a guided tour';
-      }
-    })();
-
-    // Placeholder links (targets not defined yet) do nothing
-    document.querySelectorAll('a[aria-disabled="true"], .tour-card[href="#"]').forEach(function (a) {
+    // Placeholder tour buttons (targets not defined yet) do nothing.
+    document.querySelectorAll('a[aria-disabled="true"]').forEach(function (a) {
       a.addEventListener('click', function (e) { e.preventDefault(); });
     });
-
-    // Mobile nav toggle
-    (function () {
-      var btn = document.querySelector('.nav-toggle');
-      var nav = document.getElementById('main-nav');
-      btn.addEventListener('click', function () {
-        var open = nav.classList.toggle('open');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    })();
   </script>
 </body>
 
