@@ -254,6 +254,11 @@ Extra options:
 - `--no-import` — skip the JSON import and only synchronize (needs `--sync` and/or
   `--sync-vdp`). In this mode no input file is read, and `--sync` synchronizes
   **every tool server already present in the catalog**.
+- `--strict` — exit non-zero when any item fails to import or any server fails to
+  synchronize. By default the run is **best-effort and exits 0**: individual
+  failures (e.g. a server whose VDP metadata view errors, or one the API reports
+  with a null `id`) are logged as warnings and do not fail the run, so a calling
+  install script running under `set -e` is not aborted. Use `--strict` in CI.
 - `--debug` — print raw samples of API answers.
 
 ```shell

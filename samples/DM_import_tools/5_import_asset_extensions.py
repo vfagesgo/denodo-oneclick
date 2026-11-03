@@ -443,6 +443,10 @@ def main():
                          "tool server already in the catalog. Needs --sync and/or --sync-vdp.")
     ap.add_argument("--dry-run", action="store_true", help="read only: show what would change")
     ap.add_argument("--debug", action="store_true", help="print raw samples of API answers")
+    ap.add_argument("--strict", action="store_true",
+                    help="exit non-zero if any item failed to import or any server failed to "
+                         "synchronize. By default the run is best-effort and exits 0 so a calling "
+                         "install script is not aborted by an expected sync error.")
     ap.add_argument("--base-url", default=os.environ.get("DENODO_DC_URL", "http://localhost/denodo-data-catalog"))
     ap.add_argument("--user", default=os.environ.get("DENODO_USER", "admin"))
     ap.add_argument("--password", default=os.environ.get("DENODO_PASSWORD", "admin"))
@@ -481,7 +485,23 @@ def main():
         imp.sync_servers(all_servers=args.no_import)
 
     print("\n== Done ==  " + ", ".join(f"{k}={v}" for k, v in imp.stats.items()))
-    return 1 if imp.stats["failed"] or imp.stats["sync_failed"] else 0
+
+    # Some tool servers legitimately cannot be synchronized (e.g. a server whose
+    # backing VDP metadata view errors, or one whose 'id' the API reports as
+    # null). Those are already caught per-server and counted in sync_failed, and
+    # the same goes for individual import failures. Treat them as warnings and
+    # exit 0 by default, so a calling install script running under `set -e` is
+    # not aborted by an expected, non-fatal condition. Pass --strict to make any
+    # such failure exit non-zero (e.g. in CI).
+    problems = imp.stats["failed"] + imp.stats["sync_failed"]
+    if problems:
+        print(f"WARNING: {imp.stats['failed']} import failure(s) and "
+              f"{imp.stats['sync_failed']} sync failure(s) - see messages above.")
+        if args.strict:
+            print("Exiting non-zero because --strict was given.")
+            return 1
+        print("Continuing (non-fatal); re-run with --strict to treat these as errors.")
+    return 0
 
 
 if __name__ == "__main__":
