@@ -123,11 +123,11 @@ fi
 # ---------------------------------------------------------------------------
 log_section "4.5" "Update Data Marketplace metadata"
 
-#python 1_import_domains.py          --file "$SCRIPT_DIR/1_${vdb_name}_domains.sjon" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
-#python 2_import_property_groups.py  --file "$SCRIPT_DIR/2_${vdb_name}_property_groups.sjon" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
-#python 3_assign_domains.py          --file "$SCRIPT_DIR/3_${vdb_name}_domain_assignments.sjon" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
-#python 4_assign_property_groups.py  --file "$SCRIPT_DIR/4_${vdb_name}_property_assignments.sjon" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
-python 5_import_asset_extensions.py --file "$SCRIPT_DIR/5_asset_extensions.sjon" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
+#python "$SCRIPT_DIR/../DM_import_tools/1_import_domains.py"         --file "$SCRIPT_DIR/1_${vdb_name}_domains.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
+#python $SCRIPT_DIR/../DM_import_tools/2_import_property_groups.py"  --file "$SCRIPT_DIR/2_${vdb_name}_property_groups.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
+#python $SCRIPT_DIR/../DM_import_tools/3_assign_domains.py"          --file "$SCRIPT_DIR/3_${vdb_name}_domain_assignments.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
+#python $SCRIPT_DIR/../DM_import_tools/4_assign_property_groups.py"  --file "$SCRIPT_DIR/4_${vdb_name}_property_assignments.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
+python $SCRIPT_DIR/../DM_import_tools/5_import_asset_extensions.py" --file "$SCRIPT_DIR/5_asset_extensions.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1
 
 # ---------------------------------------------------------------------------
 log_section "5" "Wait for Denodo AI SDK to start"
