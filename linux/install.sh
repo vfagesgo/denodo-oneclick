@@ -1661,8 +1661,8 @@ log_step "Importing admin VDB"
 log_step "Importing asset_extensions VDB"
 "$REPO_ROOT/samples/vdb_asset_extensions/vdb_asset_extensions_install.sh"
 
-log_step "Importing bank_demo VDB"
-"$REPO_ROOT/samples/vdb_bank_demo/vdb_bank_demo_install.sh"
+#log_step "Importing bank_demo VDB"
+#"$REPO_ROOT/samples/vdb_bank_demo/vdb_bank_demo_install.sh"
 
 log_step "Importing pharm_ai VDB"
 "$REPO_ROOT/samples/vdb_pharm_ai/vdb_pharm_ai_install.sh"
