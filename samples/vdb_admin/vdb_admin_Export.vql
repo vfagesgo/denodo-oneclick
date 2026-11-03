@@ -19,6 +19,19 @@ CREATE OR REPLACE ROLE denodooneclickrole '';
 CREATE OR REPLACE ROLE execute_only 'Server-wide metadata and execute access';
 
 # #######################################
+# TAG CREATION
+# #######################################
+CREATE OR REPLACE TAGS (ai_banking, ai_ready, country_classification_tag, mcp, medixit_ai, pii_data, restricted_transaction_data DESCRIPTION = 'For high-sensitivity transaction records, including payment details, account transfers, and transaction history that need stricter access controls.');
+
+CHOWNS (CHOWN admin TAG ai_banking LASTMODIFICATIONUSER admin, 
+    CHOWN admin TAG ai_ready LASTMODIFICATIONUSER admin, 
+    CHOWN admin TAG country_classification_tag LASTMODIFICATIONUSER admin, 
+    CHOWN admin TAG mcp LASTMODIFICATIONUSER admin, 
+    CHOWN admin TAG medixit_ai LASTMODIFICATIONUSER admin, 
+    CHOWN admin TAG pii_data LASTMODIFICATIONUSER admin, 
+    CHOWN admin TAG restricted_transaction_data LASTMODIFICATIONUSER admin);
+
+# #######################################
 # CONFIGURATION PROPERTIES
 # #######################################
 
