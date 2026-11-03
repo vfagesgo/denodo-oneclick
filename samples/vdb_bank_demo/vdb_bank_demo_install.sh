@@ -53,7 +53,7 @@ until (echo > /dev/tcp/localhost/9999) >/dev/null 2>&1; do
     exit 1
   fi
   sleep 4
-  VDP_WAITED=$((VDP_WAITED + 2))
+  VDP_WAITED=$((VDP_WAITED + 4))
 done
 log_step "Denodo VDP is listening on TCP port 9999"
 
