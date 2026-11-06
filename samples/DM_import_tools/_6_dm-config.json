@@ -1,0 +1,128 @@
+{
+  "_comment": "Denodo Data Marketplace admin configuration. Each section is the exact REST request body (see dm-api-docs.json). Keys starting with '_' are ignored. Any string '${VAR}' is replaced by the environment variable VAR when set.",
+
+  "llmConfiguration": {
+    "_endpoint": "POST /public/api/configuration/llm-configuration (multipart part 'llmConfiguration', LlmDualConfigurationRequest)",
+    "llmConfiguration": {
+      "aiServiceType": "OPENAI",
+      "openAiConfiguration": {
+        "authenticationType": "API_KEY",
+        "apiKey": "${OPENAI_API_KEY}",
+        "organizationId": "",
+        "modelName": "gpt-5.4-mini",
+        "maxTokens": 128000,
+        "maxOutputTokens": 16000,
+        "useResponsesApi": true
+      },
+      "temperatureConfiguration": {
+        "customTemperatureEnabled": false,
+        "temperatureOption": "disabled",
+        "temperatureValue": 0.0
+      },
+      "headers": []
+    },
+    "thinkingLlmConfiguration": {
+      "thinkingEnabled": true,
+      "aiServiceType": "OPENAI",
+      "openAiConfiguration": {
+        "authenticationType": "API_KEY",
+        "apiKey": "${OPENAI_API_KEY}",
+        "organizationId": "",
+        "modelName": "gpt-5.5",
+        "maxTokens": 128000,
+        "maxOutputTokens": 16000,
+        "useResponsesApi": true,
+        "reasoningEffort": "medium"
+      },
+      "headers": []
+    },
+    "proxyConfiguration": {
+      "enabled": false,
+      "host": "",
+      "port": 0,
+      "userName": "",
+      "password": ""
+    }
+  },
+
+  "vectorDbConfiguration": {
+    "_endpoint": "POST /public/api/configuration/vectordb-integration/api-configuration (multipart part 'vectorDbConfiguration', VectorDbConfigurationRequest)",
+    "enabled": true,
+    "dbConnectionConfiguration": {
+      "connectionProvider": "PG_VECTOR",
+      "pgVectorConfiguration": {
+        "authenticationType": "LOGIN_PASSWORD",
+        "url": "jdbc:postgresql://localhost:5432/denodo",
+        "username": "denodo",
+        "password": "password",
+        "schema": "public"
+      }
+    },
+    "embeddingModelConfiguration": {
+      "embeddingModelProvider": "OPENAI",
+      "openAiConfiguration": {
+        "authenticationType": "API_KEY",
+        "apiKey": "${OPENAI_API_KEY}",
+        "organizationId": "",
+        "modelName": "text-embedding-3-small",
+        "maxTokens": 8191
+      },
+      "headers": []
+    },
+    "indexConfiguration": {
+      "batchSize": 100,
+      "refreshMetadataInterval": 60
+    }
+  },
+
+  "vectorDbServers": [
+    {
+      "_endpoint": "POST /public/api/configuration/vectordb-integration/vdp-server (VectorDbConfigureVdpServerRequest)",
+      "serverId": 1,
+      "enabled": true,
+      "username": "admin",
+      "password": "password",
+      "dataUsageEnabled": true,
+      "dataUsageSampleSize": 10,
+      "externalElementsConfiguration": {
+        "enabled": true,
+        "tags": []
+      }
+    }
+  ],
+
+  "assistedQuery": {
+    "_endpoint": "POST /public/api/configuration/ai-integration/assisted-query (AssistedQueryConfigurationRequest)",
+    "enabled": true,
+    "dataUsageEnabled": true,
+    "dataUsageConfiguration": {
+      "tuplesToUse": 10
+    },
+    "languageConfiguration": {
+      "languageOption": "BROWSER",
+      "language": "en"
+    },
+    "executionMode": "MANUAL",
+    "extraInstructionsConfiguration": {
+      "enabled": false,
+      "content": ""
+    },
+    "externalElementsConfiguration": {
+      "enabled": true,
+      "tags": []
+    }
+  },
+
+  "chatbot": {
+    "_endpoint": "POST /public/api/configuration/personalization/denodo-assistant/chatbot (ChatbotConfigurationRequest)",
+    "enabled": true,
+    "customInstructionsConfiguration": {
+      "enabled": true,
+      "content": "Use Skills whenever there is a possible match. Otherwise, use a verified query as a second option, if one is available.\n\n- Before using any tool, always explain its purpose in one simple sentence.\n- If a verified query is used, ALWAYS include a Markdown table with the header '☑ Verified Query: **<query_name>**' and a row below describing its purpose.\n- If a Skill is used, ALWAYS include the following text before any response, replacing <Skill_name> with the actual skill name: 🧠 **Using Skill: <Skill_name>**"
+    },
+    "skillsConfiguration": {
+      "enabled": true,
+      "allowedTags": []
+    }
+  }
+}

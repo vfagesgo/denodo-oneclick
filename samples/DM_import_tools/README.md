@@ -14,6 +14,10 @@ Run them in numeric order — later scripts depend on what earlier ones create:
 | 3 | `3_assign_domains.py` | Assign views / web services / assets to domains | `3_domain_assignments.json` |
 | 4 | `4_assign_property_groups.py` | Assign property groups & set values on elements | `4_property_assignments.json` |
 | 5 | `5_import_asset_extensions.py` | Asset-extension types, provider types, tool servers | `5_asset_extensions.json` |
+| 6 | `6_import_dm-config.py` | Admin configuration: LLM, Vector DB, Denodo Assistant | `_6_dm-config.json` |
+
+Script 6 is independent of 1–5 (global admin settings, not catalog content) and
+can be run on its own.
 
 ## Requirements
 
@@ -48,6 +52,8 @@ python 2_import_property_groups.py  --base-url http://localhost/denodo-data-cata
 python 3_assign_domains.py          --base-url http://localhost/denodo-data-catalog --user admin --password admin --server-id 1
 python 4_assign_property_groups.py  --base-url http://localhost/denodo-data-catalog --user admin --password admin --server-id 1
 python 5_import_asset_extensions.py --base-url http://localhost/denodo-data-catalog --user admin --password admin --server-id 1 --sync
+OPENAI_API_KEY=sk-... \
+python 6_import_dm-config.py        --base-url http://localhost/denodo-data-catalog --user admin --password admin --server-id 1
 ```
 
 ---
@@ -271,4 +277,89 @@ To synchronize only, without importing anything:
 ```shell
 python3 5_import_asset_extensions.py --no-import --sync             # sync all catalog tool servers
 python3 5_import_asset_extensions.py --no-import --sync-vdp --sync  # sync VDP elements first, then servers
+```
+
+## 6 — `6_import_dm-config.py`
+
+Applies the **Data Marketplace admin configuration**: LLM and thinking LLM,
+Vector DB (connection, embedding model, indexed VDP servers) and the Denodo
+Assistant (assisted query, chatbot, agent skills).
+
+API:
+
+| Step (`--only`) | JSON section | Endpoint |
+|-----------------|--------------|----------|
+| `llm` | `llmConfiguration` | `POST /configuration/llm-configuration` (multipart) |
+| `vectordb` | `vectorDbConfiguration` | `POST /configuration/vectordb-integration/api-configuration` (multipart) |
+| `servers` | `vectorDbServers` (list) | `POST /configuration/vectordb-integration/vdp-server` (one call per server) |
+| `assisted-query` | `assistedQuery` | `POST /configuration/ai-integration/assisted-query` |
+| `chatbot` | `chatbot` | `POST /configuration/personalization/denodo-assistant/chatbot` |
+
+Each section is sent **as-is** as the request body (schemas
+`LlmDualConfigurationRequest`, `VectorDbConfigurationRequest`,
+`VectorDbConfigureVdpServerRequest`, `AssistedQueryConfigurationRequest`,
+`ChatbotConfigurationRequest`). Steps run in the order above; a section missing
+from the JSON is skipped. Unlike scripts 1–5 there is no diff: every selected
+section is posted (the API replaces the configuration).
+
+**Secrets.** Any string `"${VAR}"` is replaced by the environment variable `VAR`
+when it is set (e.g. `"apiKey": "${OPENAI_API_KEY}"`); otherwise a warning is
+printed and the literal is sent. Keys starting with `_` (e.g. `_comment`,
+`_endpoint`) are ignored. Passwords / API keys are masked in `--dry-run` output.
+
+**Backup (rollback).** Before applying, the current configuration returned by
+`GET /configuration/configuration-details` is saved to
+`_6_dm-config.backup-<timestamp>.json` next to the script; the run aborts if the
+backup fails. The backup is the raw API answer — restoring it is a manual step.
+
+Input JSON (abridged):
+
+```json
+{ "llmConfiguration": {
+    "llmConfiguration":         { "aiServiceType": "OPENAI",
+                                  "openAiConfiguration": { "authenticationType": "API_KEY",
+                                    "apiKey": "${OPENAI_API_KEY}", "modelName": "gpt-5.4-mini", ... } },
+    "thinkingLlmConfiguration": { "thinkingEnabled": true, "aiServiceType": "OPENAI",
+                                  "openAiConfiguration": { ..., "modelName": "gpt-5.5",
+                                                           "reasoningEffort": "medium" } },
+    "proxyConfiguration":       { "enabled": false, "host": "", "port": 0 } },
+  "vectorDbConfiguration": {
+    "enabled": true,
+    "dbConnectionConfiguration":   { "connectionProvider": "PG_VECTOR",
+                                     "pgVectorConfiguration": { "url": "jdbc:postgresql://localhost:5432/denodo",
+                                       "username": "denodo", "password": "password",
+                                       "authenticationType": "LOGIN_PASSWORD" } },
+    "embeddingModelConfiguration": { "embeddingModelProvider": "OPENAI",
+                                     "openAiConfiguration": { "modelName": "text-embedding-3-small", ... } },
+    "indexConfiguration":          { "batchSize": 100, "refreshMetadataInterval": 60 } },
+  "vectorDbServers": [ { "serverId": 1, "enabled": true, "username": "admin", "password": "password",
+                         "dataUsageEnabled": true, "dataUsageSampleSize": 10,
+                         "externalElementsConfiguration": { "enabled": true, "tags": [] } } ],
+  "assistedQuery": { "enabled": true, "dataUsageEnabled": true, ... },
+  "chatbot":       { "enabled": true,
+                     "customInstructionsConfiguration": { "enabled": true, "content": "..." },
+                     "skillsConfiguration": { "enabled": true, "allowedTags": [] } } }
+```
+
+UI label → JSON field mapping for the less obvious ones: *Use sample data* →
+`dataUsageEnabled`; *Enable asset extensions* → `externalElementsConfiguration.enabled`;
+*Enable server metadata vectorization* → `vectorDbServers[].enabled`.
+
+Extra options:
+
+- `--only llm,vectordb,servers,assisted-query,chatbot` — apply a subset of steps.
+- `--no-backup` — do not save the current configuration first.
+
+```shell
+python3 6_import_dm-config.py [--file _6_dm-config.json] [--only ...] \
+    [--no-backup] [--dry-run] <connection flags>
+```
+
+From an install script:
+
+```shell
+export OPENAI_API_KEY="sk-..."
+"$PYTHON" "$SCRIPT_DIR/../DM_import_tools/6_import_dm-config.py" \
+  --base-url http://localhost/denodo-data-catalog \
+  --user admin --password "$DENODO_VDP_PWD" --server-id 1
 ```
