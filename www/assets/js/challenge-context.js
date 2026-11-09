@@ -98,7 +98,7 @@
     insertBanner();
     if (!updateScenarioLine()) insertMissingScenarioHint();
     if (key === 'medixit') document.addEventListener('click', medixitRouting, true);
-    const nativeLink = document.querySelector('a[href="index.html"]');
+    const nativeLink = document.querySelector('a[href="/index.html"]');
     if (nativeLink && /get started/i.test(nativeLink.textContent || '')) {
       // Existing nav's "Get started" should stay on the welcome page,
       // instead of returning to the new industry selector.
