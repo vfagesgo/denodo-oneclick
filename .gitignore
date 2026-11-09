@@ -5,6 +5,7 @@ __pycache__
 cookies.txt
 headers.txt
 !README.md
+!**/pages_md/**.md
 !**/skills/**/*.md
 .DS_Store
 tmp/
