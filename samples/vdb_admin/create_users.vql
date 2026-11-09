@@ -1,0 +1,7 @@
+-- 1. Create the generic role
+CREATE ROLE enduser_executeonly 'metadata and execute access only';
+
+-- 2. Grant read + execute on each database
+ALTER ROLE enduser_executeonly GRANT CONNECT, METADATA, EXECUTE ON aws_tpcds;
+ALTER ROLE enduser_executeonly GRANT CONNECT, METADATA, EXECUTE ON bank_demo;
+ALTER ROLE enduser_executeonly GRANT CONNECT, METADATA, EXECUTE ON pharm_ai;
