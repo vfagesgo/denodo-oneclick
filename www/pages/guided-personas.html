@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome to your Denodo trial</title>
+<link rel="stylesheet" href="../assets/css/challenge-context.css">
+<!--
+  Try Denodo: guided persona tours.
+  A standalone page, served next to index_v3.html. The top of the page repeats the v0006 welcome
+  screen. Start tour opens the guide in its own small window (Document Picture-in-Picture in
+  Chrome and Edge, a docked window in other browsers, or on this page if pop-ups are blocked)
+  and opens Design Studio, the Data Marketplace or the AI SDK chatbot in one browser tab.
+  Tour content: the TOURS object below. docs/GUIDED_TOURS.md is generated from it.
+  Miniature screens: ../assets/images/guide/*.jpg. Progress: localStorage key denodo.guided.crestbank.v3.
+-->
+<style>
+@font-face{font-family:"Proxima Nova";src:url("../assets/fonts/Proxima%20Nova/proximanova-regular-webfont.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Proxima Nova";src:url("../assets/fonts/Proxima%20Nova/proximanova-medium-webfont.woff2") format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Proxima Nova";src:url("../assets/fonts/Proxima%20Nova/proximanova-semibold-webfont.woff2") format("woff2");font-weight:600;font-display:swap}
+:root{
+  --midnight-blue:#112533; --dark-midnight-blue:#0a3f5b; --light-blue:#84b5ce;
+  --peacock-blue:#006699; --peacock-blue-hover:#3276b1;
+  --green-success:#42b044; --highlight-orange:#ff9933; --warning-red:#f05149;
+  --gunmetal:#4f5e69; --grey:#c7c9ca; --light-grey:#e7e9ea; --light-grey-b:#f3f4f5;
+  --line:#dadfe3; --muted:#60707c; --r-sm:4px; --r-md:6px;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--light-grey-b);color:var(--midnight-blue);
+  font-family:"Proxima Nova","proxima-nova",Roboto,"Segoe UI",system-ui,sans-serif;
+  font-size:14px;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.025em;line-height:1.15}
+p{margin:0}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit;text-align:left}
+a{color:var(--peacock-blue)}
+:focus-visible{outline:2px solid var(--peacock-blue);outline-offset:2px}
+.ico{width:20px;height:20px;display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;
+  border-radius:var(--r-sm);font-size:14px;font-weight:600;text-decoration:none;
+  border:1px solid transparent;transition:background .12s,border-color .12s}
+.btn-primary{background:var(--peacock-blue);color:#fff}
+.btn-primary:hover{background:var(--peacock-blue-hover)}
+.btn-ghost{background:#fff;border-color:var(--line);color:var(--midnight-blue)}
+.btn-ghost:hover{background:var(--light-grey-b)}
+.btn-sm{padding:7px 13px;font-size:13.5px}
+.lnk{color:var(--peacock-blue);font-weight:600;font-size:13.5px}
+.lnk:hover{text-decoration:underline}
+.time{font-size:12.5px;color:var(--muted)}
+
+.app{display:flex;min-height:100vh}
+.nav{width:238px;flex:none;background:#fff;border-right:1px solid var(--line);padding:14px 0;display:flex;flex-direction:column}
+.nav .brand{display:flex;align-items:center;padding:10px 18px 22px}
+.nav .brand img{height:28px}
+.nav-s{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:16px 18px 6px}
+.nav a{display:flex;align-items:center;gap:10px;padding:7px 18px;font-size:14px;color:var(--midnight-blue);text-decoration:none;width:100%;border-left:3px solid transparent}
+.nav a:hover{background:var(--light-grey-b)}
+.nav .on{background:#e1edf4;border-left-color:var(--peacock-blue);color:var(--peacock-blue);font-weight:600}
+.nav svg{color:var(--gunmetal);flex:none}
+.nav .on svg{color:var(--peacock-blue)}
+.main{flex:1 1 auto;min-width:0;background:var(--light-grey-b);padding-bottom:60px}
+.hero{background:var(--dark-midnight-blue);padding:30px 40px 92px;position:relative;overflow:hidden}
+.hero h1{color:#fff;font-size:27px;text-align:center;position:relative;z-index:1}
+.hero #td-challenge-note{display:none}
+.hero svg.deco{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+.wrap{max-width:1020px;margin:-68px auto 0;padding:0 40px;position:relative;z-index:2}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px}
+.panel-p{padding:26px 30px}
+.panel h2{font-size:21px;margin-bottom:6px}
+.sub{font-size:13.5px;color:var(--gunmetal);line-height:1.5}
+
+/* ---- autoplay product animation ---- */
+.an-frame{position:relative;border-radius:14px;padding:22px;overflow:hidden;
+  background:#fff radial-gradient(var(--line) 1px,transparent 1px) 0 0/22px 22px;
+  border:1px solid var(--line)}
+.an-win{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  box-shadow:0 6px 26px rgba(17,37,51,.09)}
+.an-tabs{display:flex;gap:20px;padding:15px 18px 0;border-bottom:1px solid var(--light-grey)}
+.an-tabs span{font-size:13px;color:var(--muted);padding-bottom:9px;border-bottom:2px solid transparent}
+.an-tabs span.on{color:var(--peacock-blue);font-weight:600;border-bottom-color:var(--peacock-blue)}
+.an-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 18px 20px;
+  background:var(--light-grey-b);min-height:316px}
+.an-col{background:#eef1f4;border-radius:7px;padding:10px}
+.an-col h5{font-size:12px;font-weight:600;color:var(--gunmetal);margin:0 0 10px;
+  display:flex;align-items:center;gap:7px;letter-spacing:.01em}
+.an-col h5 em{font-style:normal;color:var(--muted);font-weight:400}
+.an-card{background:#fff;border:1px solid var(--line);border-radius:6px;margin-bottom:9px;
+  opacity:1;transform:translateY(0);transition:opacity .35s,transform .35s,border-color .25s}
+.an-card.hidden{opacity:0;transform:translateY(8px)}
+.an-card.lit{border-color:var(--peacock-blue)}
+.an-card .cb{padding:10px 11px 9px}
+.an-card .nm{font-size:12.5px;font-weight:600;line-height:1.35;margin-bottom:7px}
+.an-card .nm{overflow-wrap:anywhere}
+.an-tag{display:inline-block;font-size:11px;font-weight:600;border:1px solid var(--line);
+  border-radius:3px;padding:1px 6px;margin:0 4px 2px 0;color:var(--gunmetal)}
+.an-tag.pii{border-color:#efc3bf;color:#b8342c}
+.an-tag.mcp{border-color:#b9cfdc;color:var(--peacock-blue)}
+.an-row{display:none;align-items:center;gap:7px;padding:7px 11px;border-top:1px solid var(--light-grey);
+  background:#f7f9fa;font-size:11.5px;color:var(--gunmetal)}
+.an-card.work .an-row.w{display:flex}
+.an-card.done .an-row.d{display:flex}
+.an-row .sp{width:11px;height:11px;border:2px solid var(--grey);border-top-color:var(--peacock-blue);
+  border-radius:50%;animation:sp .7s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.an-row .tick{width:13px;height:13px;border-radius:50%;background:var(--green-success);flex:none;
+  display:flex;align-items:center;justify-content:center;margin-left:auto}
+.an-row .dots{margin-left:auto;color:var(--grey)}
+.an-cursor{position:absolute;width:19px;height:25px;pointer-events:none;z-index:5;
+  transition:left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.an-pause{position:absolute;right:18px;bottom:18px;width:40px;height:40px;border-radius:50%;
+  background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(17,37,51,.14);z-index:6}
+.an-pause:hover{border-color:var(--peacock-blue)}
+.an-cap{font-size:12.5px;color:var(--muted);margin-top:10px;text-align:center}
+
+
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:20px}
+.s3{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.s3 .art{height:112px;background:#e3ecf2 center/cover no-repeat}
+.s3 .in{padding:18px;display:flex;flex-direction:column;flex:1 1 auto}
+.s3 h4{font-size:16px;margin-bottom:9px;line-height:1.3}
+.s3 p{font-size:12.5px;color:var(--gunmetal);line-height:1.55;flex:1 1 auto;margin-bottom:15px}
+.s3 .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.howto{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:22px}
+.howto .n{font-size:13px;font-weight:600;color:var(--peacock-blue);margin-bottom:8px}
+.howto h4{font-size:15px;margin-bottom:6px;line-height:1.3}
+.howto p{font-size:13px;color:var(--gunmetal);line-height:1.6}
+
+.notice{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);
+  border-radius:8px;padding:14px 20px;margin-bottom:18px;font-size:14px;line-height:1.5}
+.notice .sp{margin-left:auto;display:flex;gap:12px;align-items:center}
+.resume{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:65;background:var(--peacock-blue);
+  color:#fff;border-radius:4px 0 0 4px;padding:12px 9px;font-size:12.5px;font-weight:600;writing-mode:vertical-rl}
+#inline-guide{margin-top:22px}
+#inline-guide iframe{width:100%;max-width:420px;height:760px;border:1px solid var(--line);border-radius:8px;background:#fff;display:block}
+
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+.help h3{font-size:16px;margin-bottom:14px}
+.jump{display:flex;flex-wrap:wrap;gap:8px 18px}
+.help a{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13.5px;font-weight:600}
+.help a:hover{text-decoration:underline}
+
+@media(max-width:1100px){.steps3{grid-template-columns:1fr}.duo{grid-template-columns:1fr}}
+@media(max-width:900px){.nav{display:none}.howto{grid-template-columns:1fr;gap:18px}}
+@media(max-width:760px){
+  .wrap{padding:0 16px;margin-top:-48px}
+  .hero{padding:26px 18px 74px}
+  .hero h1{font-size:22px;line-height:1.25}
+  .panel-p{padding:20px 18px}
+  .panel h2{font-size:19px;line-height:1.25}
+  /* the board is a 4-column desktop layout: stack it so nothing is clipped */
+  .an-frame{padding:12px}
+  .an-board{grid-template-columns:1fr;gap:10px;min-height:0;padding:12px}
+  .an-col{padding:10px 12px}
+  .an-col h5{margin-bottom:8px}
+  .an-card{margin-bottom:7px}
+  .an-tabs{gap:14px;padding:12px 12px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .an-tabs span{white-space:nowrap;font-size:12.5px}
+  .an-cursor{display:none}
+  .an-card.hidden{display:none}
+  .an-pause{right:12px;bottom:12px}
+  .an-cap{font-size:12px;padding:0 4px}
+  .s3 .art{height:150px}
+  .s3 .in{padding:16px}
+  .s3 h4{font-size:17px}
+  .s3 p{font-size:13.5px}
+  .s3 .row{justify-content:space-between}
+  .resume{top:auto;bottom:0;right:12px;transform:none;writing-mode:horizontal-tb;border-radius:4px 4px 0 0;padding:10px 16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+ <aside class="nav">
+  <div class="brand"><img src="../assets/images/denodo_logo_black.png" alt="Denodo"></div>
+  <div class="nav-s">Trial</div>
+  <a href="welcome.html?challenge=crestbank"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-5 2 2-5 5-2z"/></svg>Get started</a>
+  <a class="on" href="guided-personas.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4V5z"/><path d="M8 9h8M8 12h5"/></svg>Guided tours</a>
+  <div class="nav-s">Tools</div>
+  <a data-app="ds" href="/denodo-design-studio/" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5zM3 7l9 5 9-5M12 12v10"/></svg>Design Studio</a>
+  <a data-app="dm" href="/denodo-data-catalog/#/" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Data Marketplace</a>
+  <a data-app="chat" href="/chatbot/" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l2 6.2L20 10l-6 1.8L12 18l-2-6.2L4 10l6-1.8L12 2z"/></svg>Ask a Question</a>
+  <a data-app="mcp" href="mcp-api.html" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6L11.8 6.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6l1.2-1.2"/></svg>MCP and API</a>
+  <a data-app="docs" href="documentation.html" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Documentation</a>
+ </aside>
+
+ <div class="main">
+  <div class="hero">
+   <svg class="deco" viewBox="0 0 1200 220" preserveAspectRatio="none" aria-hidden="true">
+    <circle cx="120" cy="40" r="3" fill="#2f6f93"/><circle cx="170" cy="90" r="3" fill="#2f6f93"/>
+    <circle cx="70" cy="140" r="3" fill="#2f6f93"/><circle cx="220" cy="30" r="3" fill="#2f6f93"/>
+    <circle cx="1080" cy="60" r="3" fill="#2f6f93"/><circle cx="1130" cy="120" r="3" fill="#2f6f93"/>
+    <circle cx="1020" cy="160" r="3" fill="#2f6f93"/><circle cx="980" cy="40" r="3" fill="#2f6f93"/>
+    <path d="M120 40L170 90M70 140L170 90M220 30L170 90M1080 60L1130 120M1020 160L1130 120M980 40L1080 60" stroke="#2f6f93" stroke-width="1" fill="none"/>
+   </svg>
+   <h1>Welcome to your Denodo trial!</h1>
+  </div>
+
+  <div class="wrap">
+   <div class="notice" id="status" role="status" aria-live="polite" hidden></div>
+
+   <div class="an-frame" id="anim">
+    <div class="an-win">
+     <div class="an-tabs" id="antabs"></div>
+     <div class="an-board" id="anboard"></div>
+    </div>
+    <svg class="an-cursor" id="cur" viewBox="0 0 19 25" fill="#112533" stroke="#fff" stroke-width="1.4">
+     <path d="M1 1l16 11-7 1.4 3.6 8-3 1.3-3.6-8L1 20z"/></svg>
+    <button class="an-pause" id="pz" onclick="toggleAnim()" aria-label="Pause">
+     <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+    </button>
+   </div>
+   <p class="an-cap">One governed view, built once, reachable four ways.</p>
+
+   <div class="panel panel-p" style="margin-top:24px">
+    <h2>Choose a tour and get hands on in a few minutes!</h2>
+    <p class="sub" data-scenario-line>Crestbank wants to understand loan repayment activity among Gold and Platinum customers. Choose the role you want to play in answering this question.</p>
+    <div class="steps3" id="cards"></div>
+    <div id="inline-guide" hidden></div>
+   </div>
+
+   <div class="panel panel-p" style="margin-top:20px">
+    <h2>How the guided tours work</h2>
+    <p class="sub">Every step takes place in the live Denodo Platform loaded with the Crestbank sample data.</p>
+    <div class="howto">
+     <div><div class="n">01</div><h4>A guide opens beside Denodo</h4>
+      <p>In Chrome and Edge it stays on top of your other windows. In other browsers it opens as a small window at the side of your screen.</p></div>
+     <div><div class="n">02</div><h4>Each step opens the right tool</h4>
+      <p>Design Studio, the Data Marketplace or the AI SDK chatbot opens in one browser tab, with a picture of the screen to look for.</p></div>
+     <div><div class="n">03</div><h4>You confirm each result</h4>
+      <p>Tick a step when you see its result. Your progress is saved in this browser, so you can close the guide and resume later.</p></div>
+    </div>
+   </div>
+
+   <div class="duo">
+    <div class="panel panel-p">
+     <h3 style="font-size:16px;margin-bottom:8px">Skip the tours</h3>
+     <p class="sub" style="line-height:1.55;margin-bottom:14px">Open any tool and dive right in!</p>
+     <div class="jump">
+      <a class="lnk" data-app="ds" href="/denodo-design-studio/" target="denodo-app">Design Studio</a>
+      <a class="lnk" data-app="dm" href="/denodo-data-catalog/#/" target="denodo-app">Data Marketplace</a>
+      <a class="lnk" data-app="chat" href="/chatbot/" target="denodo-app">Ask a Question</a>
+      <a class="lnk" data-app="mcp" href="mcp-api.html" target="denodo-app">MCP and API</a>
+      <a class="lnk" data-app="docs" href="documentation.html" target="denodo-app">Documentation</a>
+     </div>
+    </div>
+    <div class="panel panel-p help">
+     <h3>We are here to help</h3>
+     <a data-app="docs" href="documentation.html" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Trial quick start guide</a>
+     <a data-app="mcp" href="mcp-api.html" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6"/></svg>Connect your own AI client over MCP</a>
+     <a href="https://community.denodo.com" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20v-1.5c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5V20M17 6a3 3 0 0 1 0 6M18.5 14c2 .7 3 2.1 3 4v2h-3.5"/></svg>Ask the Denodo Community</a>
+    </div>
+   </div>
+
+   <p style="font-size:12.5px;color:var(--muted);margin-top:28px">Property of Denodo. © Copyright Denodo 2026</p>
+  </div>
+ </div>
+</div>
+<button class="resume" id="resume" type="button" hidden>Resume tour</button>
+
+<script>
+/* ============ Product animation: copied from index_v3.html (v0006) ============ */
+var TABS=['Sources','Model','Marketplace','Services'];
+
+var DATASETS=[
+ /* Connected sources match the entry-page diagram (index.html): illustrative source
+    types, not the lineage of the product. Views and data products are real objects.
+    loan_repayment_360 is what the Data Engineer tour builds. */
+ {who:'Crestbank',
+  src:[['Traditional DB &amp; DW','Core systems'],['SaaS apps','CRM &amp; service'],['Streaming','Payments events']],
+  views:[['customers',['mcp','pii_data']],['loans',['ai_banking']],['loan_payments',['ai_banking']]],
+  dp:['loan_repayment_360',['mcp','ai_banking']]},
+ /* Existing product. i_clinical_trials_patients_start_date is implemented by
+    v_clinical_trials_patients_start_date = clinical_trials + common_date + patients. */
+ {who:'Medixit',
+  src:[['Files','X-ray images'],['Lakehouse','Research platform'],['SaaS','Clinical apps']],
+  views:[['patients',['medixit_ai']],['clinical_trials',['medixit_ai']],['common_date',['medixit_ai']]],
+  dp:['i_clinical_trials_patients_start_date',['ai_ready']]}
+];
+var USERS=['Data Marketplace','SQL','REST service','MCP tool'];
+/* The industry chosen on the entry page pins the dataset. With no choice,
+   the loop alternates as before. */
+var CHALLENGE=(function(){try{
+  var q=new URLSearchParams(location.search).get('challenge');
+  if(!q)return 0;   /* this page defaults to Crestbank */ q=q.toLowerCase();
+  for(var i=0;i<DATASETS.length;i++) if(DATASETS[i].who.toLowerCase()===q) return i;
+  return null;
+}catch(e){return null}})();
+var dsi=CHALLENGE!==null?CHALLENGE:Math.floor(Math.random()*DATASETS.length);
+
+function tick(){return '<span class="tick"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg></span>'}
+function tags(list){return list.map(function(t){
+ var c=t==='pii_data'?' pii':(t==='mcp'?' mcp':'');
+ return '<span class="an-tag'+c+'">'+t+'</span>'}).join('')}
+function rowW(l){return '<div class="an-row w"><span class="sp"></span>'+l+'<span class="dots">\u2022</span></div>'}
+function rowD(l){return '<div class="an-row d">'+l+tick()+'</div>'}
+
+function buildBoard(){
+ var d=DATASETS[dsi];
+ document.getElementById('antabs').innerHTML=TABS.map(function(t,i){
+  return '<span id="tab'+i+'">'+t+'</span>'}).join('');
+ document.getElementById('anboard').innerHTML=
+  '<div class="an-col" id="colA"><h5>Connected sources <em>'+d.src.length+'</em></h5>'+
+   d.src.map(function(x){return '<div class="an-card"><div class="cb"><div class="nm">'+x[0]+
+    '</div><span class="an-tag">'+x[1]+'</span></div></div>'}).join('')+'</div>'+
+  '<div class="an-col" id="colB"><h5>Governed views <em>'+d.views.length+'</em></h5>'+
+   d.views.map(function(v,i){return '<div class="an-card" id="c'+(i+1)+'"><div class="cb"><div class="nm">'+
+    v[0]+'</div>'+tags(v[1])+'</div>'+rowW('Reading schema')+rowD('Validated')+'</div>'}).join('')+'</div>'+
+  '<div class="an-col" id="colC"><h5>Data product <em id="dpn">0</em></h5>'+
+   '<div class="an-card hidden" id="dp"><div class="cb"><div class="nm">'+d.dp[0]+'</div>'+
+   tags(d.dp[1])+'</div>'+rowW('Combining '+d.views.length+' views')+rowD('Published')+'</div></div>'+
+  '<div class="an-col" id="colD"><h5>Reachable from <em id="cn">0</em></h5>'+
+   USERS.map(function(u,i){return '<div class="an-card hidden" id="u'+(i+1)+'"><div class="cb"><div class="nm">'+
+    u+'</div></div>'+rowD('Live')+'</div>'}).join('')+'</div>';
+}
+
+var anI=0, anTimer=null, anOn=true;
+function el(id){return document.getElementById(id)}
+function cls(id,c,on){var e=el(id); if(e) e.classList.toggle(c,!!on)}
+function tab(i){TABS.forEach(function(_,n){cls('tab'+n,'on',n===i)}); cur('#tab'+i,undefined,10)}
+function cur(sel,dx,dy){
+ var t=document.querySelector(sel), f=el('anim'), c=el('cur');
+ if(!t||!f||!c) return;
+ var a=t.getBoundingClientRect(), b=f.getBoundingClientRect();
+ c.style.left=(a.left-b.left+(dx===undefined?a.width*0.55:dx))+'px';
+ c.style.top=(a.top-b.top+(dy===undefined?a.height*0.55:dy))+'px';
+}
+function anReset(){
+ if(CHALLENGE===null) dsi=(dsi+1)%DATASETS.length;   /* alternate only when unpinned */
+ else dsi=CHALLENGE;
+ buildBoard();
+ tab(0); cur('#colA',24,14);
+}
+var AN=[
+ function(){anReset()},
+ function(){tab(1)},
+ function(){cur('#c1'); cls('c1','work',1); cls('c1','lit',1)},
+ function(){cls('c1','work',0); cls('c1','done',1); cls('c1','lit',0); cur('#c2')},
+ function(){cls('c2','work',1); cls('c2','lit',1)},
+ function(){cls('c2','work',0); cls('c2','done',1); cls('c2','lit',0); cur('#c3')},
+ function(){cls('c3','work',1); cls('c3','lit',1)},
+ function(){cls('c3','work',0); cls('c3','done',1); cls('c3','lit',0)},
+ function(){tab(2)},
+ function(){cls('dp','hidden',0); cls('dp','work',1); cls('dp','lit',1); el('dpn').textContent='1'; cur('#dp')},
+ function(){},
+ function(){cls('dp','work',0); cls('dp','done',1); cls('dp','lit',0)},
+ function(){tab(3)},
+ function(){cls('u1','hidden',0); cls('u1','done',1); el('cn').textContent='1'; cur('#u1')},
+ function(){cls('u2','hidden',0); cls('u2','done',1); el('cn').textContent='2'; cur('#u2')},
+ function(){cls('u3','hidden',0); cls('u3','done',1); el('cn').textContent='3'; cur('#u3')},
+ function(){cls('u4','hidden',0); cls('u4','done',1); el('cn').textContent='4'; cur('#u4')},
+ function(){},
+ function(){}
+];
+function anStep(){ AN[anI](); anI=(anI+1)%AN.length }
+var PZ_PAUSE='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+var PZ_PLAY='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>';
+function anPlay(){ if(anTimer) return; anOn=true; anTimer=setInterval(anStep,780); el('pz').innerHTML=PZ_PAUSE }
+function anStop(){ clearInterval(anTimer); anTimer=null; anOn=false; el('pz').innerHTML=PZ_PLAY }
+function toggleAnim(){ anOn?anStop():anPlay() }
+if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+ anReset(); AN.slice(1).forEach(function(f){f()}); anStop();
+} else { anReset(); anPlay(); }
+</script>
+
+<script>
+/* ============ Where Denodo is ============ */
+/* Served next to Denodo, links stay on this server. Opened from a laptop for testing, links use the trial server. */
+const TRIAL='https://try-dev.dimv.foo';
+const LOCAL=!/^https?:$/.test(location.protocol)||/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const HOST=LOCAL?TRIAL:location.origin;
+const APPS={
+ ds:['/denodo-design-studio/','Design Studio'],
+ dm:['/denodo-data-catalog/#/','Data Marketplace'],
+ dmProduct:['/denodo-data-catalog/#/browse-tree/database/bank_demo/view/loan_repayment_360','Data Marketplace'],
+ chat:['/chatbot/','Ask a Question'],
+ mcp:['mcp-api.html','MCP and API'],
+ docs:['documentation.html','Documentation']
+};
+const appUrl=k=>HOST+APPS[k][0];
+const asset=p=>new URL(p,location.href).href;
+document.querySelectorAll('a[data-app]').forEach(a=>{a.href=appUrl(a.dataset.app)});
+
+/* ============ Progress ============ */
+const KEY='denodo.guided.crestbank.v3';
+let state={role:null,step:0,done:{},os:/Win/i.test(navigator.platform||navigator.userAgent)?'win':'mac',view:null};
+try{state=Object.assign(state,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+if(!state.view){state.view='loan_repayment_360_'+Math.random().toString(36).replace(/[^a-z]/g,'').slice(0,3).padEnd(3,'x')}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
+save();
+const fill=s=>s.split('{HOST}').join(HOST).split('{VIEW}').join(state.view);
+
+/* ============ The three tours ============
+   Step fields:
+   t      title
+   app    tool the step opens (key in APPS)
+   intro  one short paragraph (optional)
+   do     the actions, in order. **text** is shown in bold (UI labels)
+   copy   text to paste: a string, or {mac, win} for terminal steps
+   hint   {mac, win}: where to run the commands
+   file   [path, name]: a file to download
+   shots  [[image, caption]]: miniature screens from images/guide
+   note   extra information (optional)
+   link   [label, url] (optional)
+   why    why the step matters (optional)
+   ok     the result the visitor confirms
+   optional  true when the step can be skipped
+   ============================================ */
+const TOURS={
+ analyst:{name:'Business Analyst',img:'../assets/images/persona-analyst.jpg',time:'About 8 min',
+  one:'Use Denodo’s Data Marketplace to find, review and get analytical insights from data products using natural language.',
+  stages:[['Find',[0]],['Query',[1,2,3,4]],['Ask',[5,6]]],
+  steps:[
+   {t:"Open the data product",app:'dmProduct',
+    do:["Select **Open Data Marketplace**. It opens **loan_repayment_360** in **Databases > bank_demo > 3 - Data Products**.",
+        "Read the **Summary**: what the product answers and who owns it.",
+        "Hover over a field to read its business description."],
+    shots:[['ba-1-product',"loan_repayment_360 in the Data Marketplace."]],
+    why:"You find data by what it means, not by table names. The descriptions come from the engineer who built the product.",
+    ok:"loan_repayment_360 opens, with Summary, Schema and Query tabs."},
+   {t:"Choose and count the columns",app:'dmProduct',
+    do:["Open the **Query** tab.",
+        "Drag **customer_loyalty_tier**, **payment_transaction_identifier** and **payment_transaction_amount** from **Fields** into **Output columns**.",
+        "On payment_transaction_identifier, open the three-dot menu and choose **Apply aggregation function > COUNT**.",
+        "On payment_transaction_amount, choose **SUM** the same way."],
+    shots:[['ba-2-aggregate',"Output columns with COUNT and SUM applied."]],
+    ok:"Output columns shows customer_loyalty_tier, COUNT_payment_transaction_identifier and SUM_payment_transaction_amount."},
+   {t:"Filter to Gold and Platinum",app:'dmProduct',
+    do:["Drag **customer_loyalty_tier** into **Filters**.",
+        "In the **Filter wizard**, set **Operator** to **in** and switch on **Add multiple literals**.",
+        "Type **'Gold'**, select **+**, type **'Platinum'**, then select **Ok**."],
+    shots:[['ba-3-filter',"The Filter wizard with both values added."]],
+    ok:"Filters shows customer_loyalty_tier in ('Gold', 'Platinum')."},
+   {t:"Sort and run the query",app:'dmProduct',
+    do:["Drag the **SUM** field into **Order by**.",
+        "Open its three-dot menu and choose **Change to DESC**.",
+        "Select **Execute**."],
+    shots:[['ba-4-order',"Order by, Change to DESC."],['ba-4-result',"The result."]],
+    why:"No SQL to write. Denodo groups by the field you did not aggregate and runs the query against the live sources.",
+    ok:"2 rows. Gold: 7 payments, 17600.0. Platinum: 6 payments, 13900.0."},
+   {t:"Export the result",app:'dmProduct',
+    do:["Select **Export**.",
+        "Choose **CSV** and **All results**, and keep **Export header** ticked.",
+        "Select **Ok**."],
+    shots:[['ba-5-export',"The Export query dialog."]],
+    ok:"A CSV file with the two rows downloads."},
+   {t:"Open Denodo Assistant",app:'dmProduct',
+    do:["Select the **Denodo Assistant** icon at the bottom right.",
+        "Under **Databases**, choose **Select All**.",
+        "Ask the question below."],
+    copy:"Which skills do you have available?",
+    shots:[['ba-6-assistant',"Choose the databases the Assistant can use."],['ba-6-skills',"The skills it lists."]],
+    why:"Agent skills are reviewed query patterns. The Assistant follows them instead of writing its own joins.",
+    ok:"A table of skills that includes bank-demo-verified-queries."},
+   {t:"Ask with a verified skill",app:'dmProduct',
+    do:["Paste the request below into Denodo Assistant and send it."],
+    copy:"Use the bank-demo-verified-queries skill, query 3: top customers by total recorded repayments. Run it on bank_demo and return the top 10 customer IDs with their number of payments and total recorded payments.",
+    why:"The same governed data as your own query, asked in plain English and answered with a definition a data steward reviewed.",
+    ok:"A ranked list of customers. Customer 23 is first, with 3,700."}]},
+
+ engineer:{name:'Data Engineer',img:'../assets/images/persona-engineer.jpg',time:'About 10 min',
+  one:'Federate live data sources, create a data model, add metadata, and publish it as a reusable data product in Denodo, all without writing code.',
+  stages:[['Model',[0,1,2]],['Describe',[3,4]],['Publish',[5,6]]],
+  steps:[
+   {t:"Describe the view to the Data Modeling Wizard",app:'ds',
+    intro:"Your view is called **{VIEW}**, so the shared loan_repayment_360 stays as it is.",
+    do:["In Design Studio, choose **File > New > Data Model**. The **Data model** tab opens at **VIEW CREATION**.",
+        "Paste the request below into the box at the bottom and press **Enter**."],
+    copy:"Create a reusable data view in bank_demo named {VIEW}. Join customers to loans on customer_id, and loans to loan_payments on loan_id, using inner joins. Include customer ID, loyalty classification, loan ID, loan amount, loan status, payment ID, payment amount and payment date. Exclude customer names, email, phone, addresses and date of birth. Do not replace any existing view.",
+    shots:[['de-1-prompt',"The request, with Denodo Assistant searching the metadata."]],
+    why:"The wizard reads the views' metadata, so it finds the join keys itself. You describe the result, and it writes and validates the VQL.",
+    ok:"Denodo Assistant runs Metadata search, Generate and Validate."},
+   {t:"Answer the Assistant if it asks",app:'ds',optional:true,
+    do:["If the Assistant asks where to place the view, reply with the text below."],
+    copy:"Place it in the bank_demo database, without a folder.",
+    shots:[['de-2-folder',"The Assistant's options, and the reply."]],
+    ok:"The Assistant reports that it created the view model in the bank_demo VDB."},
+   {t:"Check the model and preview the rows",app:'ds',
+    do:["On the right, open **View > TREE VIEW**: a projection over two joins.",
+        "Open **VQL** to read the **CREATE VIEW** statement.",
+        "Open the **Query** tab to preview the rows.",
+        "Select **Next Step**."],
+    shots:[['de-3-model',"TREE VIEW of the joins, with Next Step."],['de-3-rows',"Query: the rows the view returns."]],
+    why:"The join is defined once, in Denodo. Every analyst, report and agent gets the same rows.",
+    ok:"Query shows 23 total rows and 8 columns."},
+   {t:"Review the field metadata",app:'ds',
+    do:["The wizard suggests field names, then field descriptions.",
+        "Check them on the **OUTPUT** tab and edit any you want to change.",
+        "Select **Next Step**."],
+    shots:[['de-4-fields',"FIELD METADATA: suggested names and descriptions."]],
+    why:"These descriptions are what analysts read in the Data Marketplace and what AI agents read through MCP.",
+    ok:"Each of the eight fields has a business-friendly name and a description."},
+   {t:"Review the view metadata and create the view",app:'ds',
+    do:["Check **Name** ({VIEW}), **Database** (bank_demo) and the suggested **Description**.",
+        "Select **Create view**."],
+    shots:[['de-5-viewmeta',"VIEW METADATA, with Create view."],['de-6-success',"The view is created."]],
+    ok:"The message Success: The data model was created correctly."},
+   {t:"Sync the Data Marketplace with Virtual DataPort",app:'dm',
+    intro:"The Data Marketplace keeps its own copy of the Virtual DataPort catalog. A new view appears there after a sync.",
+    do:["In the Data Marketplace, open **Administration > Sync with VDP**.",
+        "Check that **{VIEW}** is listed under **New elements in server**, then confirm.",
+        "If a dialog lists VDP tags, keep the selected tags and confirm."],
+    note:"The user who runs the sync needs the METADATA privilege on every element of the catalog. If Sync with VDP is not in your Administration menu, your trial administrator can run it.",
+    link:["Denodo documentation: Synchronize with Virtual DataPort","https://community.denodo.com/docs/html/browse/latest/en/vdp/data_catalog/administration/synchronize/synchronize"],
+    why:"Design Studio and the Data Marketplace are separate applications. The sync is what makes your view discoverable.",
+    ok:"{VIEW} is listed under New elements in server, and the sync completes."},
+   {t:"Find your view in the Data Marketplace",app:'dm',
+    do:["Search for **{VIEW}**, or browse **Databases > bank_demo**.",
+        "Open it and check the **Summary** and **Schema**."],
+    shots:[['ba-1-product',"A data product in the Data Marketplace: the shared loan_repayment_360."]],
+    ok:"{VIEW} opens with its description and eight described fields."}]},
+
+ ai:{name:'AI Builder',img:'../assets/images/persona-ai.jpg',time:'About 12 min',
+  one:'Build AI agents and applications using Denodo AI SDK, or connect existing AI agents to governed enterprise data through Denodo MCP Server.',
+  stages:[['Chat',[0,1,2]],['Code',[3,4]],['Agents',[5]]],
+  steps:[
+   {t:"Open the AI SDK chatbot",app:'chat',
+    intro:"Ask a Question is the Denodo AI SDK sample chatbot.",
+    do:["Select **Open Ask a Question** and sign in with your Denodo user.",
+        "If an agent list is shown, choose **Banking agent**. It works on bank_demo, with DeepQuery and reports turned on. Otherwise, use the default chatbot."],
+    why:"This is a finished agent built on the AI SDK. The next steps show what it does underneath, so you can build your own.",
+    ok:"The chatbot is open and you are signed in."},
+   {t:"Ask the Crestbank question",app:'chat',
+    do:["Paste the question below and send it.",
+        "Under the answer, open the collapsible steps. The metadata step shows the views it found. The data query step shows the VQL it ran on Denodo."],
+    copy:"Compare Gold and Platinum customer loyalty tiers in bank_demo.loan_repayment_360. Return the number of recorded payment transactions and the total payment amounts for each tier.",
+    why:"The answer is traceable. You see the views and the VQL behind it, not only the text.",
+    ok:"Gold: 7 payments, 17,600. Platinum: 6 payments, 13,900. The data query step shows the VQL."},
+   {t:"Hand a bigger question to DeepQuery",app:'chat',optional:true,
+    intro:"DeepQuery is the AI SDK research agent. It plans the analysis, runs several queries and writes a report.",
+    do:["Ask the question below.",
+        "If the chatbot suggests DeepQuery, accept it."],
+    copy:"Analyse recorded loan payments in bank_demo by customer loyalty tier and loan status. Which tiers contribute most, and how do approved, pending and rejected loans differ?",
+    ok:"A plan, the queries it ran and a written report."},
+   {t:"Sign in from your terminal",
+    intro:"Command-line calls to this trial need a Cloudflare Access sign-in.",
+    do:["Choose your system below.",
+        "Run the commands. Your browser opens to confirm the sign-in."],
+    copy:{mac:"brew install cloudflared\ncloudflared access login {HOST}",
+          win:"winget install --id Cloudflare.cloudflared\n# Close and reopen PowerShell, then run:\ncloudflared access login {HOST}"},
+    hint:{mac:"Run in Terminal. Uses Homebrew.",win:"Run in PowerShell. winget is part of Windows 10 and 11."},
+    ok:"Your browser shows that the sign-in succeeded."},
+   {t:"Ask the same question from code",
+    do:["Download **question.json**.",
+        "Run the commands below from the folder you saved it in. Replace **YOUR_DENODO_USER** with your user name.",
+        "Enter your password when the terminal asks for it."],
+    file:['guide-files/question.json','question.json'],
+    copy:{mac:"cd ~/Downloads\ncloudflared access curl {HOST}/aisdk/answerDataQuestion -u YOUR_DENODO_USER -X POST -H \"Content-Type: application/json\" --data-binary @question.json",
+          win:"cd $HOME\\Downloads\ncloudflared access curl {HOST}/aisdk/answerDataQuestion -u YOUR_DENODO_USER -X POST -H \"Content-Type: application/json\" --data-binary \"@question.json\""},
+    hint:{mac:"Run in Terminal.",win:"Run in PowerShell."},
+    why:"The same question and the same governed answer, from your own code. This is the endpoint your application calls.",
+    ok:"A JSON answer with the VQL it generated and the same totals: Gold 7 and 17,600, Platinum 6 and 13,900."},
+   {t:"Connect your own agent over MCP",app:'mcp',optional:true,
+    do:["Open **MCP and API** and copy the **AI-SDK MCP Endpoint**: {HOST}/aisdk/mcp",
+        "Add it to an MCP-capable client, such as Visual Studio Code, with the configuration shown on that page.",
+        "Ask your agent the Crestbank question."],
+    ok:"Your client lists the Denodo tools and answers from bank_demo."}]}
+};
+const ORDER=['analyst','engineer','ai'];
+const isDone=(r,i)=>!!(state.done[r]&&state.done[r][i]);
+const countDone=r=>TOURS[r].steps.filter((_,i)=>isDone(r,i)).length;
+const plain=s=>fill(s).split('**').join('');
+
+/* ============ Persona cards (the v0006 card) ============ */
+function renderCards(){
+ const box=document.getElementById('cards');box.replaceChildren();
+ ORDER.forEach(r=>{
+  const t=TOURS[r],n=countDone(r),c=document.createElement('div');c.className='s3';c.dataset.tour=r;
+  c.innerHTML='<div class="art"></div><div class="in"><h4></h4><p></p><div class="row"><button class="btn btn-primary btn-sm" type="button"></button><span class="time"></span></div></div>';
+  c.querySelector('.art').style.backgroundImage='url("'+t.img+'")';
+  c.querySelector('h4').textContent=t.name;c.querySelector('p').textContent=t.one;
+  c.querySelector('.time').textContent=n?n+' of '+t.steps.length+' steps done':t.time;
+  const b=c.querySelector('button');b.textContent=n===t.steps.length?'Start tour again':n?'Resume tour':'Start tour';
+  b.onclick=()=>start(r);box.append(c)});
+ document.getElementById('resume').hidden=!(state.role&&!guide);
+}
+document.getElementById('resume').onclick=()=>start(state.role);
+
+/* ============ The guide window ============ */
+const GUIDE_CSS=`
+@font-face{font-family:"Proxima Nova";src:url("${asset('fonts/Proxima%20Nova/proximanova-regular-webfont.woff2')}") format("woff2");font-weight:400}
+@font-face{font-family:"Proxima Nova";src:url("${asset('fonts/Proxima%20Nova/proximanova-medium-webfont.woff2')}") format("woff2");font-weight:500}
+@font-face{font-family:"Proxima Nova";src:url("${asset('fonts/Proxima%20Nova/proximanova-semibold-webfont.woff2')}") format("woff2");font-weight:600}
+:root{--midnight-blue:#112533;--peacock-blue:#006699;--peacock-blue-hover:#3276b1;--green-success:#42b044;--highlight-orange:#ff9933;
+ --gunmetal:#4f5e69;--light-grey:#e7e9ea;--light-grey-b:#f3f4f5;--line:#dadfe3;--muted:#60707c;--r-sm:4px}
+*,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:#fff;color:var(--midnight-blue);font-family:"Proxima Nova","proxima-nova",Roboto,"Segoe UI",system-ui,sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+h4{margin:0;font-weight:600;letter-spacing:-.02em;line-height:1.3}p{margin:0}
+b{font-weight:600;color:var(--midnight-blue)}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit;text-align:left}
+a{color:var(--peacock-blue)}
+:focus-visible{outline:2px solid var(--peacock-blue);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:var(--r-sm);font-size:14px;font-weight:600;line-height:1.2;text-decoration:none;border:1px solid transparent;transition:background .12s,border-color .12s}
+.btn-primary{background:var(--peacock-blue);color:#fff}.btn-primary:hover{background:var(--peacock-blue-hover)}
+.btn-ghost{background:#fff;border-color:var(--line);color:var(--midnight-blue)}.btn-ghost:hover{background:var(--light-grey-b)}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.lnk{color:var(--peacock-blue);font-weight:600;font-size:14px;padding:9px 6px}.lnk:hover{text-decoration:underline}
+
+.g-h{padding:18px 24px 16px;border-bottom:1px solid var(--light-grey)}
+.g-h .r{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.g-h .ttl{font-size:15px;font-weight:600}
+.g-h .x{margin-left:auto;color:var(--muted);font-size:24px;line-height:1;padding:4px 8px;min-width:36px;min-height:36px;text-align:center;border-radius:var(--r-sm)}
+.g-h .x:hover{background:var(--light-grey-b)}
+.g-stages{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+.g-stages div{font-size:12.5px;color:var(--muted)}
+.g-stages div i{display:block;height:3px;border-radius:2px;background:var(--light-grey);margin-bottom:7px}
+.g-stages div.on i{background:var(--peacock-blue)}
+.g-stages div.cur{color:var(--midnight-blue);font-weight:600}
+.g-stages div.cur i{background:var(--highlight-orange)}
+.g-h .cnt{font-size:13px;color:var(--muted);margin-top:12px}
+
+.g-b{padding:24px 24px 30px;flex:1 1 auto;overflow:auto}
+.opt{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.g-b h4{font-size:20px;margin-bottom:12px}
+.intro{font-size:15px;line-height:1.65;color:var(--gunmetal);margin-bottom:14px}
+ol.do{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.do li{counter-increment:s;position:relative;padding-left:34px;margin:0 0 12px;font-size:15px;line-height:1.6;color:var(--gunmetal)}
+ol.do li::before{content:counter(s);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:#e1edf4;color:var(--peacock-blue);font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.act{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 4px}
+.os{display:inline-flex;gap:2px;padding:3px;background:var(--light-grey-b);border-radius:6px;margin-top:18px}
+.os button{padding:6px 16px;font-size:13.5px;font-weight:600;color:var(--gunmetal);border-radius:4px}
+.os button.on{background:#fff;color:var(--peacock-blue);box-shadow:0 1px 2px rgba(17,37,51,.12)}
+.hint{font-size:13px;color:var(--muted);margin-top:8px}
+.code{margin-top:16px;background:var(--light-grey-b);border-radius:6px}
+.code .top{display:flex;align-items:center;justify-content:space-between;padding:8px 8px 0 14px}
+.code .top span{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.code .cp{font-size:13px;font-weight:600;color:var(--peacock-blue);padding:5px 8px;border-radius:4px}
+.code .cp:hover{background:#e1edf4}
+.code pre{margin:0;padding:8px 14px 14px;font:13px/1.65 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--midnight-blue);white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto}
+.shot{margin:22px 0 0}
+.shot button{display:block;width:100%;padding:0;cursor:zoom-in;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 4px 14px rgba(17,37,51,.08)}
+.shot img{display:block;width:100%;height:auto}
+.shot figcaption{font-size:13px;color:var(--muted);margin-top:9px;line-height:1.5}
+.note{font-size:14px;line-height:1.6;color:var(--muted);margin-top:18px}
+.why{margin-top:24px;padding-top:18px;border-top:1px solid var(--light-grey)}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.why p{font-size:14.5px;line-height:1.65;color:var(--gunmetal)}
+.res{margin-top:24px;padding-top:18px;border-top:1px solid var(--light-grey)}
+.chk{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:15px;line-height:1.55;color:var(--midnight-blue)}
+.chk input{flex:none;width:20px;height:20px;margin:2px 0 0;accent-color:var(--green-success);cursor:pointer}
+.chk small{display:block;font-size:13px;color:var(--muted);margin-top:4px}
+.chk.ok small{color:#2e7d32}
+.g-f{padding:16px 24px;border-top:1px solid var(--light-grey);display:flex;align-items:center;gap:8px;background:#fff}
+.g-f .sp{margin-left:auto}
+.doneic{width:48px;height:48px;border-radius:50%;background:#eaf6ec;color:var(--green-success);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.g-b .lead{font-size:15px;line-height:1.65;color:var(--gunmetal)}
+.miss{margin:12px 0 0;padding-left:20px;font-size:14.5px;line-height:1.75;color:var(--gunmetal)}
+.nx{margin-top:10px}
+.nx button{display:block;width:100%;padding:14px 0;border-top:1px solid var(--light-grey)}
+.nx button:last-child{border-bottom:1px solid var(--light-grey)}
+.nx b{display:flex;justify-content:space-between;font-size:15.5px;margin-bottom:4px}
+.nx b::after{content:"→";color:var(--peacock-blue)}
+.nx span{font-size:13.5px;color:var(--gunmetal);line-height:1.55;display:block}
+.nx button:hover b{color:var(--peacock-blue)}
+.sec{margin-top:28px}
+`;
+const GUIDE_HTML=`
+<div class="g-h">
+ <div class="r"><span class="ttl" id="g-tour"></span><button class="x" id="g-x" title="Close the guide. Your progress is saved." aria-label="Close the guide">×</button></div>
+ <div class="g-stages" id="g-stages"></div>
+ <div class="cnt" id="g-cnt"></div>
+</div>
+<div class="g-b" id="g-b"></div>
+<div class="g-f">
+ <button class="btn btn-ghost" id="g-back" type="button">Back</button>
+ <button class="lnk" id="g-exit" type="button">Exit</button>
+ <span class="sp"></span>
+ <button class="btn btn-primary" id="g-next" type="button">Next</button>
+</div>`;
+
+let guide=null;        // {doc, win, mode}
+let showingDone=false;
+
+async function start(role){
+ if(state.role!==role){state.role=role;state.step=0}
+ showingDone=false;save();
+ if(guide&&!guide.win.closed){renderGuide();renderCards();try{guide.win.focus()}catch(e){}return}
+ guide=await openGuide();
+ renderGuide();renderCards();
+}
+
+async function openGuide(){
+ const force=new URLSearchParams(location.search).get('guide');
+ // 1. Chrome and Edge: a small window that stays on top of Denodo
+ if(window.documentPictureInPicture&&!force){
+  try{const w=await documentPictureInPicture.requestWindow({width:420,height:780});return mount(w,'float')}catch(e){}
+ }
+ // 2. Other browsers: a window docked at the right of the screen
+ if(force!=='inline'){
+  const W=420,H=Math.min(820,screen.availHeight-40),L=Math.max(0,screen.availWidth-W-16);
+  const w=window.open('','denodo-guide','popup=yes,width='+W+',height='+H+',left='+L+',top=20');
+  if(w&&w.document){w.document.title='Denodo guide';return mount(w,'window')}
+ }
+ // 3. Pop-ups blocked: the guide opens on this page
+ const host=document.getElementById('inline-guide');host.hidden=false;
+ const frame=document.createElement('iframe');frame.title='Denodo guide';
+ host.replaceChildren(frame);host.scrollIntoView({block:'start'});
+ status('The guide is open on this page. Allow pop-ups for this site to open it beside Denodo instead.');
+ return mount(frame.contentWindow,'inline');
+}
+
+function mount(win,mode){
+ const d=win.document;d.open();
+ d.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Denodo guide</title><style>'+GUIDE_CSS+'</style></head><body>'+GUIDE_HTML+'</body></html>');d.close();
+ const g={doc:d,win,mode};
+ d.getElementById('g-back').onclick=()=>{if(showingDone)showingDone=false;else if(state.step>0)state.step--;save();renderGuide()};
+ d.getElementById('g-next').onclick=()=>{const n=TOURS[state.role].steps.length;if(state.step<n-1)state.step++;else showingDone=true;save();renderGuide()};
+ d.getElementById('g-x').onclick=()=>closeGuide('The guide is closed. Your progress is saved.');
+ d.getElementById('g-exit').onclick=()=>closeGuide('You left the '+TOURS[state.role].name+' tour at step '+(state.step+1)+'. Your progress is saved.');
+ win.addEventListener('pagehide',()=>{if(guide&&guide.win===win){guide=null;renderCards();status('The guide is closed. Your progress is saved.',true)}});
+ if(mode!=='inline')status('The guide is open'+(mode==='float'?' and stays on top of your other windows.':' in a window beside this one.')+' Each step opens Denodo in one browser tab.');
+ return g;
+}
+
+function closeGuide(msg){
+ if(!guide)return;const g=guide;guide=null;
+ if(g.mode==='inline'){const h=document.getElementById('inline-guide');h.hidden=true;h.replaceChildren()}
+ else{try{g.win.close()}catch(e){}}
+ renderCards();status(msg,true);try{window.focus()}catch(e){}
+}
+
+function status(msg,resume){
+ const s=document.getElementById('status');s.hidden=false;s.replaceChildren();
+ const t=document.createElement('span');t.textContent=msg;s.append(t);
+ if(resume&&state.role){
+  const w=document.createElement('span');w.className='sp';
+  const b=document.createElement('button');b.className='btn btn-primary btn-sm';b.type='button';b.textContent='Resume tour';b.onclick=()=>start(state.role);
+  const x=document.createElement('button');x.className='lnk';x.type='button';x.textContent='Start over';
+  x.onclick=()=>{state.done[state.role]={};state.step=0;state.role=null;save();s.hidden=true;renderCards()};
+  w.append(b,x);s.append(w)}
+}
+
+function openApp(url){
+ // One Denodo tab for every step
+ const w=window.open(url,'denodo-app');
+ if(!w&&guide)guide.win.open(url,'_blank');
+}
+
+/* DOM helpers for the guide document. **text** becomes bold. */
+function mk(d,tag,cls,text){const e=d.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function rich(d,tag,cls,text){const e=mk(d,tag,cls);fill(text).split('**').forEach((part,k)=>{if(!part)return;e.append(k%2?mk(d,'b',null,part):d.createTextNode(part))});return e}
+
+function renderGuide(){
+ if(!guide)return;
+ const d=guide.doc,r=state.role,t=TOURS[r],n=t.steps.length,i=Math.min(state.step,n-1),s=t.steps[i],done=countDone(r);
+ const $=id=>d.getElementById(id);
+ $('g-tour').textContent=t.name+' tour';
+ const st=$('g-stages');st.replaceChildren();
+ t.stages.forEach(([label,idx])=>{
+  const cur=!showingDone&&idx.includes(i),all=idx.some(k=>isDone(r,k))&&idx.every(k=>isDone(r,k)||t.steps[k].optional);
+  const c=mk(d,'div',cur?'cur':(all?'on':''));c.append(mk(d,'i'));c.append(d.createTextNode(label));st.append(c)});
+ $('g-cnt').textContent=showingDone?done+' of '+n+' steps confirmed':'Step '+(i+1)+' of '+n+(s.app?' · '+APPS[s.app][1]:'');
+ const b=$('g-b');b.replaceChildren();b.scrollTop=0;
+ if(showingDone){renderDone(d,b,r,t);$('g-back').disabled=false;$('g-next').hidden=true;return}
+ $('g-next').hidden=false;$('g-back').disabled=i===0;$('g-next').textContent=i===n-1?'Finish':'Next';
+
+ if(s.optional)b.append(mk(d,'div','opt','Optional'));
+ b.append(mk(d,'h4',null,plain(s.t)));
+ if(s.intro)b.append(rich(d,'p','intro',s.intro));
+ const ol=mk(d,'ol','do');s.do.forEach(x=>ol.append(rich(d,'li',null,x)));b.append(ol);
+
+ const act=mk(d,'div','act');
+ if(s.app){const a=mk(d,'button','btn btn-primary','Open '+APPS[s.app][1]+' ↗');a.type='button';a.onclick=()=>openApp(appUrl(s.app));act.append(a)}
+ if(s.file){const a=mk(d,'a','btn btn-ghost','Download '+s.file[1]);a.href=asset(s.file[0]);a.download=s.file[1];act.append(a)}
+ if(act.childNodes.length)b.append(act);
+
+ if(s.hint){
+  const sw=mk(d,'div','os');[['mac','Mac'],['win','Windows']].forEach(([k,l])=>{const x=mk(d,'button',state.os===k?'on':'',l);x.type='button';x.onclick=()=>{state.os=k;save();renderGuide()};sw.append(x)});
+  b.append(sw);b.append(mk(d,'div','hint',s.hint[state.os]));
+ }
+ if(s.copy){
+  const text=fill(typeof s.copy==='string'?s.copy:s.copy[state.os]);
+  const box=mk(d,'div','code'),top=mk(d,'div','top');
+  top.append(mk(d,'span',null,s.hint?(state.os==='win'?'PowerShell':'Terminal'):'Paste this'));
+  const c=mk(d,'button','cp','Copy');c.type='button';c.onclick=()=>copy(text,c,d);top.append(c);
+  box.append(top);box.append(mk(d,'pre',null,text));b.append(box);
+ }
+ (s.shots||[]).forEach(([img,cap])=>{
+  const f=mk(d,'figure','shot'),btn=mk(d,'button');btn.type='button';btn.title='Open the full screen';
+  const im=mk(d,'img');im.src=asset('../assets/images/guide/'+img+'.jpg');im.alt=cap;btn.append(im);
+  btn.onclick=()=>window.open(asset('../assets/images/guide/'+img+'-full.jpg'),'_blank');
+  f.append(btn);f.append(mk(d,'figcaption',null,cap+' Select the picture to see the full screen.'));b.append(f)});
+ if(s.note)b.append(mk(d,'p','note',fill(s.note)));
+ if(s.link){const p=mk(d,'p','note');const a=mk(d,'a',null,s.link[0]);a.href=s.link[1];a.target='_blank';a.rel='noopener';p.append(a);b.append(p)}
+ if(s.why){const w=mk(d,'div','why');w.append(mk(d,'div','lbl','Why this matters'));w.append(mk(d,'p',null,s.why));b.append(w)}
+
+ const ok=isDone(r,i),res=mk(d,'div','res');res.append(mk(d,'div','lbl','You should see'));
+ const lab=mk(d,'label','chk'+(ok?' ok':'')),cb=mk(d,'input');cb.type='checkbox';cb.checked=ok;
+ const tx=mk(d,'span');tx.append(d.createTextNode(fill(s.ok)));tx.append(mk(d,'small',null,ok?'Confirmed.':'Tick when you see this result.'));
+ lab.append(cb,tx);res.append(lab);b.append(res);
+ cb.onchange=()=>{state.done[r]=state.done[r]||{};state.done[r][i]=cb.checked;save();renderGuide();renderCards()};
+}
+
+function renderDone(d,b,r,t){
+ const missing=t.steps.map((x,k)=>isDone(r,k)||x.optional?null:(k+1)+'. '+plain(x.t)).filter(Boolean),ok=!missing.length;
+ if(ok){const ic=mk(d,'div','doneic');ic.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';b.append(ic)}
+ b.append(mk(d,'h4',null,ok?'You completed the '+t.name+' tour':'Nearly done'));
+ b.append(mk(d,'p','lead',ok?'You confirmed every step in the live Denodo Platform.':'These steps are not ticked yet. Go back to finish them, or continue with another role.'));
+ if(!ok){const ul=mk(d,'ul','miss');missing.forEach(m=>ul.append(mk(d,'li',null,m)));b.append(ul)}
+ const sec=mk(d,'div','sec');sec.append(mk(d,'div','lbl','Continue the Crestbank story'));
+ const nx=mk(d,'div','nx');
+ ORDER.filter(x=>x!==r).forEach(x=>{const btn=mk(d,'button');btn.type='button';btn.append(mk(d,'b',null,TOURS[x].name));btn.append(mk(d,'span',null,TOURS[x].one));
+  btn.onclick=()=>{state.role=x;state.step=0;showingDone=false;save();renderGuide();renderCards()};nx.append(btn)});
+ sec.append(nx);b.append(sec);
+}
+
+async function copy(text,btn,d){
+ try{await (d.defaultView.navigator.clipboard||navigator.clipboard).writeText(text)}
+ catch(e){const ta=d.createElement('textarea');ta.value=text;d.body.append(ta);ta.select();try{d.execCommand('copy')}catch(_){}ta.remove()}
+ btn.textContent='Copied';setTimeout(()=>{btn.textContent='Copy'},1400);
+}
+
+renderCards();
+// A returning visitor sees where they left off
+if(state.role&&countDone(state.role)&&countDone(state.role)<TOURS[state.role].steps.length)
+ status('You were part way through the '+TOURS[state.role].name+' tour, at step '+(state.step+1)+'.',true);
+const wanted=new URLSearchParams(location.search).get('role');
+if(TOURS[wanted]){const c=document.querySelector('.s3[data-tour="'+wanted+'"]');if(c)c.scrollIntoView({block:'center'})}
+</script>
+<script src="..assets/js/challenge-context.js"></script>
+</body>
+</html>

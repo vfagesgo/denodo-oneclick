@@ -1,0 +1,14 @@
+{
+  "question": "Compare Gold and Platinum customer loyalty tiers in bank_demo.loan_repayment_360. Return the number of recorded payment transactions and the total payment amounts for each tier. Execute against live data, group by customer_loyalty_tier, and do not infer overdue status.",
+  "plot": false,
+  "vdp_database_names": [
+    "bank_demo"
+  ],
+  "vdp_tag_names": [],
+  "use_views": [
+    "bank_demo.loan_repayment_360"
+  ],
+  "markdown_response": true,
+  "verbose": true,
+  "vql_execute_rows_limit": 100
+}
