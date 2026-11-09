@@ -1,307 +1,423 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/fonts.css">
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="shortcut icon" href="images/favicon.ico">
-  <title>Welcome to your Denodo trial</title>
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Choose an industry use case for your Denodo experience.">
+  <title>Denodo | Choose an industry use case</title>
   <style>
-    /* Layout mirrors www/denodo_trial_welcome.svg.
-       Content source: www/index.md. Icons: images/icons/*.svg (recolored via CSS mask). */
+:root { --denodo:#006699; --navy:#122a42; --text:#26354b; --muted:#60738a; --border:#d8e1e9; --focus:#006699; --surface:#fff; --soft:#f5f8fb; }
+    *,*::before,*::after{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:#fff;font-family:"Proxima Nova","proxima-nova",Roboto,"Segoe UI",Arial,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+    button,a{font:inherit}a{color:inherit}button{cursor:pointer}
+    :focus-visible{outline:3px solid #0a7fae;outline-offset:3px}
+    .site-header{height:84px;padding:0 max(28px,calc((100vw - 1180px)/2));display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #f0f2f5}
+    .logo{display:flex;gap:12px;align-items:center;text-decoration:none}
+    .logo img{width:146px;height:44px;object-fit:contain;object-position:left center}
+    .fallback-logo{font-weight:900;letter-spacing:-1.7px;font-size:29px;color:#080808}
+    .logo-mark{display:inline-block;color:#f05149;letter-spacing:0;font-size:18px;vertical-align:top;margin-left:3px}
+    .header-link{font-size:13px;color:#4b6376;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+    .header-link:hover{text-decoration:underline}
+    
+    
+    
+    h1{font-size:clamp(35px,4.15vw,53px);letter-spacing:-.045em;line-height:1.1;color:#1b2c44;margin:0 0 20px;font-weight:800}
+    
+    
+    
+    
+    .choice:focus-visible{outline-offset:5px}
+    
+    .icon-frame svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+    
+    
+    
+    
+    
+    .continue-label svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+    .choice:hover .continue-label svg{transform:translateX(3px)}
+    
+    
+    @media(max-width:680px){.site-header{height:72px;padding:0 22px}.logo img{width:117px;height:37px}.header-link{font-size:12px}h1{font-size:36px}.icon-frame svg{width:31px;height:31px}.below{font-size:12px;margin-top:26px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
 
-    *, *::before, *::after { box-sizing: border-box; }
 
-    html, body { height: auto; min-height: 100%; }
+/* --- type scale and rhythm (Notion / Mixpanel inspired) --- */
+.page{max-width:1024px;margin:0 auto;padding:38px 28px 44px}
+.heading{text-align:center;margin:0 0 34px}
+.heading h1{font-size:46px;line-height:1.08;letter-spacing:-.035em;font-weight:800;margin:0 0 12px;color:#111b2e}
+.heading .subtitle{font-size:18px;line-height:1.5;color:#55657a;margin:0;max-width:700px;margin-inline:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:0 0 30px}
+.choice{display:flex;flex-direction:column;text-align:left;padding:0;overflow:hidden;background:#fff;
+  border:1px solid #e3e8ee;border-radius:14px;cursor:pointer;transition:border-color .14s,box-shadow .14s,transform .14s}
+.choice:hover{border-color:#006699;box-shadow:0 10px 28px rgba(17,37,51,.10);transform:translateY(-2px)}
+.card-media{position:relative;display:block;aspect-ratio:16/7;overflow:hidden;background:#eef3f7}
+.card-media img{width:100%;height:100%;object-fit:cover;display:block}
+.card-tag{position:absolute;left:14px;top:14px;background:rgba(255,255,255,.94);color:#112533;
+  font-size:12.5px;font-weight:700;letter-spacing:.02em;padding:5px 11px;border-radius:999px;
+  box-shadow:0 2px 8px rgba(17,37,51,.16)}
+.card-body{display:flex;flex-direction:column;flex:1 1 auto;padding:20px 22px 18px}
+.industry{font-size:23px;font-weight:700;letter-spacing:-.02em;color:#111b2e;margin:0 0 8px;line-height:1.2}
+.challenge-description{font-size:16px;line-height:1.55;color:#4d5d70;margin:0 0 20px;flex:1 1 auto}
+.choice-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-top:1px solid #eef2f6;padding-top:14px}
+.customer{font-size:13.5px;font-weight:600;color:#5b6a7b}
+.continue-label{display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:#006699}
+.continue-label svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round;transition:transform .14s}
+.choice:hover .continue-label svg{transform:translateX(4px)}
+.site-header{padding:18px 28px}
+.site-header .logo img{height:34px}
+.header-link{font-size:15px;font-weight:600}
+@media(max-width:820px){
+  .page{padding:28px 18px 40px}
+  .heading h1{font-size:34px}
+  .heading .subtitle{font-size:16.5px}
+  .grid{grid-template-columns:1fr;gap:18px;margin-bottom:24px}
+}
+@media(max-width:820px){.header-link{display:inline-flex;align-items:center;min-height:42px;padding:0 4px}}
 
-    body {
-      margin: 0;
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(135deg, #f7f9fd, #edf2f9);
-      color: var(--midnight-blue);
-      -webkit-font-smoothing: antialiased;
-    }
 
-    .page {
-      max-width: 1480px;
-      margin: 0 auto;
-      padding: var(--s8) var(--s8) var(--s9);
-    }
 
-    /* ---------- Header ---------- */
-    .page-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: var(--s6);
-    }
+/* Flowise-inspired, lightweight Denodo story canvas. No external JavaScript or assets. */
+.denodo-flow {max-width:1024px;margin:0 auto;border:1px solid #dce5ed;border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 8px 26px rgba(25,49,69,.055);color:#183047;}
+.df-toolbar{min-height:67px;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #e7edf2;background:#fff}
+.df-titleline{display:flex;align-items:center;gap:11px;min-width:0}
+.df-logo-icon{display:flex;align-items:center;justify-content:center;flex:0 0 auto;width:96px;height:30px}.df-logo-icon img{max-width:96px;max-height:30px;width:100%;height:100%;object-fit:contain;display:block}
+.df-title{font-size:15px;line-height:1.24;color:#15263b;font-weight:800;letter-spacing:-.02em}
+.df-sub{font-size:11.5px;color:#4a5f71;margin-top:3px}
+.df-controls{display:flex;align-items:center;gap:11px;flex:0 0 auto;justify-content:flex-end}
+.df-demo-tag{display:none}
+.df-toggle{display:inline-flex;align-items:center;gap:3px;border:1px solid #dce5ed;background:#f6f9fb;padding:3px;border-radius:9px}
+.df-toggle button{font-size:11.5px;font-weight:700;color:#607286;border:0;background:transparent;padding:7px 10px;border-radius:6px;white-space:nowrap;transition:background .2s,color .2s,box-shadow .2s}
+.df-toggle button[aria-pressed="true"]{background:#fff;color:#006699;box-shadow:0 1px 5px rgba(23,43,62,.11)}
+.df-scroll{height:329px;overflow-x:auto;overflow-y:hidden;scrollbar-color:#bbcedb #f4f8fa;scrollbar-width:thin;background-color:#f8fbfd;background-image:radial-gradient(#d6e3ea 0.9px,transparent 0.9px);background-size:19px 19px;position:relative}
+.df-canvas{position:relative;width:1050px;height:329px;margin:auto;isolation:isolate}
+.df-wireboard{position:absolute;inset:0;pointer-events:none;z-index:1;width:1050px;height:329px;overflow:visible}
+.df-wire{fill:none;stroke:#bfe8e2;stroke-width:3.2;stroke-linecap:round;opacity:.95}
+.df-wire.active{stroke:#15b6ab;stroke-width:3.2;stroke-dasharray:12 10;animation:df-route 1.05s linear infinite}
+.df-wire.secondary{stroke:#8fd8cf;stroke-width:1.9;opacity:.62}
+.df-packet{fill:#0fb7ab;filter:drop-shadow(0 0 5px rgba(15,183,171,.45))}
+.df-packet.output{fill:#0fb7ab}
+@keyframes df-route{to{stroke-dashoffset:-30}}
+.df-node{position:absolute;z-index:2;background:#fff;border:1px solid #d6e3eb;border-radius:12px;box-shadow:0 3px 11px rgba(28,55,77,.055);transition:border-color .3s,box-shadow .3s,transform .3s;}
+.df-node.is-active{border-color:#2b95c4;box-shadow:0 0 0 3px rgba(0,122,176,.085),0 7px 22px rgba(20,78,118,.09)}
+.df-node::before,.df-node::after{content:"";position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid #a9cadb;transform:translateY(-50%);z-index:3}
+.df-node::before{left:-6px}.df-node::after{right:-6px}
+.df-source{width:226px;height:68px;left:18px;padding:10px 12px 10px 11px;display:flex;align-items:center;gap:11px}
+.df-source::before{display:none}
+.df-source.s1{top:38px}.df-source.s2{top:122px}.df-source.s3{top:206px}
+.df-source-icon{width:38px;height:38px;flex:0 0 auto;background:#edf7fb;color:#0079ad;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.df-source-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+.df-source-name{font-size:14px;line-height:1.18;color:#1c3549;font-weight:750;letter-spacing:-.025em}
+.df-source-sub{font-size:11px;margin-top:4px;color:#4a5f71}
+.df-denodo{left:330px;top:24px;width:266px;height:auto;border-color:#a9cede;overflow:hidden}
+.df-denodo::before,.df-denodo::after{border-color:#3696bd}
+.df-denodo-head{display:flex;align-items:center;gap:12px;padding:14px 15px 11px;background:linear-gradient(135deg,#f1f9fc,#fff 80%);border-bottom:1px solid #e8eff4}
+.df-symbol{width:88px;height:28px;display:flex;align-items:center;justify-content:flex-start;flex:0 0 88px}.df-symbol img{max-width:88px;max-height:28px;width:100%;height:100%;object-fit:contain;display:block}
+.df-denodo-brand{font-size:20px;font-weight:850;color:#17263c;line-height:1.1;letter-spacing:-.055em}
+.df-denodo-sub{font-size:12px;color:#006699;font-weight:700;margin-top:3px}
+.df-denodo-rows{padding:10px 13px;display:flex;flex-direction:column;gap:6px}
+.df-layer-row{border:1px solid #e6edf2;border-radius:8px;background:#fbfdfe;min-height:34px;display:flex;align-items:center;gap:9px;padding:0 9px;font-size:11.5px;color:#476072;font-weight:650;transition:background .25s,border-color .25s}
+.df-layer-row svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#258cb5;stroke-width:1.9;stroke-linejoin:round;stroke-linecap:round}
+.df-denodo.is-active .df-layer-row{border-color:#cce5f1;background:#f5fbff}
+.df-denodo-foot{border-top:1px solid #ebf0f4;display:flex;align-items:center;gap:6px;padding:9px 15px;font-size:10.5px;font-weight:700;color:#4a5f71}
+.df-live-dot{width:7px;height:7px;border-radius:50%;background:#17a680;box-shadow:0 0 0 3px #dff7ef;display:inline-block;flex:0 0 auto}
+.df-product{left:622px;top:74px;width:192px;height:190px;padding:13px 13px;overflow:hidden}
+.df-product::before,.df-product::after{border-color:#e77980}
+.df-product-kicker{display:flex;align-items:center;gap:7px;color:#a15159;font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:800}
+.df-product-kicker svg{width:15px;height:15px;stroke:#e84b52;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.df-product-name{font-size:13.2px;overflow-wrap:anywhere;line-height:1.2;font-weight:800;color:#183047;margin-top:9px;min-height:22px;font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;letter-spacing:-.03em}
+.df-product-divider{height:1px;background:#e8eef2;margin:10px 0 8px}
+.df-chip-row{display:block;margin-top:2px}.df-product-types{font-size:9.1px;color:#5d7385;line-height:1.25;font-weight:700}
+.df-field{padding:4px 6px;border-radius:5px;background:#f0f5f8;font-size:9px;color:#526c7e;font-weight:700;white-space:nowrap}
+.df-product-bottom{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#1d7558;font-weight:700}
+.df-product-bottom svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.2;fill:none}
+.df-product-preview{height:42px;border:1px solid #e7eef3;border-radius:10px;background:linear-gradient(180deg,#ffffff,#f7fbfd);position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.df-product-preview::before{content:"";position:absolute;left:0;right:0;top:0;height:9px;background:#eef5f8}
+.df-product-preview::after{content:"";position:absolute;left:12px;top:15px;width:74px;height:16px;background:linear-gradient(90deg,#bfe8e2 0 20%,transparent 20% 24%,#83d4ca 24% 40%,transparent 40% 44%,#58c2b6 44% 66%,transparent 66% 70%,#15b6ab 70% 100%);border-radius:4px;opacity:.95}
+.df-product-dot{position:absolute;right:12px;top:14px;width:30px;height:16px;border-radius:18px;background:radial-gradient(circle at 8px 8px,#8ee0d6 0 4px,transparent 4px),linear-gradient(90deg,#e9f7f5,#d4f0ec);}
+.df-output{left:846px;width:184px;height:60px;padding:10px 11px;display:flex;gap:9px;align-items:center}
+.df-output::after{display:none}
+.df-output.o1{top:36px}.df-output.o2{top:111px}.df-output.o3{top:186px}.df-output.o4{top:261px}
+.df-output-icon{width:29px;height:29px;flex:0 0 29px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#fff0f0;color:#df565b}
+.df-output-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+.df-output-name{font-size:11px;color:#213c50;font-weight:800;letter-spacing:-.025em;white-space:normal;line-height:1.12}
+.df-output-sub{font-size:10.5px;color:#4a5f71;margin-top:3px;white-space:normal;line-height:1.12}
+.df-caption-area{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.95fr);gap:12px;padding:14px 17px 12px;border-top:1px solid #e3ebf0;background:#fff;min-height:92px}
+.df-story{display:flex;align-items:center;gap:13px;min-width:0}
+.df-step-number{width:37px;height:37px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#eaf5fa;color:#006699;flex:0 0 37px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+.df-step-title{font-size:13.3px;color:#1c354a;font-weight:800;line-height:1.25}
+.df-step-description{font-size:12.5px;color:#617587;margin-top:3px;line-height:1.4}
+.df-question{border:1px solid #e3ebf0;border-radius:10px;background:#f8fafc;display:flex;align-items:flex-start;gap:9px;padding:9px 11px;min-width:0}
+.df-question-icon{color:#df555b;font-size:18px;font-weight:900;line-height:1.1;flex:0 0 auto}
+.df-question-label{font-size:10.5px;text-transform:uppercase;font-weight:800;letter-spacing:.065em;color:#4a5f71;line-height:1.2}
+.df-question-text{font-size:11.8px;color:#3a5368;font-weight:650;line-height:1.35;margin-top:4px}
+.df-footer{padding:0 17px 12px;background:#fff;display:flex;gap:6px;align-items:center}
+.df-step-btn{position:relative;min-width:0;flex:1 1 0;height:24px;background:none;border:0;color:#4a5f71;font-size:11px;font-weight:700;text-align:left;padding:0;overflow:visible}
+.df-step-btn .df-tick{display:block;height:3px;background:#e6edf2;border-radius:8px;position:absolute;top:0;left:0;right:0;overflow:hidden}
+.df-step-btn.active .df-tick::after{content:"";display:block;width:100%;height:100%;background:#1681b3;transform-origin:left;animation:df-fill 3.2s linear forwards}
+.df-step-btn.done .df-tick{background:#1681b3}
+.df-step-btn span:last-child{display:block;margin-top:8px}
+.df-step-btn.active{color:#006699}
+@keyframes df-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.df-mobile-hint{display:none}
+.denodo-flow.is-paused *, .denodo-flow.is-paused *::before,.denodo-flow.is-paused *::after{animation-play-state:paused!important}
+@media(min-width:1024px){.df-canvas{transform:scale(.92);transform-origin:top left;margin:0}.df-scroll{height:303px;overflow-x:hidden}}
+@media(min-width:731px) and (max-width:1023px){.df-mobile-hint{display:block;margin:0 12px 9px;text-align:center;color:#4a5f71;font-size:11px}}
+@media(max-width:730px){
+ .df-toolbar{padding:11px 12px;gap:7px;flex-wrap:wrap}
+ .df-titleline{flex:1 1 auto}.df-controls{gap:5px;flex:1 1 100%;justify-content:space-between}
+ .df-title{font-size:14px}.df-sub{font-size:11px}.df-demo-tag{font-size:9px}
+ .df-toggle button{padding:8px 12px;min-height:38px} .df-scroll{height:294px}.df-canvas{transform:scale(.895);transform-origin:top left;margin:0;width:1050px;height:329px}
+ .df-caption-area{grid-template-columns:1fr;gap:10px;padding:12px}
+ .df-story{align-items:flex-start}.df-question{padding:10px}
+ .df-footer{padding:0 12px 12px}.df-step-btn{font-size:11.5px;height:40px}
+ .df-mobile-hint{display:block;margin:0 12px 9px;text-align:center;color:#4a5f71;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+ .denodo-flow *,.denodo-flow *::before,.denodo-flow *::after{animation:none!important;transition:none!important}
+ .df-step-btn.active .df-tick::after{transform:none}
+ .df-packet{display:none}
+}
 
-    .page-header h1 {
-      margin: 0 0 var(--s3);
-      font-size: 38px;
-      font-weight: 760;
-      letter-spacing: -1px;
-      color: #14213d;
-    }
-
-    .page-header p {
-      margin: 0;
-      font-size: 17px;
-      color: #66758f;
-    }
-
-    .brand img {
-      display: block;
-      height: 104px;
-      width: auto;
-    }
-
-    h2.section {
-      margin: var(--s8) 0 var(--s5);
-      font-size: 23px;
-      font-weight: 740;
-      color: #172541;
-    }
-
-    /* ---------- Grids ---------- */
-    .grid-personas {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--s5);
-    }
-
-    .grid-usecases {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: var(--s5);
-    }
-
-    /* ---------- Cards ---------- */
-    .card {
-      display: flex;
-      flex-direction: column;
-      background: var(--white);
-      border: 1px solid #dce5f1;
-      border-radius: 18px;
-      padding: var(--s5);
-      box-shadow: 0 4px 14px rgba(20, 33, 61, 0.10);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .card-badge {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: var(--s4);
-    }
-
-    .ico {
-      display: inline-block;
-      width: 28px;
-      height: 28px;
-      background-color: currentColor;
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-      -webkit-mask-position: center;
-      mask-position: center;
-      -webkit-mask-size: contain;
-      mask-size: contain;
-    }
-
-    .ico-database { -webkit-mask-image: url(images/icons/database.svg); mask-image: url(images/icons/database.svg); }
-    .ico-sparkle  { -webkit-mask-image: url(images/icons/sparkle.svg);  mask-image: url(images/icons/sparkle.svg); }
-    .ico-users    { -webkit-mask-image: url(images/icons/users.svg);    mask-image: url(images/icons/users.svg); }
-    .ico-bot      { -webkit-mask-image: url(images/icons/bot.svg);      mask-image: url(images/icons/bot.svg); }
-    .ico-network  { -webkit-mask-image: url(images/icons/network.svg);  mask-image: url(images/icons/network.svg); }
-    .ico-cube     { -webkit-mask-image: url(images/icons/cube.svg);     mask-image: url(images/icons/cube.svg); }
-    .ico-grid     { -webkit-mask-image: url(images/icons/grid.svg);     mask-image: url(images/icons/grid.svg); }
-    .ico-link     { -webkit-mask-image: url(images/icons/link.svg);     mask-image: url(images/icons/link.svg); }
-    .ico-book     { -webkit-mask-image: url(images/icons/book.svg);     mask-image: url(images/icons/book.svg); }
-
-    .card h3 {
-      margin: 0 0 var(--s3);
-      font-size: 19px;
-      font-weight: 740;
-      color: #172541;
-    }
-
-    .card p {
-      margin: 0 0 var(--s5);
-      font-size: 14px;
-      line-height: 1.5;
-      flex: 1 1 auto;
-    }
-
-    /* Accent palettes (match SVG) */
-    .accent-blue  .card-badge { background: #e8f2ff; } .accent-blue  .ico { color: #1672dc; } .accent-blue  p { color: #176bd0; }
-    .accent-violet .card-badge { background: #f0ebff; } .accent-violet .ico { color: #7547e8; } .accent-violet p { color: #7547e8; }
-    .accent-teal  .card-badge { background: #e5f8f2; } .accent-teal  .ico { color: #0c9f79; } .accent-teal  p { color: #079b77; }
-    .accent-orange .card-badge { background: #fff0e6; } .accent-orange .ico { color: #e87935; } .accent-orange p { color: #64738d; }
-
-    /* Use-case cards keep neutral body copy */
-    .grid-usecases .card p { color: #64738d; }
-
-    .btn-tour {
-      display: block;
-      padding: var(--s3);
-      border-radius: 7px;
-      background: #176bd6;
-      color: var(--white);
-      font-size: 13px;
-      font-weight: 700;
-      text-align: center;
-      text-decoration: none;
-      transition: background 0.15s ease;
-    }
-
-    .btn-tour:hover { background: #125bb8; }
-    .btn-tour:focus-visible { outline: 2px solid #176bd6; outline-offset: 2px; }
-
-    .card[data-disabled] { }
-    .btn-tour[aria-disabled="true"] { opacity: 0.55; cursor: default; }
-    .btn-tour[aria-disabled="true"]:hover { background: #176bd6; }
-
-    /* ---------- Tools row ---------- */
-    .tools {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s5) var(--s9);
-      align-items: center;
-      background: #f7f9fc;
-      border: 1px solid #e5ebf3;
-      border-radius: 16px;
-      padding: var(--s6) var(--s7);
-    }
-
-    .tool {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--s3);
-      color: #293752;
-      font-size: 15px;
-      font-weight: 650;
-      text-decoration: none;
-    }
-
-    .tool .ico { color: #43536d; width: 26px; height: 26px; }
-    .tool:hover { color: #176bd6; }
-    .tool:hover .ico { color: #176bd6; }
-    .tool:focus-visible { outline: 2px solid #176bd6; outline-offset: 3px; border-radius: 4px; }
-
-    footer.page-footer {
-      margin-top: var(--s8);
-      font-size: 13px;
-      color: #66758f;
-    }
-
-    /* ---------- Responsive ---------- */
-    @media (max-width: 1200px) {
-      .grid-usecases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 820px) {
-      .page { padding: var(--s6) var(--s4) var(--s8); }
-      .page-header { flex-direction: column-reverse; align-items: flex-start; }
-      .page-header h1 { font-size: 30px; }
-      .grid-personas, .grid-usecases { grid-template-columns: 1fr; }
-      .tools { gap: var(--s5); flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+</style>
 </head>
-
 <body>
-  <div class="page">
-    <header class="page-header">
-      <div>
-        <h1>Welcome to your Denodo trial</h1>
-        <p>Choose a guided tour. Start by role, or jump straight into a use case.</p>
-      </div>
-      <div class="brand">
-        <img src="images/denodo_logo_black.png" alt="Denodo">
-      </div>
-    </header>
-
-    <!-- ===== Start by persona ===== -->
-    <h2 class="section">Start by persona</h2>
-    <section class="grid-personas" aria-label="Start by persona">
-      <div class="card accent-blue">
-        <div class="card-badge"><span class="ico ico-database"></span></div>
-        <h3>Data Engineer</h3>
-        <p>Integrate, manage and deliver data for AI and analytics, optimize your Lakehouse, and publish reusable data products.</p>
-        <a class="btn-tour" href="/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login">Start tour</a>
-      </div>
-      <div class="card accent-violet">
-        <div class="card-badge"><span class="ico ico-sparkle"></span></div>
-        <h3>AI Builder</h3>
-        <p>Connect to governed enterprise data and leverage active context to power AI agents and applications.</p>
-        <a class="btn-tour" href="/chatbot/">Start tour</a>
-      </div>
-      <div class="card accent-teal">
-        <div class="card-badge"><span class="ico ico-users"></span></div>
-        <h3>Business Analyst / End User</h3>
-        <p>Discover and use trusted data products and other self-service data assets for analytics and decision-making.</p>
-        <a class="btn-tour" href="/denodo-data-catalog/#/">Start tour</a>
-      </div>
-    </section>
-
-    <!-- ===== By use case ===== -->
-    <h2 class="section">Or choose a tour by use case</h2>
-    <section class="grid-usecases" aria-label="Choose a tour by use case">
-      <div class="card accent-violet">
-        <div class="card-badge"><span class="ico ico-sparkle"></span></div>
-        <h3>Deliver Active Context for AI</h3>
-        <p>Build and deliver governed, real-time context for AI Agents.</p>
-        <a class="btn-tour" href="mcp-api.html">Start tour</a>
-      </div>
-      <div class="card accent-blue">
-        <div class="card-badge"><span class="ico ico-database"></span></div>
-        <h3>Optimize your Lakehouse</h3>
-        <p>Learn how Denodo enhances your Lakehouse with live data access, unified semantics, and performance optimizations.</p>
-        <a class="btn-tour" href="documentation.html">Start tour</a>
-      </div>
-      <div class="card accent-orange">
-        <div class="card-badge"><span class="ico ico-network"></span></div>
-        <h3>Use and Share Data Products</h3>
-        <p>Discover, consume and securely share governed data products.</p>
-        <a class="btn-tour" href="/denodo-data-catalog/#/">Start tour</a>
-      </div>
-      <div class="card accent-violet">
-        <div class="card-badge"><span class="ico ico-bot"></span></div>
-        <h3>AWS SageMaker &amp; Denodo MCP</h3>
-        <p>Deploy trusted AI Agents faster with Denodo and AWS SageMaker.</p>
-        <a class="btn-tour" href="mcp-api.html">Start tour</a>
-      </div>
-    </section>
-
-    <!-- ===== Tools direct access ===== -->
-    <h2 class="section">Tools direct access</h2>
-    <nav class="tools" aria-label="Tools direct access">
-      <a class="tool" href="/denodo-design-studio/?uri=%2F%2Flocalhost%3A9999%2Fadmin&amp;auth=login" target="_blank" rel="noopener">
-        <span class="ico ico-cube"></span>Design Studio</a>
-      <a class="tool" href="/denodo-data-catalog/#/" target="_blank" rel="noopener">
-        <span class="ico ico-grid"></span>Data Marketplace</a>
-      <a class="tool" href="/chatbot/" target="_blank" rel="noopener">
-        <span class="ico ico-sparkle"></span>AI Chatbot</a>
-      <a class="tool" href="mcp-api.html">
-        <span class="ico ico-link"></span>MCP &amp; API</a>
-      <a class="tool" href="documentation.html">
-        <span class="ico ico-book"></span>Documentation</a>
-    </nav>
-
-    <footer class="page-footer">Property of Denodo. © Copyright Denodo <span>2026</span></footer>
+  <header class="site-header">
+    <a class="logo" href="index.html" aria-label="Denodo">
+      <img src="assets/images/denodo_logo_black.png" alt="Denodo">
+      <span class="fallback-logo" hidden>denodo<span class="logo-mark">✣</span></span>
+    </a>
+    <a class="header-link" href="pages/welcome.html?challenge=crestbank">Skip selection <span aria-hidden="true">→</span></a>
+  </header>
+  <main class="page" id="main">
+    <div class="heading">
+      <h1>What would you like to work on?</h1>
+      <p class="subtitle">Pick an industry scenario. We will set up a guided Denodo experience around it.</p>
+    </div>
+    <div class="grid" role="group" aria-label="Choose a business challenge">
+      <button class="choice" type="button" data-challenge="crestbank" aria-label="Choose Banking, Crestbank">
+        <span class="card-media"><img src="assets/images/card-banking.jpg" alt="" loading="lazy"><span class="card-tag">Banking</span></span>
+        <span class="card-body">
+          <span class="industry">Crestbank</span>
+          <span class="challenge-description">Help a bank understand repayment activity among its Gold and Platinum customers.</span>
+          <span class="choice-bottom"><span class="customer">Customer and loan data</span><span class="continue-label">Select <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></span></span>
+        </span>
+      </button>
+      <button class="choice" type="button" data-challenge="medixit" aria-label="Choose Pharmaceuticals, Medixit">
+        <span class="card-media"><img src="assets/images/card-pharma.jpg" alt="" loading="lazy"><span class="card-tag">Pharmaceuticals</span></span>
+        <span class="card-body">
+          <span class="industry">Medixit</span>
+          <span class="challenge-description">Help a pharmaceutical company understand patient participation, study start dates and the X-ray images linked to trial patients.</span>
+          <span class="choice-bottom"><span class="customer">Clinical-trial and X-ray data</span><span class="continue-label">Select <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></span></span>
+        </span>
+      </button>
+    </div>
+    
+<section id="ai-layer-animation" class="denodo-flow" aria-label="Interactive illustration: Denodo connects distributed data through its AI Data Layer pillars into a governed data product for analysis, APIs and AI. This illustration does not query a live Denodo system.">
+ <div class="df-toolbar">
+   <div class="df-titleline"><div class="df-logo-icon"><img src="assets/images/denodo_logo_black.png" alt="Denodo"></div><div><div class="df-title">One data layer. Many possibilities.</div><div class="df-sub">See how Denodo turns distributed data into trusted answers</div></div></div>
+   <div class="df-controls">
+    <div class="df-toggle" role="group" aria-label="Example scenario"><button type="button" data-df-scenario="crestbank" aria-pressed="true">Banking</button><button type="button" data-df-scenario="medixit" aria-pressed="false">Pharma</button></div>
+   </div>
+ </div>
+ <div class="df-scroll" role="region" aria-label="Horizontal workflow from sources through Denodo to consumers" tabindex="0">
+  <div class="df-canvas" id="df-canvas" data-step="0">
+   <svg class="df-wireboard" viewBox="0 0 1050 329" role="presentation" aria-hidden="true">
+  <path class="df-wire secondary" d="M244 72 C286 72 292 108 330 120"/>
+  <path class="df-wire active df-wire-in" d="M244 72 C286 72 292 108 330 120"/>
+  <circle class="df-packet df-packet-in" r="4"><animateMotion dur="2.8s" begin="-2.8s" repeatCount="indefinite" path="M244 72 C286 72 292 108 330 120" /></circle>
+  <path class="df-wire secondary" d="M244 156 C286 156 292 156 330 170"/>
+  <path class="df-wire active df-wire-in" d="M244 156 C286 156 292 156 330 170"/>
+  <circle class="df-packet df-packet-in" r="4"><animateMotion dur="2.8s" begin="-3.12s" repeatCount="indefinite" path="M244 156 C286 156 292 156 330 170" /></circle>
+  <path class="df-wire secondary" d="M244 240 C286 240 292 204 330 220"/>
+  <path class="df-wire active df-wire-in" d="M244 240 C286 240 292 204 330 220"/>
+  <circle class="df-packet df-packet-in" r="4"><animateMotion dur="2.8s" begin="-3.44s" repeatCount="indefinite" path="M244 240 C286 240 292 204 330 220" /></circle>
+  <path class="df-wire secondary" d="M596 168 C621 168 635 168 657 168"/>
+  <path class="df-wire active df-wire-mid" d="M596 168 C621 168 635 168 657 168"/>
+  <circle class="df-packet df-packet-mid" r="4"><animateMotion dur="2s" begin="-3.85s" repeatCount="indefinite" path="M596 168 C621 168 635 168 657 168" /></circle>
+  <path class="df-wire secondary" d="M814 168 C839 168 842 68 846 68"/>
+  <path class="df-wire active df-wire-out" d="M814 168 C839 168 842 68 846 68"/>
+  <circle class="df-packet output df-packet-out" r="4"><animateMotion dur="2.8s" begin="-2.8s" repeatCount="indefinite" path="M814 168 C839 168 842 68 846 68" /></circle>
+  <path class="df-wire secondary" d="M814 168 C839 168 842 142 846 142"/>
+  <path class="df-wire active df-wire-out" d="M814 168 C839 168 842 142 846 142"/>
+  <circle class="df-packet output df-packet-out" r="4"><animateMotion dur="2.8s" begin="-3.16s" repeatCount="indefinite" path="M814 168 C839 168 842 142 846 142" /></circle>
+  <path class="df-wire secondary" d="M814 168 C839 168 842 217 846 217"/>
+  <path class="df-wire active df-wire-out" d="M814 168 C839 168 842 217 846 217"/>
+  <circle class="df-packet output df-packet-out" r="4"><animateMotion dur="2.8s" begin="-3.52s" repeatCount="indefinite" path="M814 168 C839 168 842 217 846 217" /></circle>
+  <path class="df-wire secondary" d="M814 168 C839 168 842 292 846 292"/>
+  <path class="df-wire active df-wire-out" d="M814 168 C839 168 842 292 846 292"/>
+  <circle class="df-packet output df-packet-out" r="4"><animateMotion dur="2.8s" begin="-3.88s" repeatCount="indefinite" path="M814 168 C839 168 842 292 846 292" /></circle>
+</svg>
+   <div class="df-node df-source s1" data-node="source">
+<div class="df-source-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div><div><div class="df-source-name" data-source-name="0">Traditional DB &amp; DW</div><div class="df-source-sub" data-source-sub="0">Core systems</div></div></div><div class="df-node df-source s2" data-node="source">
+<div class="df-source-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h5"/></svg></div><div><div class="df-source-name" data-source-name="1">SaaS apps</div><div class="df-source-sub" data-source-sub="1">CRM &amp; service</div></div></div><div class="df-node df-source s3" data-node="source">
+<div class="df-source-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v16h16v-7M8 10h4M8 14h5M14 3h7v7M21 3l-9 9"/></svg></div><div><div class="df-source-name" data-source-name="2">Streaming</div><div class="df-source-sub" data-source-sub="2">Payments events</div></div></div>
+   <div class="df-node df-denodo" data-node="layer">
+    <div class="df-denodo-head"><div class="df-symbol"><img src="assets/images/denodo_logo_black.png" alt="Denodo"></div><div><div class="df-denodo-brand">AI Data Layer</div><div class="df-denodo-sub">Active context, powered by Denodo</div></div></div>
+    <div class="df-denodo-rows">
+     <div class="df-layer-row"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a8.5 8.5 0 1 0 0 17a8.5 8.5 0 0 0 0-17z"/><path d="M3.5 12h17M12 3c2.5 2.3 3.8 5.3 3.8 9S14.5 18.7 12 21c-2.5-2.3-3.8-5.3-3.8-9S9.5 5.3 12 3z"/></svg><span>Universal Connectivity</span></div>
+     <div class="df-layer-row"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16M4 6h16M4 16h9"/></svg><span>Zero-Copy Delivery</span></div>
+     <div class="df-layer-row"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V8a4 4 0 1 1 8 0v3M6 11h12v9H6z"/></svg><span>Governed Access</span></div>
+     <div class="df-layer-row"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M4.9 6.9l2.8 2.8M16.3 14.3l2.8 2.8M3 12h4M17 12h4M4.9 17.1l2.8-2.8M16.3 9.7l2.8-2.8"/><circle cx="12" cy="12" r="3.5"/></svg><span>Semantic Trust</span></div>
+    </div>
+    <div class="df-denodo-foot"><span class="df-live-dot"></span>ACTIVE CONTEXT</div>
+   </div>
+   <div class="df-node df-product" data-node="product">
+    <div class="df-product-kicker"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 9h8M8 13h6"/></svg><span>Data product</span></div>
+    <div class="df-product-name" id="df-product-name">loan_repayment_360</div>
+    <div class="df-product-preview" aria-hidden="true"><span class="df-product-dot"></span></div>
+    <div class="df-product-divider"></div>
+    <div class="df-chip-row"><div class="df-product-types" id="df-product-types">Dataset, model, dashboard, API, etc.</div></div>
+    <div class="df-product-bottom"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 5 5L20 5"/></svg><span>Reusable &amp; governed</span></div>
+   </div>
+   <div class="df-node df-output o1" data-node="consumer"><div class="df-output-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6M7 16h10"/></svg></div><div><div class="df-output-name">Data Marketplace</div><div class="df-output-sub">Find and use data products</div></div></div><div class="df-node df-output o2" data-node="consumer"><div class="df-output-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="3"/><path d="M6 16V11M11 16V8M16 16V6"/></svg></div><div><div class="df-output-name">Analytics &amp; data science</div><div class="df-output-sub">BI tools, Python, R</div></div></div><div class="df-node df-output o3" data-node="consumer"><div class="df-output-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></div><div><div class="df-output-name">Data as a Service</div><div class="df-output-sub">REST, OData, GraphQL</div></div></div><div class="df-node df-output o4" data-node="consumer"><div class="df-output-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="7" width="14" height="12" rx="3"/><path d="M12 7V4M9 3h6M2 11h3M19 11h3M9 12h.01M15 12h.01M9 16h6"/></svg></div><div><div class="df-output-name">AI</div><div class="df-output-sub">MCP, AI SDK, agent skills</div></div></div></div></div>
   </div>
+ </div>
+ <div class="df-caption-area" aria-live="polite" aria-atomic="true">
+  <div class="df-story"><div class="df-step-number" id="df-step-num">01</div><div><div class="df-step-title" id="df-step-title">Connect to data where it lives</div><div class="df-step-description" id="df-step-desc">Reach banking data in core systems, SaaS apps and event streams where it lives.</div></div></div>
+  <div class="df-question"><span class="df-question-icon" aria-hidden="true">“</span><div><div class="df-question-label">The business question</div><div class="df-question-text" id="df-question-text">Which Gold and Platinum customers have loan payments recorded, and when?</div></div></div>
+ </div>
+ <div class="df-footer" role="group" aria-label="Animation stages">
+  <button class="df-step-btn active" type="button" data-df-step="0"><span class="df-tick"></span><span>01 Connect</span></button>
+  <button class="df-step-btn" type="button" data-df-step="1"><span class="df-tick"></span><span>02 AI Data Layer</span></button>
+  <button class="df-step-btn" type="button" data-df-step="2"><span class="df-tick"></span><span>03 Publish</span></button>
+  <button class="df-step-btn" type="button" data-df-step="3"><span class="df-tick"></span><span>04 Consume</span></button>
+ </div>
+ <div class="df-mobile-hint" aria-hidden="true">Swipe the diagram sideways to explore the full flow →</div>
+</section>
 
+
+  </main>
   <script>
-    // Placeholder tour buttons (targets not defined yet) do nothing.
-    document.querySelectorAll('a[aria-disabled="true"]').forEach(function (a) {
-      a.addEventListener('click', function (e) { e.preventDefault(); });
-    });
-  </script>
-</body>
+(function () {
+      const KEY = 'trydenodo.selectedChallenge.v1';
+      const img = document.querySelector('.logo img');
+      if (img) {
+        const showFallback = function () {
+          img.hidden = true;
+          const fallback = img.nextElementSibling;
+          if (fallback) fallback.hidden = false;
+        };
+        img.addEventListener('error', showFallback);
+        if (img.complete && !img.naturalWidth) showFallback();
+      }
+      document.querySelectorAll('[data-challenge]').forEach(function(button) {
+        button.addEventListener('click', function() {
+          const challenge = button.dataset.challenge;
+          try { sessionStorage.setItem(KEY, challenge); } catch (e) { /* session storage may be unavailable in preview */ }
+          const url = new URL('pages/welcome.html', window.location.href);
+          url.searchParams.set('challenge', challenge);
+          window.location.assign(url.href);
+        });
+      });
+    })();
 
+
+
+
+(function () {
+  'use strict';
+  const scene = document.getElementById('ai-layer-animation');
+  if (!scene) return;
+  const canvas = document.getElementById('df-canvas');
+  const svg = scene.querySelector('.df-wireboard');
+  const media = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  const examples = {
+    crestbank: {
+      sources: [ ['Traditional DB & DW','Core systems'], ['SaaS apps','CRM & service'], ['Streaming','Payments events'] ],
+      product:'loan_repayment_360',fields:['Dataset, model, dashboard, API, etc.'],
+      question:'Which Gold and Platinum customers have loan payments recorded, and when?',
+      captions:[
+        'Reach banking data in core systems, SaaS apps and event streams where it lives.',
+        'Use Denodo to connect these source types, model them consistently and govern access centrally.',
+        'Make loan_repayment_360 a reusable, governed data product.',
+        'Let teams access the same trusted loan context through the Data Marketplace, analytics, data services and AI.'
+      ]
+    },
+    medixit: {
+      sources: [ ['Files','X-ray images'], ['Lakehouse','Research platform'], ['SaaS','Clinical apps'] ],
+      product:'i_clinical_trials_patients_start_date',fields:['Dataset, model, dashboard, API, etc.'],
+      question:'How many patients joined each trial, and when did their studies begin?',
+      captions:[
+        'Connect patient records, clinical-trial data and X-ray images, even when they live in different systems.',
+        'Use Denodo to connect files, lakehouse data and SaaS apps, align meaning and govern access across teams.',
+        'Make i_clinical_trials_patients_start_date a reusable, governed data product.',
+        'Give teams the same governed clinical-trial context through the Data Marketplace, analytics, data services and AI.'
+      ]
+    }
+  };
+  const titles = [
+    'Connect to data where it lives',
+    'AI Data Layer',
+    'Publish a reusable data product',
+    'Deliver context to every consumer'
+  ];
+  let scenario = 'crestbank', step = 0, cycles = 0, playing = true, lastAuto = Date.now();
+  let userPaused = false;
+  const stepButtons = Array.from(scene.querySelectorAll('[data-df-step]'));
+  const scenarioButtons = Array.from(scene.querySelectorAll('[data-df-scenario]'));
+  const nodes = Array.from(scene.querySelectorAll('[data-node]'));
+  const sourceNames = Array.from(scene.querySelectorAll('[data-source-name]'));
+  const sourceSubs = Array.from(scene.querySelectorAll('[data-source-sub]'));
+  function showScenario(next) {
+    scenario = next;
+    const x = examples[scenario];
+    sourceNames.forEach((e,i)=>e.textContent=x.sources[i][0]);
+    sourceSubs.forEach((e,i)=>e.textContent=x.sources[i][1]);
+    document.getElementById('df-product-name').textContent = x.product;
+    document.getElementById('df-product-types').textContent = x.fields[0];
+    document.getElementById('df-question-text').textContent = x.question;
+    scenarioButtons.forEach(btn => btn.setAttribute('aria-pressed',String(btn.dataset.dfScenario===scenario)));
+    showStep(step);
+  }
+  function showStep(n) {
+    step = n;
+    canvas.dataset.step = String(step);
+    document.getElementById('df-step-num').textContent = String(step+1).padStart(2,'0');
+    document.getElementById('df-step-title').textContent = titles[step];
+    document.getElementById('df-step-desc').textContent = examples[scenario].captions[step];
+    const targetKind=['source','layer','product','consumer'][step];
+    nodes.forEach(node=>node.classList.toggle('is-active',node.dataset.node===targetKind));
+    stepButtons.forEach((btn,i)=>{
+      btn.classList.remove('active','done');
+      if(i===step) { btn.classList.add('active'); btn.setAttribute('aria-current','step'); }
+      else { btn.removeAttribute('aria-current'); if(i<step)btn.classList.add('done'); }
+    });
+  }
+  function applyPause(){
+    const reduced=!!(media&&media.matches);
+    const paused=userPaused||document.hidden||reduced;
+    playing=!paused;
+    scene.classList.toggle('is-paused',paused);
+    if(svg){
+      if(paused&&typeof svg.pauseAnimations==='function')svg.pauseAnimations();
+      if(!paused&&typeof svg.unpauseAnimations==='function')svg.unpauseAnimations();
+    }
+    if(!paused)lastAuto=Date.now();
+  }
+  scenarioButtons.forEach(btn=>btn.addEventListener('click',()=>{showScenario(btn.dataset.dfScenario);showStep(0);lastAuto=Date.now();}));
+  stepButtons.forEach(btn=>btn.addEventListener('click',()=>{showStep(Number(btn.dataset.dfStep));lastAuto=Date.now();}));
+  document.addEventListener('visibilitychange',applyPause);
+  if(media&&media.addEventListener)media.addEventListener('change',applyPause);
+  showScenario('crestbank');showStep(0);applyPause();
+  // The same two actual demo scenarios as pages/welcome.html alternate; this is an illustration, not live data.
+  window.setInterval(()=>{
+    if(!playing)return;
+    const now=Date.now();
+    if(now-lastAuto<3200)return;
+    lastAuto=now;
+    if(step===3){
+      cycles++;
+      // Rotate between Crestbank and Medixit only after a complete four-stage story.
+      showScenario(scenario==='crestbank'?'medixit':'crestbank');
+    }
+    showStep((step+1)%4);
+  },220);
+})();
+
+</script>
+</body>
 </html>

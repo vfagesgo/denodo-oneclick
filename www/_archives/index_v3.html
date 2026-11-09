@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome to your Denodo trial</title>
+<!--
+  Try Denodo, guided trial onboarding, UX prototype v4
+  Drop-in for denodo-oneclick/www/index_v3.html
+
+  Files this page expects alongside it:
+    images/persona-analyst.jpg, images/persona-engineer.jpg, images/persona-ai.jpg
+    images/denodo_logo_black.png  (currently inlined, swap the LOGO const)
+    fonts/Proxima Nova/*.woff2    (already in the repo)
+
+  Type stack matches community.denodo.com. No external scripts, no CDN.
+
+  LIVE HERO
+  The hero card calls the running trial on page load. See the ENDPOINTS block at the
+  top of the script. If the call fails it falls back to a sample result and says so
+  on screen. It never presents canned output as live.
+  Engineering needs to confirm two things: the exact query path, and whether the
+  welcome page can issue a call as a second role without a second login.
+-->
+<style>
+@font-face{font-family:"Proxima Nova";src:url("fonts/Proxima%20Nova/proximanova-regular-webfont.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Proxima Nova";src:url("fonts/Proxima%20Nova/proximanova-medium-webfont.woff2") format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Proxima Nova";src:url("fonts/Proxima%20Nova/proximanova-semibold-webfont.woff2") format("woff2");font-weight:600;font-display:swap}
+
+:root{
+  --midnight-blue:#112533; --dark-midnight-blue:#0a3f5b; --light-blue:#84b5ce;
+  --peacock-blue:#006699; --peacock-blue-hover:#3276b1;
+  --green-success:#42b044; --highlight-orange:#ff9933; --warning-red:#f05149;
+  --gunmetal:#4f5e69; --grey:#c7c9ca; --light-grey:#e7e9ea; --light-grey-b:#f3f4f5;
+  --line:#dadfe3; --muted:#60707c; --backdrop:#7f868d; --r-sm:4px; --r-md:6px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--light-grey-b);color:var(--midnight-blue);
+  font-family:"Proxima Nova","proxima-nova",Roboto,"Segoe UI",system-ui,sans-serif;
+  font-size:14px;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.025em;line-height:1.15}
+p{margin:0}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit;text-align:left}
+a{color:var(--peacock-blue)}
+.screen{display:none}.screen.active{display:block}
+:focus-visible{outline:2px solid var(--peacock-blue);outline-offset:2px}
+
+.mark{display:inline-flex;align-items:center;gap:9px;font-size:22px;font-weight:600;letter-spacing:-.03em}
+.mark em{font-style:normal;background:var(--highlight-orange);padding:2px 10px 3px;
+  transform:rotate(-1.1deg);display:inline-block;color:#2b1a00}
+.mark img{height:22px;display:block}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;
+  border-radius:var(--r-sm);font-size:14px;font-weight:600;text-decoration:none;
+  border:1px solid transparent;transition:background .12s,border-color .12s}
+.btn-primary{background:var(--peacock-blue);color:#fff}
+.btn-primary:hover{background:var(--peacock-blue-hover)}
+.btn-ghost{background:#fff;border-color:var(--line);color:var(--midnight-blue)}
+.btn-ghost:hover{background:var(--light-grey-b)}
+.btn-sm{padding:7px 13px;font-size:13.5px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.lnk{color:var(--peacock-blue);font-weight:600;font-size:13.5px}
+.lnk:hover{text-decoration:underline}
+.flag{display:inline-block;background:var(--highlight-orange);color:#2b1a00;font-size:12px;
+  font-weight:600;padding:3px 9px;border-radius:3px}
+.time{font-size:12.5px;color:var(--muted)}
+.ico{width:20px;height:20px;display:block}
+.sq{width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;
+  justify-content:center;flex:none;font-weight:600}
+.sq-blue{background:#d9e9f2;color:var(--peacock-blue)}
+.sq-teal{background:#d8efea;color:#1f7a70}
+.sq-violet{background:#e7e2f7;color:#5340b8}
+.sq-orange{background:#ffe8cf;color:#b5610f}
+
+.backdrop{min-height:100%;background:var(--backdrop);display:flex;align-items:flex-start;
+  justify-content:center;padding:52px 24px 60px}
+.sheet{background:#fff;border-radius:10px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.sheet-pad{padding:56px 60px}
+.sheet-head{text-align:center;position:relative;margin-bottom:36px}
+.sheet-head .mark{margin-bottom:32px}
+.sheet-head h1{font-size:36px;margin-bottom:12px}
+.sheet-head p{font-size:16px;color:var(--gunmetal)}
+
+
+.app{display:flex;min-height:100vh}
+.nav{width:238px;flex:none;background:#fff;border-right:1px solid var(--line);padding:14px 0;
+  display:flex;flex-direction:column}
+.nav .brand{display:flex;align-items:center;gap:9px;padding:6px 18px 20px}
+.nav .brand img{height:20px}
+.nav .brand span{font-size:14.5px;font-weight:600;letter-spacing:-.02em}
+.nav-s{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);padding:16px 18px 6px}
+.nav a,.nav button.navi{display:flex;align-items:center;gap:10px;padding:7px 18px;font-size:14px;
+  color:var(--midnight-blue);text-decoration:none;width:100%;border-left:3px solid transparent}
+.nav a:hover,.nav button.navi:hover{background:var(--light-grey-b)}
+.nav .on{background:#e1edf4;border-left-color:var(--peacock-blue);color:var(--peacock-blue);font-weight:600}
+.nav svg{color:var(--gunmetal);flex:none}
+.nav .on svg{color:var(--peacock-blue)}
+.main{flex:1 1 auto;min-width:0;background:var(--light-grey-b);padding-bottom:60px}
+.hero{background:var(--dark-midnight-blue);padding:30px 40px 92px;position:relative;overflow:hidden}
+.hero h1{color:#fff;font-size:27px;text-align:center;position:relative;z-index:1}
+/* logo is 1871.43 x 498.68, ratio 3.753 : 1 */
+.hero-logo{position:absolute;top:20px;right:30px;height:24px;width:auto;z-index:2}
+@media(max-width:700px){.hero-logo{height:18px;top:14px;right:16px}}
+.hero p{color:#b9d4e3;text-align:center;font-size:14.5px;margin-top:7px;position:relative;z-index:1}
+.hero svg.deco{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+.wrap{max-width:1020px;margin:-68px auto 0;padding:0 40px;position:relative;z-index:2}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px}
+.panel-p{padding:26px 30px}
+.panel h2{font-size:21px;margin-bottom:6px}
+.sub{font-size:13.5px;color:var(--gunmetal)}
+
+.masked{color:var(--warning-red);font-weight:600}
+.result-note{font-size:12.5px;color:var(--gunmetal);line-height:1.55;margin-top:12px;
+  border-left:3px solid var(--grey);padding-left:11px}
+.skel{height:13px;background:var(--light-grey);border-radius:3px;animation:p 1.1s ease-in-out infinite}
+@keyframes p{0%,100%{opacity:.45}50%{opacity:.9}}
+
+/* ---- autoplay product animation ---- */
+.an-frame{position:relative;border-radius:14px;padding:22px;overflow:hidden;
+  background:#fff radial-gradient(var(--line) 1px,transparent 1px) 0 0/22px 22px;
+  border:1px solid var(--line)}
+.an-win{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  box-shadow:0 6px 26px rgba(17,37,51,.09)}
+.an-tabs{display:flex;gap:20px;padding:15px 18px 0;border-bottom:1px solid var(--light-grey)}
+.an-tabs span{font-size:13px;color:var(--muted);padding-bottom:9px;border-bottom:2px solid transparent}
+.an-tabs span.on{color:var(--peacock-blue);font-weight:600;border-bottom-color:var(--peacock-blue)}
+.an-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 18px 20px;
+  background:var(--light-grey-b);min-height:316px}
+.an-col{background:#eef1f4;border-radius:7px;padding:10px}
+.an-col h5{font-size:12px;font-weight:600;color:var(--gunmetal);margin:0 0 10px;
+  display:flex;align-items:center;gap:7px;letter-spacing:.01em}
+.an-col h5 em{font-style:normal;color:var(--muted);font-weight:400}
+.an-card{background:#fff;border:1px solid var(--line);border-radius:6px;margin-bottom:9px;
+  opacity:1;transform:translateY(0);transition:opacity .35s,transform .35s,border-color .25s}
+.an-card.hidden{opacity:0;transform:translateY(8px)}
+.an-card.lit{border-color:var(--peacock-blue)}
+.an-card .cb{padding:10px 11px 9px}
+.an-card .nm{font-size:12.5px;font-weight:600;line-height:1.35;margin-bottom:7px}
+.an-tag{display:inline-block;font-size:9.5px;font-weight:600;border:1px solid var(--line);
+  border-radius:3px;padding:1px 6px;margin:0 4px 2px 0;color:var(--gunmetal)}
+.an-tag.pii{border-color:#f3b9b6;color:var(--warning-red)}
+.an-tag.mcp{border-color:#b9cfdc;color:var(--peacock-blue)}
+.an-row{display:none;align-items:center;gap:7px;padding:7px 11px;border-top:1px solid var(--light-grey);
+  background:#f7f9fa;font-size:11.5px;color:var(--gunmetal)}
+.an-card.work .an-row.w{display:flex}
+.an-card.done .an-row.d{display:flex}
+.an-row .sp{width:11px;height:11px;border:2px solid var(--grey);border-top-color:var(--peacock-blue);
+  border-radius:50%;animation:sp .7s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.an-row .tick{width:13px;height:13px;border-radius:50%;background:var(--green-success);flex:none;
+  display:flex;align-items:center;justify-content:center;margin-left:auto}
+.an-row .dots{margin-left:auto;color:var(--grey)}
+.an-cursor{position:absolute;width:19px;height:25px;pointer-events:none;z-index:5;
+  transition:left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.an-pause{position:absolute;right:18px;bottom:18px;width:40px;height:40px;border-radius:50%;
+  background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(17,37,51,.14);z-index:6}
+.an-pause:hover{border-color:var(--peacock-blue)}
+.an-cap{font-size:12.5px;color:var(--muted);margin-top:10px;text-align:center}
+@media(max-width:860px){.an-board{grid-template-columns:repeat(2,1fr)}.an-cursor{display:none}}
+
+/* ---- persona cards ---- */
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:20px}
+.s3{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.s3 .art{height:112px;background:#e3ecf2 center/cover no-repeat}
+.s3 .in{padding:18px;display:flex;flex-direction:column;flex:1 1 auto}
+.s3 .role{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:7px}
+.s3 h4{font-size:16px;margin-bottom:9px;line-height:1.3}
+.s3 p{font-size:12.5px;color:var(--gunmetal);line-height:1.55;flex:1 1 auto;margin-bottom:15px}
+.s3 .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.rows{margin-top:14px}
+.row-i{display:flex;align-items:flex-start;gap:14px;padding:18px 30px;border-top:1px solid var(--light-grey)}
+.row-i .txt{flex:1 1 auto;min-width:0}
+.row-i h4{font-size:14.5px;margin-bottom:5px}
+.row-i .lede{font-size:13px;color:var(--midnight-blue);font-weight:600;margin-bottom:4px}
+.row-i p{font-size:12.5px;color:var(--gunmetal);line-height:1.55}
+.row-i .right{display:flex;align-items:center;gap:14px;flex:none;padding-top:3px}
+
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+.help h3{font-size:16px;margin-bottom:14px}
+.jump{display:flex;flex-wrap:wrap;gap:8px 18px}
+.help a{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13.5px;font-weight:600}
+.help a:hover{text-decoration:underline}
+
+.split{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;background:#fff}
+.split-l{padding:52px 60px;display:flex;flex-direction:column;justify-content:center}
+.split-l .mark{margin-bottom:36px}
+.split-l h1{font-size:30px;margin-bottom:10px}
+.split-l .subl{color:var(--gunmetal);font-size:15px;margin-bottom:26px}
+.stagelist{list-style:none;padding:0;margin:0 0 26px;max-width:470px}
+.stagelist li{display:flex;gap:11px;padding:7px 0;font-size:13.5px;line-height:1.5;color:var(--gunmetal)}
+.stagelist .n{width:20px;height:20px;border-radius:50%;background:var(--light-grey);color:var(--midnight-blue);
+  font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
+.bar{height:6px;background:var(--light-grey);overflow:hidden;max-width:430px;margin-bottom:22px;border-radius:3px}
+.bar i{display:block;height:100%;width:0;background:var(--midnight-blue);transition:width .45s}
+.chk{list-style:none;padding:0;margin:0 0 30px;max-width:470px}
+.chk li{display:flex;align-items:center;gap:11px;padding:6px 0;font-size:14px;color:var(--muted)}
+.chk li.done{color:var(--midnight-blue)}
+.chk .d{width:16px;height:16px;border-radius:50%;border:2px solid var(--grey);flex:none}
+.chk li.done .d{border-color:var(--green-success);background:var(--green-success)}
+.split-r{background:#fff7ed;display:flex;align-items:center;justify-content:center;padding:48px;
+  clip-path:polygon(7% 0,100% 0,100% 100%,0 100%)}
+
+.ws{display:flex;flex-direction:column;height:100vh}
+.ws-top{display:flex;align-items:center;gap:20px;background:var(--midnight-blue);color:#fff;
+  padding:0 18px;height:46px;flex:none;font-size:13.5px}
+.ws-top img{height:19px;filter:brightness(0) invert(1)}
+.ws-top .app-n{font-weight:600}
+.ws-top .env{margin-left:auto;opacity:.65;font-size:12px}
+.ws-body{display:flex;flex:1 1 auto;min-height:0}
+.ws-tree{width:244px;flex:none;background:#fff;border-right:1px solid var(--line);overflow:auto;padding:12px 0}
+.t-h{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:6px 16px}
+.t-f{font-size:13px;font-weight:600;padding:7px 16px;color:var(--gunmetal)}
+.t-i{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:6px 16px 6px 30px;
+  cursor:pointer;border-left:3px solid transparent}
+.t-i:hover{background:var(--light-grey-b)}
+.t-i.sel{background:#e1edf4;border-left-color:var(--peacock-blue);font-weight:600;color:var(--peacock-blue)}
+.t-i .src{margin-left:auto;font-size:10.5px;color:var(--muted);font-weight:400}
+.ws-main{flex:1 1 auto;overflow:auto;padding:22px;min-width:0;background:var(--light-grey-b)}
+.ws-main h3{font-size:15px;margin-bottom:14px}
+.canvas{background:#fff;border:1px solid var(--line);border-radius:6px;min-height:170px;padding:22px;
+  display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px}
+.canvas .empty{color:var(--muted);margin:auto;font-size:14px}
+.node{border:1px solid var(--line);border-radius:5px;min-width:166px;background:#fff}
+.node header{background:var(--light-grey-b);padding:7px 10px;font-size:13px;font-weight:600;
+  border-bottom:1px solid var(--line)}
+.node ul{list-style:none;margin:0;padding:6px 10px;font-size:12px;color:var(--gunmetal);line-height:1.8}
+.node .pii{color:var(--warning-red);font-size:9.5px;font-weight:600;margin-left:4px}
+.joinline{align-self:center;color:var(--peacock-blue);font-size:12px;font-weight:600}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.field{margin-bottom:16px;max-width:620px}
+.field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px}
+.field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:8px 10px;font:inherit;font-size:13.5px;background:#fff;color:inherit}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap}
+.tagbtn{border:1px solid var(--line);border-radius:3px;padding:5px 11px;font-size:12.5px;background:#fff}
+.tagbtn.on{background:#e1edf4;border-color:var(--peacock-blue);color:var(--peacock-blue);font-weight:600}
+.result{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:var(--light-grey-b);text-align:left;padding:8px 12px;font-weight:600;border-bottom:1px solid var(--line)}
+td{padding:8px 12px;border-bottom:1px solid var(--light-grey)}
+tr:last-child td{border-bottom:0}
+code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em;
+  background:#eef1f3;padding:1px 5px;border-radius:3px}
+
+.guide{width:324px;flex:none;background:#fff;border-left:1px solid var(--line);display:flex;
+  flex-direction:column;z-index:60}
+.g-h{padding:14px 20px 12px;border-bottom:1px solid var(--light-grey)}
+.g-h .r{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.g-h .ttl{font-size:13.5px;font-weight:600}
+.g-h .x{margin-left:auto;color:var(--muted);font-size:19px;line-height:1;padding:0 4px}
+.g-stages{display:flex;gap:4px;margin-bottom:10px}
+.g-stages span{flex:1 1 0;height:3px;border-radius:2px;background:var(--light-grey)}
+.g-stages span.on{background:var(--peacock-blue)}
+.g-stages span.cur{background:var(--highlight-orange)}
+.g-h .cnt{font-size:11.5px;color:var(--muted)}
+.g-b{padding:20px;flex:1 1 auto;overflow:auto}
+.g-b h4{font-size:17px;margin-bottom:10px}
+.g-b p{font-size:13.5px;line-height:1.6;color:var(--gunmetal)}
+.why{margin-top:14px;background:var(--light-grey-b);border-left:3px solid var(--peacock-blue);
+  padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--gunmetal)}
+.why b{color:var(--midnight-blue)}
+.task{margin-top:15px;display:flex;gap:9px;font-size:13px;background:#fff7ed;border:1px solid #ffddb3;
+  border-radius:var(--r-sm);padding:11px 13px;line-height:1.5}
+.task.ok{background:#eaf6ec;border-color:#bfe2c6}
+.g-f{padding:14px 20px;border-top:1px solid var(--light-grey);display:flex;align-items:center;gap:8px}
+.g-f .btn{padding:8px 14px;font-size:13.5px}
+.g-f .sp{margin-left:auto}
+.resume{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:65;background:var(--peacock-blue);
+  color:#fff;border-radius:4px 0 0 4px;padding:12px 9px;font-size:12.5px;font-weight:600;
+  writing-mode:vertical-rl;display:none}
+.resume.show{display:block}
+.spot{position:fixed;inset:0;z-index:55;pointer-events:none;display:none}
+.spot.on{display:block}
+.hole{position:absolute;border-radius:4px;box-shadow:0 0 0 9999px rgba(17,37,51,.5);
+  outline:2px solid var(--highlight-orange);outline-offset:2px;transition:all .22s}
+
+.doneic{width:46px;height:46px;border-radius:50%;background:#eaf6ec;color:var(--green-success);
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.callout{background:var(--light-grey-b);border-left:3px solid var(--highlight-orange);
+  padding:16px 18px;margin:24px 0;font-size:14px;line-height:1.6}
+.note{font-size:12.5px;color:var(--muted);line-height:1.6;border-left:3px solid var(--grey);
+  padding-left:12px;margin-top:24px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.opt{border:1px solid var(--line);border-radius:8px;padding:22px;background:#fff;display:flex;flex-direction:column}
+.opt .sq{margin-bottom:14px}
+.opt h3{font-size:18px;margin-bottom:10px}
+.opt ul{list-style:none;margin:0 0 18px;padding:0;flex:1 1 auto}
+.opt li{display:flex;gap:9px;font-size:13.5px;line-height:1.5;padding:4px 0}
+.opt li svg{flex:none;margin-top:2px;color:var(--gunmetal)}
+.btn-select{width:100%;justify-content:center;background:#fff;border:1px solid var(--line);
+  color:var(--midnight-blue);font-weight:600;padding:10px;border-radius:var(--r-sm);font-size:14px}
+.btn-select:hover{background:var(--light-grey-b);border-color:var(--peacock-blue)}
+
+@media(max-width:1100px){.steps3{grid-template-columns:1fr}
+  .duo{grid-template-columns:1fr}.opts{grid-template-columns:1fr}}
+@media(max-width:900px){.split{grid-template-columns:1fr}.split-r{display:none}.nav{display:none}
+  .sheet-pad{padding:40px 24px}.guide{position:fixed;right:0;top:46px;bottom:0}}
+</style>
+</head>
+<body>
+
+<!-- ======== SCREEN A: WELCOME ======== -->
+<section id="s-welcome" class="screen active">
+ <div class="app">
+  <aside class="nav">
+   <div class="brand"><img alt="Denodo" class="lg"><span>Trial</span></div>
+   <div class="nav-s">Trial</div>
+   <button class="navi on"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-5 2 2-5 5-2z"/></svg>Get started</button>
+   <div class="nav-s">Tools</div>
+   <a href="/denodo-design-studio/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5zM3 7l9 5 9-5M12 12v10"/></svg>Design Studio</a>
+   <a href="/denodo-data-catalog/#/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Data Marketplace</a>
+   <a href="/chatbot/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l2 6.2L20 10l-6 1.8L12 18l-2-6.2L4 10l6-1.8L12 2z"/></svg>Ask a Question</a>
+   <a href="mcp-api.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6L11.8 6.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6l1.2-1.2"/></svg>MCP and API</a>
+   <a href="documentation.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Documentation</a>
+  </aside>
+
+  <div class="main">
+   <div class="hero">
+    <svg class="deco" viewBox="0 0 1200 220" preserveAspectRatio="none" aria-hidden="true">
+     <circle cx="120" cy="40" r="3" fill="#2f6f93"/><circle cx="170" cy="90" r="3" fill="#2f6f93"/>
+     <circle cx="70" cy="140" r="3" fill="#2f6f93"/><circle cx="220" cy="30" r="3" fill="#2f6f93"/>
+     <circle cx="1080" cy="60" r="3" fill="#2f6f93"/><circle cx="1130" cy="120" r="3" fill="#2f6f93"/>
+     <circle cx="1020" cy="160" r="3" fill="#2f6f93"/><circle cx="980" cy="40" r="3" fill="#2f6f93"/>
+     <path d="M120 40L170 90M70 140L170 90M220 30L170 90M1080 60L1130 120M1020 160L1130 120M980 40L1080 60" stroke="#2f6f93" stroke-width="1" fill="none"/>
+     <rect x="1140" y="22" width="9" height="9" fill="#f05149" opacity=".8"/>
+     <rect x="58" y="188" width="9" height="9" fill="#ff9933" opacity=".7"/>
+    </svg>
+    <svg class="hero-logo" xmlns="http://www.w3.org/2000/svg" aria-label="Denodo" viewBox="0 0 1871.43 498.68"><g><path fill="#ffffff" d="M407.49,491.26c-40.75,0-71.97-10.08-93.71-30.25c-21.71-20.18-32.56-48.91-32.56-86.21c0-36.5,10.11-65.62,30.35-87.39c20.25-21.77,48.56-32.65,84.96-32.65c33.08,0,57.93,9.23,74.57,27.67c16.65,18.46,24.98,44.86,24.98,79.24v25.07H348.68c0.63,10.36,2.74,19.04,6.35,25.98c3.59,6.98,8.3,12.5,14.21,16.63c5.77,4.11,12.5,7.06,20.19,8.87c7.67,1.77,16.06,2.65,25.18,2.65c7.8,0,15.5-0.88,23.04-2.65c7.57-1.81,14.51-4.18,20.77-7.08c5.49-2.53,10.59-5.25,15.27-8.17c4.7-2.91,8.48-5.5,11.44-7.76h7.11v57.54c-5.51,2.24-10.55,4.35-15.09,6.27c-4.56,1.91-10.81,3.87-18.74,5.88c-7.31,1.97-14.84,3.53-22.6,4.67C428.09,490.69,418.63,491.26,407.49,491.26z M429.79,344.77c-0.4-14.74-3.7-25.94-9.91-33.65c-6.23-7.69-15.74-11.56-28.55-11.56c-13.05,0-23.28,4.06-30.65,12.16c-7.37,8.08-11.44,19.09-12.18,33.05H429.79z"/><path fill="#ffffff" d="M744.82,485.28h-67.67V374.42c0-9.03-0.35-18.02-1.07-27c-0.69-8.94-1.98-15.54-3.94-19.79c-2.29-5.03-5.63-8.65-9.98-10.85c-4.37-2.19-10.2-3.29-17.49-3.29c-5.51,0-11.09,1.08-16.72,3.19c-5.65,2.15-11.66,5.51-18.07,10.15v158.45h-67.26V261.75h67.26v24.68c11.02-9.7,21.75-17.25,32.21-22.72c10.41-5.42,22-8.13,34.67-8.13c22.05,0,38.89,7.2,50.55,21.6c11.68,14.4,17.52,35.27,17.52,62.59V485.28z"/><path fill="#ffffff" d="M1003.88,373.66c0,36.78-9.72,65.74-29.13,86.9c-19.4,21.17-46.9,31.75-82.43,31.75c-35.19,0-62.59-10.59-82.13-31.75c-19.51-21.16-29.27-50.12-29.27-86.9c0-37.15,9.76-66.25,29.27-87.28c19.54-21.03,46.94-31.57,82.13-31.57c35.39,0,62.86,10.61,82.34,31.77C994.14,307.75,1003.88,336.77,1003.88,373.66zM934.84,374.07c0-13.27-1.08-24.32-3.19-33.15c-2.1-8.84-5.02-15.89-8.74-21.19c-4-5.59-8.46-9.47-13.45-11.65c-5.02-2.19-10.74-3.29-17.13-3.29c-5.99,0-11.46,0.98-16.33,2.89c-4.85,1.93-9.33,5.6-13.42,11.05c-3.86,5.17-6.92,12.27-9.23,21.29c-2.31,9.03-3.46,20.36-3.46,34.04c0,13.67,1.1,24.71,3.28,33.14c2.17,8.44,4.98,15.17,8.45,20.19c3.58,5.2,8.07,8.97,13.43,11.37c5.37,2.38,11.33,3.57,17.85,3.57c5.4,0,10.89-1.19,16.45-3.57c5.58-2.39,10.03-5.98,13.34-10.74c3.99-5.71,7.01-12.59,9.07-20.61C933.81,399.38,934.84,388.27,934.84,374.07z"/><path fill="#ffffff" d="M1185.78,143.44V272.5c-9.63-5.15-25.23-12.76-33.7-14.98c-7.37-1.94-16.49-3.69-27.77-3.69c-12.42,0-24.23,2.82-35.37,8.46c-11.16,5.65-20.62,13.29-28.44,22.98c-1.87,2.32-3.62,4.76-5.27,7.27c-15.5,20.32-23.26,47-23.26,80.09c0,36.74,9.76,65.71,29.3,86.89c19.55,21.17,46.93,31.75,82.18,31.75c35.5,0,62.95-10.59,82.37-31.75c18.81-20.52,28.69-48.39,29.28-83.54l0,0V143.44H1185.78z M1182.85,406.37c-2.03,8.04-5.06,14.89-9.03,20.61c-3.34,4.78-7.78,8.36-13.36,10.74c-5.56,2.37-11.05,3.6-16.43,3.6c-6.53,0-12.5-1.23-17.88-3.6c-5.4-2.38-9.87-6.17-13.47-11.33c-3.45-5.06-6.26-11.8-8.43-20.21c-2.19-8.42-3.28-19.48-3.28-33.15c0-13.67,1.17-25.01,3.46-34.04c2.3-9.02,5.4-16.12,9.22-21.29c4.11-5.43,8.6-9.14,13.47-11.06c4.87-1.91,10.28-2.88,16.33-2.88c6.41,0,12.11,1.11,17.1,3.29c5.01,2.19,9.5,6.07,13.45,11.64c3.73,5.31,6.64,12.39,8.75,21.19c2.12,8.84,3.16,19.9,3.16,33.16C1185.91,387.2,1184.89,398.34,1182.85,406.37z"/><path fill="#ffffff" d="M176.79,143.44V272.5c-9.64-5.15-25.25-12.76-33.71-14.98c-7.35-1.94-16.47-3.69-27.75-3.69c-12.42,0-24.23,2.82-35.37,8.46c-11.16,5.65-20.62,13.29-28.45,22.98c-1.86,2.32-3.61,4.76-5.29,7.27c-15.47,20.32-23.24,47-23.24,80.09c0,36.74,9.76,65.71,29.29,86.89c19.56,21.17,46.93,31.75,82.19,31.75c35.5,0,62.95-10.59,82.36-31.75c18.82-20.52,28.71-48.39,29.28-83.54l0,0V143.44H176.79z M173.86,406.37c-2.04,8.04-5.06,14.89-9.03,20.61c-3.33,4.78-7.79,8.36-13.37,10.74c-5.56,2.37-11.05,3.6-16.41,3.6c-6.53,0-12.5-1.23-17.88-3.6c-5.38-2.38-9.87-6.17-13.47-11.33c-3.46-5.06-6.26-11.8-8.45-20.21c-2.2-8.42-3.27-19.48-3.27-33.15c0-13.67,1.16-25.01,3.46-34.04c2.3-9.02,5.38-16.12,9.22-21.29c4.11-5.43,8.6-9.14,13.47-11.06c4.85-1.91,10.28-2.88,16.32-2.88c6.41,0,12.11,1.11,17.09,3.29c5,2.19,9.52,6.07,13.47,11.64c3.72,5.31,6.62,12.39,8.76,21.19c2.11,8.84,3.15,19.9,3.15,33.16C176.93,387.2,175.91,398.34,173.86,406.37z"/><path fill="#ffffff" d="M1514.19,372.64c0,36.74-9.71,65.72-29.1,86.87c-19.43,21.18-46.89,31.77-82.38,31.77c-35.22,0-62.63-10.59-82.16-31.77c-19.56-21.15-29.32-50.13-29.32-86.87c0-37.18,9.76-66.27,29.32-87.28c19.53-21.06,46.94-31.57,82.16-31.57c35.36,0,62.77,10.57,82.26,31.77C1504.46,306.72,1514.19,335.73,1514.19,372.64zM1445.17,373.02c0-13.27-1.04-24.31-3.13-33.12c-2.15-8.84-5.06-15.91-8.78-21.21c-3.97-5.57-8.48-9.45-13.46-11.64c-4.97-2.19-10.69-3.3-17.09-3.3c-6.02,0-11.48,0.97-16.33,2.89c-4.87,1.93-9.37,5.62-13.46,11.05c-3.84,5.18-6.91,12.28-9.22,21.32c-2.32,9.01-3.47,20.36-3.47,34.01c0,13.68,1.06,24.74,3.27,33.16c2.17,8.44,4.98,15.15,8.45,20.21c3.58,5.17,8.07,8.97,13.45,11.35c5.38,2.39,11.33,3.57,17.88,3.57c5.4,0,10.87-1.18,16.43-3.57c5.58-2.38,10.03-5.98,13.34-10.76c3.99-5.71,7.01-12.58,9.05-20.61C1444.16,398.36,1445.17,387.23,1445.17,373.02z"/><polygon fill="#F05249" points="1573.32,199.56 1608.01,258.87 1547.92,293.12 1513.22,233.76 	"/><rect x="1646.12" y="280.57" fill="#F05249" width="69.41" height="68.56"/><polygon fill="#F05249" points="1753.63,258.86 1788.35,199.56 1848.44,233.76 1813.72,293.1 	"/><polygon fill="#F05249" points="1788.35,156.03 1753.63,96.67 1813.72,62.39 1848.44,121.76 	"/><rect x="1646.12" y="143.5" fill="#ffffff" width="69.41" height="68.58"/><polygon fill="#F05249" points="1715.53,74.93 1646.12,74.93 1646.12,6.37 1715.53,6.38 	"/><polygon fill="#F05249" points="1608.01,96.67 1573.32,156.04 1513.22,121.76 1547.92,62.4 	"/></g></svg>
+    <h1>Welcome to your Denodo trial!</h1>
+   </div>
+
+   <div class="wrap">
+    <!-- autoplay product animation -->
+    <div class="an-frame" id="anim">
+     <div class="an-win">
+      <div class="an-tabs" id="antabs"></div>
+      <div class="an-board" id="anboard"></div>
+     </div>
+     <svg class="an-cursor" id="cur" viewBox="0 0 19 25" fill="#112533" stroke="#fff" stroke-width="1.4">
+      <path d="M1 1l16 11-7 1.4 3.6 8-3 1.3-3.6-8L1 20z"/></svg>
+     <button class="an-pause" id="pz" onclick="toggleAnim()" aria-label="Pause">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+     </button>
+    </div>
+    <p class="an-cap">One governed view, built once, reachable four ways. This is the Data Engineer tour.</p>
+
+    <!-- personas -->
+    <div class="panel panel-p" style="margin-top:24px">
+     <h2>Choose a tour and get hands on in a few minutes!</h2>
+     <p class="sub">Crestbank needs to know which of its Gold and Platinum customers are falling behind on
+      their loan repayments. Choose the role you want to play in helping the bank achieve its objective!</p>
+     <div class="steps3" id="steps3"></div>
+    </div>
+
+    <!-- use cases -->
+    <div class="panel" style="margin-top:20px">
+     <div class="panel-p" style="padding-bottom:2px">
+      <h2>Or choose a tour by use case</h2>
+      <p class="sub">Scenario led tours built on the sample data already loaded in your trial.</p>
+     </div>
+     <div class="rows" id="rows"></div>
+    </div>
+
+    <div class="duo">
+     <div class="panel panel-p">
+      <h3 style="font-size:16px;margin-bottom:8px">Skip the tours</h3>
+      <p class="sub" style="line-height:1.55;margin-bottom:14px">Open any tool and dive right in!</p>
+      <div class="jump">
+       <a class="lnk" href="/denodo-design-studio/">Design Studio</a>
+       <a class="lnk" href="/denodo-data-catalog/#/">Data Marketplace</a>
+       <a class="lnk" href="/chatbot/">Ask a Question</a>
+       <a class="lnk" href="mcp-api.html">MCP and API</a>
+       <a class="lnk" href="documentation.html">Documentation</a>
+      </div>
+     </div>
+     <div class="panel panel-p help">
+      <h3>We are here to help</h3>
+      <a href="documentation.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Trial quick start guide</a>
+      <a href="mcp-api.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6"/></svg>Connect your own AI client over MCP</a>
+      <a href="https://community.denodo.com"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20v-1.5c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5V20M17 6a3 3 0 0 1 0 6M18.5 14c2 .7 3 2.1 3 4v2h-3.5"/></svg>Ask the Denodo Community</a>
+     </div>
+    </div>
+
+    <p style="font-size:12.5px;color:var(--muted);margin-top:28px">Property of Denodo. © Copyright Denodo 2026</p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ======== SCREEN B: GETTING READY (path preview folded in) ======== -->
+<section id="s-ready" class="screen">
+ <div class="split">
+  <div class="split-l">
+   <span class="mark"><img alt="Denodo" class="lg"><em>Trial</em></span>
+   <h1 id="r-h1">Setting up your workspace</h1>
+   <p class="subl" id="r-sub"></p>
+   <ul class="stagelist" id="r-stages"></ul>
+   <div class="bar"><i id="pbar"></i></div>
+   <ul class="chk" id="plist">
+    <li><span class="d"></span>Denodo Platform 9.6 running</li>
+    <li><span class="d"></span>Data sources <code>bank</code> and <code>banking_rag</code> connected</li>
+    <li><span class="d"></span>Crestbank sample data products loaded</li>
+    <li><span class="d"></span>Your personal workspace folder created</li>
+   </ul>
+   <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-primary" id="pgo" disabled onclick="openWorkspace()">Open guided workspace</button>
+    <button class="btn btn-ghost" onclick="go('s-welcome')">Back</button>
+   </div>
+  </div>
+  <div class="split-r">
+   <svg viewBox="0 0 400 330" width="100%" style="max-width:400px" aria-hidden="true">
+    <rect x="30" y="34" width="124" height="66" rx="5" fill="#fff" stroke="#112533" stroke-width="2.5"/>
+    <text x="92" y="64" text-anchor="middle" font-size="12.5" font-weight="700" fill="#112533" font-family="sans-serif">customers</text>
+    <text x="92" y="82" text-anchor="middle" font-size="10" fill="#60707c" font-family="sans-serif">bank</text>
+    <rect x="246" y="34" width="124" height="66" rx="5" fill="#fff" stroke="#112533" stroke-width="2.5"/>
+    <text x="308" y="64" text-anchor="middle" font-size="12.5" font-weight="700" fill="#112533" font-family="sans-serif">loans</text>
+    <text x="308" y="82" text-anchor="middle" font-size="10" fill="#60707c" font-family="sans-serif">bank</text>
+    <rect x="138" y="128" width="124" height="66" rx="5" fill="#fff" stroke="#112533" stroke-width="2.5"/>
+    <text x="200" y="158" text-anchor="middle" font-size="12.5" font-weight="700" fill="#112533" font-family="sans-serif">loan_payments</text>
+    <text x="200" y="176" text-anchor="middle" font-size="10" fill="#60707c" font-family="sans-serif">bank</text>
+    <path d="M92 100v36h46M308 100v36h-46M200 194v38" fill="none" stroke="#112533" stroke-width="2.5"/>
+    <rect x="110" y="232" width="180" height="60" rx="5" fill="#ff9933" stroke="#112533" stroke-width="2.5"/>
+    <text x="200" y="258" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2b1a00" font-family="sans-serif">loan_repayment_360</text>
+    <text x="200" y="276" text-anchor="middle" font-size="10" fill="#4a3000" font-family="sans-serif">governed data product</text>
+    <rect x="316" y="246" width="26" height="26" rx="4" fill="#42b044"/>
+    <path d="M322 259l4 4 8-8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+   </svg>
+  </div>
+ </div>
+</section>
+
+<!-- ======== SCREEN C: GUIDED WORKSPACE ======== -->
+<section id="s-ws" class="screen">
+ <div class="ws">
+  <div class="ws-top"><img alt="Denodo" class="lg"><span class="app-n">Design Studio</span>
+   <span class="env">Crestbank, trial workspace</span></div>
+  <div class="ws-body">
+   <aside class="ws-tree">
+    <div class="t-h">Crestbank</div>
+    <div class="t-f">01 Data Sources</div>
+    <div class="t-i" style="cursor:default">bank</div>
+    <div class="t-i" style="cursor:default">banking_rag</div>
+    <div class="t-f">03 Data Products</div>
+    <div id="tviews"></div>
+   </aside>
+   <main class="ws-main">
+    <h3>New view, untitled</h3>
+    <div class="canvas" id="canvas"><p class="empty">Select views from the tree to add them here.</p></div>
+    <div class="toolbar">
+     <button class="btn btn-ghost" id="btn-wizard" onclick="runWizard()">Data Modeling Wizard</button>
+     <button class="btn btn-ghost" id="btn-save" onclick="saveMeta()">Save metadata</button>
+     <button class="btn btn-primary" id="btn-publish" onclick="publish()">Publish as data product</button>
+    </div>
+    <div id="meta" hidden>
+     <div class="field"><label for="f-name">View name</label><input id="f-name" value="loan_repayment_360"></div>
+     <div class="field"><label for="f-desc">Business description</label>
+      <textarea id="f-desc" rows="3" placeholder="What this answers, and what it must not be used for."></textarea></div>
+     <div class="field"><label>Tags</label><div class="tagrow">
+      <button class="tagbtn" onclick="this.classList.toggle('on')">ai_banking</button>
+      <button class="tagbtn" onclick="this.classList.toggle('on')">mcp</button>
+      <button class="tagbtn" onclick="this.classList.toggle('on')">pii_data</button></div></div>
+    </div>
+    <div id="preview" hidden>
+     <h3 style="margin-top:22px">Result preview, 4 of 128 rows</h3>
+     <div class="result"><table>
+      <thead><tr><th>customer_id</th><th>last_name</th><th>loyalty</th><th>loan_amount</th><th>status</th><th>payments</th></tr></thead>
+      <tbody>
+       <tr><td>1042</td><td>Okonjo</td><td>Platinum</td><td>480,000</td><td>active</td><td>3 of 12</td></tr>
+       <tr><td>1177</td><td>Marchetti</td><td>Gold</td><td>265,000</td><td>active</td><td>2 of 24</td></tr>
+       <tr><td>1203</td><td>Lindqvist</td><td>Platinum</td><td>612,500</td><td>active</td><td>1 of 36</td></tr>
+       <tr><td>1318</td><td>Baptiste</td><td>Gold</td><td>198,000</td><td>active</td><td>4 of 18</td></tr>
+      </tbody></table></div>
+    </div>
+   </main>
+   <aside class="guide" id="guide">
+    <div class="g-h">
+     <div class="r"><span class="ttl" id="g-tour">Data Engineer tour</span>
+      <button class="x" title="Dismiss" onclick="dismiss()">×</button></div>
+     <div class="g-stages" id="gstages"></div>
+     <div class="cnt" id="gcnt"></div>
+    </div>
+    <div class="g-b">
+     <h4 id="gt"></h4><p id="gb"></p>
+     <div class="why" id="gw"></div>
+     <div class="task" id="gk"><span id="gki">○</span><span id="gkt"></span></div>
+    </div>
+    <div class="g-f">
+     <button class="btn btn-ghost" id="gback" onclick="step(-1)">Back</button>
+     <button class="lnk" onclick="exitTour()" style="padding:8px 4px">Exit</button>
+     <span class="sp"></span>
+     <button class="btn btn-primary" id="gnext" onclick="step(1)">Next</button>
+    </div>
+   </aside>
+  </div>
+ </div>
+ <button class="resume" id="resume" onclick="resumeTour()">Resume tour</button>
+ <div class="spot" id="spot"><div class="hole" id="hole"></div></div>
+</section>
+
+<!-- ======== SCREEN D: COMPLETION ======== -->
+<section id="s-done" class="screen">
+ <div class="backdrop">
+  <div class="sheet" style="max-width:800px">
+   <div class="sheet-pad">
+    <div class="doneic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg></div>
+    <h1 style="font-size:30px;margin-bottom:12px" id="done-h">You published a data product</h1>
+    <p style="font-size:15px;color:var(--gunmetal);line-height:1.6" id="done-p"><code>loan_repayment_360</code>
+     is published and discoverable in the Data Marketplace.</p>
+    <div class="callout" id="done-c"><b>What you actually did.</b> You combined <code>customers</code>,
+     <code>loans</code> and <code>loan_payments</code> into one governed view, described it so a person or an
+     AI agent can use it correctly, and published it once for every consumer, covering SQL, REST, the
+     Marketplace and MCP, instead of copying it into each.</div>
+    <h3 style="font-size:16px;margin-bottom:14px">Keep going with the same data product</h3>
+    <div class="opts">
+     <div class="opt"><span class="sq sq-teal" id="d1"></span><h3>Consume it as an analyst</h3>
+      <ul><li>Find it in the Data Marketplace</li><li>Run the same question</li><li>Ask Denodo Assistant in plain English</li></ul>
+      <button class="btn-select" onclick="openTour('analyst')">Select</button></div>
+     <div class="opt"><span class="sq sq-violet" id="d2"></span><h3>Turn it into an agent tool</h3>
+      <ul><li>Expose it over Denodo MCP Server</li><li>Wire it into your own client</li><li>Watch governance hold</li></ul>
+      <button class="btn-select" onclick="openTour('ai')">Select</button></div>
+    </div>
+    <p class="note"><b>Prototype note.</b> Publication here is simulated. In the trial, this step is confirmed by
+     reading the published view back from the running server before the tour is marked complete. Clicking the
+     button is not treated as success.</p>
+    <div style="margin-top:24px"><button class="btn btn-ghost" onclick="go('s-welcome')">Back to all tours</button></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<script>
+/* Swap for images/denodo_logo_black.png when this file is placed in www/ */
+var LOGO='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH4AAABkCAYAAABAboR1AAAACXBIWXMAAAsSAAALEgHS3X78AAAFy0lEQVR42u2bz5WjRhDGP/b5Do5g2AjMRDDsUboMimBwBJYjMJuBNgM2AmkvuprJgM0AZ4AiKB9cjHtb3dBopLHk+b73+r0doEvV/es/1QUbiQio96cP7AKCpwieIniK4CmCpwieIniK4CmCpwieIniK4CmCpwieIniK4CmCpwieIniK4CmCpwieAoCf2AW3q8NquQGQmdfi7T4n+P+/MgAPXOopgqcI/tb38fqwWpavtJEfVsvdYbVMuMffBvQCwBOAJ4Vfxdt9YzyyBpCM1E8BbAA8Gs9XABDxf8teNfgOwJ11+Uu83a8DB83WcetjvN13XOqvF3rlgA4AbaAJ33M19/jrVuq49hxv93VI5Xi77wB8dtxKZi/1URRljj2lFZH+PZKJoiiBlUAB0ItIe6ZZn+se/Yteuo+3+3aMh4g0Rv0EQAcgBnAAsB4GzlzwjSNh8Mn8sXcGPgfwpz0rRSQ/87JfAkjj7b6a4iEikWOvzwBs4u2+Z1R/Qwpd3j11dwB2PMdTBH9DEX6qS/YpdTONFX4Ql/rrBp7gn6TLHwAOh9UyNfdpPZpNxVcbAA+H1fKbBncdwV839FKhxcN2rX+XRiBXB9gYgr9HAI+H1fJzvN1XXOqvV7kBfdDTYbXMZqwWG8et0jnjoyhKART6wwmAXpeTWZGlnnEHO2YyogWw8x0Bx86menwaSgegmRr1jvZA29QCqEWkCzy2FcaZvZvbH2qnUDt2cmanfWL6UumzNvy1OetHVDrqvoCHiLwU7ZwegDhK77mXmzbUznrEzlAaAImjbuN4NlNQLju1bcOwtZnwQRRgMmKjHqnramPjsDHmv1kqs15fLKq+WIiWXv/2+mqXvliUWm+w8eKb6VwR4JhMgZ/oKLu0dqd7wE+VdeAACvbjFb40Duj9jPq1Ba/ri0XdF4vUAbYxoEpfLMTxTKIDpjdtDM4lEzM9CPzI4GlHRnx1hs7uLBvVCTY2M2z0M8D72t2FTqaRGT0J3lc+GPuGvR/8BeBeRBIAPwP4HrCv2MHEQW1kIpIBuNdrx3vOtL4C+KJ+2bpz7INH9UUk0pTm7477v2k8EGIjAfBrwJ5e4t88u90nqfbrV0fV6q0SOK7kQDW8bNCXMOVEIzMHgJ35wkL/bacP7zQQHNNHESlFZI3jlyLm7w8B1NEgFhHzGLQB8OwwUxjB3JSN2gPtyJ49Oax+dQ2wB2sQXgy8PSqPzojq7PeJ48fRtSiKGrN4nhs9opjRrnaWy49kxFYdeC0baYvr+d1E/7rgNVbbes8gvCj4uQmcsdeviWcJvruA33P9cD3fnaGzp15HuyZU4/HlwTEIR7Nyod/Qj814W883nPhwzfj2woPtteoCB/DFZ/zDmex/C+z07oxtak+ZPQG6JIj0wn0SvtRHUZQ4vqwZc9C5nIpI9cYzvg/s2LltSU7YVp7tQRhFUe5Y7t8c/AdjZmLsmKXR8p0j0u1cQctgY4i2fccdDfjOqSYwui5H6vrakgQcG5uJLaZ0pJQfLrQ9jUbMgzOuJMVwfCo8SQs7+dJ57FRGjj1Xuy+JjakETmBGLZ/wo9a2pJ7sYm9m7zw2WvU/G8lQJlYK3Jlp1HuFz9fQRMypJSTDNJa9Shy5/tlp3wuAL0/wwx7ExWttqJ3dCXbStwQ/J6fcA8g8LzXK/xr8Ce8Mdp62rE/NsRs2kpmTqrw09B/AG05OdVjjg24NopCcexeSqz8F/Iy3hNVEW4qJvHofYCMJeFPYheboz1Gcn1drwJFb0WaP43fGU7nqVAdB5ohYW9f351Pfivuegef7fg3IcmN/H36/0/b0gW3JHRm9Vl/KhNowfTH7tTnXt/jBbPh/596n+OkVwVMETxE8RfAUwVMETxE8RfAUwVMETxE8RfAUwVMETxE8RfAUwVMETxE8RfAUwVMETxE8wVMETxE8RfAUwVMETxE8RfAUwVMETxE8RfAUwVMETxE8RfAUwVOv1t+0x1VczSFTtgAAAABJRU5ErkJggg==';
+document.querySelectorAll('img.lg').forEach(function(i){i.src=LOGO});
+
+var I={
+ users:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3.2"/><path d="M3 20v-1.5c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5V20M17 5a3 3 0 0 1 0 6M18.5 13c2 .7 3 2.1 3 4v3h-3.5"/></svg>',
+ db:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v14c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>',
+ agent:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="11" rx="3"/><circle cx="9" cy="13.5" r="1.2"/><circle cx="15" cy="13.5" r="1.2"/><path d="M12 8V4M8 23h8"/></svg>',
+ grid:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+ spark:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l2 6.2L20 10l-6 1.8L12 18l-2-6.2L4 10l6-1.8L12 2zM19 16l.9 2.6L22.5 19.5l-2.6.9L19 23l-.9-2.6L15.5 19.5l2.6-.9L19 16z"/></svg>',
+ net:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="2.6"/><circle cx="5" cy="19" r="2.6"/><circle cx="19" cy="19" r="2.6"/><path d="M12 7.6v5M10.3 14.3L6.6 17M13.7 14.3l3.7 2.7"/></svg>',
+ cloud:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4 4 0 0 1-.5-8 5.5 5.5 0 0 1 10.6-1.3A3.8 3.8 0 0 1 18 18H7z"/><path d="M12 12v6M9.5 15.5L12 18l2.5-2.5"/></svg>',
+ check:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg>'
+};
+['d1'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=I.users});
+['d2'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=I.agent});
+
+/* =================== TOURS =================== */
+var TOURS={
+ analyst:{g:'p',i:'users',a:'sq-teal',t:'Business Analyst',art:'images/persona-analyst.jpg',
+  time:'8 min',
+  one:'Use Denodo’s Data Marketplace to find, review and get analytical insights from data products using natural language.',
+  stages:[['Find it','Search the Data Marketplace and read what the product is for.'],
+          ['Review and request','Run the question, then request access to a restricted column.'],
+          ['Ask in plain English','Put the same question to Denodo Assistant and compare.']]},
+ engineer:{g:'p',i:'db',a:'sq-blue',t:'Data Engineer',art:'images/persona-engineer.jpg',
+  time:'10 min',
+  one:'Federate live data sources, create a data model, add metadata, and publish it as a reusable data product in Denodo, all without writing code.',
+  stages:[['Open the governed views','Add customers, loans and loan_payments to a new view.'],
+          ['Model and describe','Combine them with the Data Modeling Wizard, add a description and tags.'],
+          ['Publish and verify','Publish as a data product and confirm it is discoverable.']]},
+ ai:{g:'p',i:'agent',a:'sq-violet',t:'AI Builder',art:'images/persona-ai.jpg',
+  time:'12 min',
+  one:'Build AI agents and applications using Denodo AI SDK, or connect existing AI agents to governed enterprise data through Denodo MCP Server.',
+  stages:[['Expose the tool','Tag the product mcp so the Denodo MCP Server publishes it.'],
+          ['Connect your client','Point VS Code, Claude Desktop or Cursor at the MCP endpoint.'],
+          ['Build and test the agent','Answer the question, then test the permission boundary.']]},
+ context:{g:'u',i:'spark',a:'sq-violet',t:'Deliver Active Context for AI',time:'10 min',
+  one:'Ensure that AI gets reliable, live information to make a correct choice!',
+  stages:[['Two roles, one question','Compare the authorised results.'],
+          ['Change the source','Update an operational record.'],
+          ['Ask again','See the answer reflect the change.']]},
+ lakehouse:{g:'u',i:'db',a:'sq-blue',t:'Optimize your Lakehouse',time:'7 min',
+  one:'Explore how Denodo helps a banking agent satisfy customer needs by federating the right data at the right time!',
+  stages:[['The lakehouse list','Top customers by propensity score.'],
+          ['Apply current reality','Arrears, dormancy and consent remove four of them.'],
+          ['Decide','The governed decision view, and what it cost to run.']]},
+ share:{g:'u',i:'net',a:'sq-orange',t:'Use and Share Data Products',time:'8 min',
+  one:'Publish and share governed data products through Denodo Data Marketplace, SQL and REST APIs for consumption by analysts and applications.',
+  stages:[['Discover','Inspect the product and its documentation.'],
+          ['Query it in SQL','Run it from Design Studio.'],
+          ['Call it as REST','Hit the published service and compare.']]},
+ aws:{g:'u',i:'cloud',a:'sq-orange',t:'Seamless Application modernization with AWS and Denodo',time:'9 min',
+  one:'Guide a migration team as a legacy system moves to Amazon Aurora. Ensure that passenger experience on a flight is not negatively impacted due to the migration!',
+  stages:[['Before the move','The application reads the contract, not the legacy database.'],
+          ['During the cutover','Switch the underlying source while the contract stays fixed.'],
+          ['After the move','Same questions, same answers, new system underneath.']]}
+};
+var ORDER=['analyst','engineer','ai'];
+var state=load();
+function load(){try{return JSON.parse(localStorage.getItem('denodo.trial')||'{}')}catch(e){return{}}}
+function save(){try{localStorage.setItem('denodo.trial',JSON.stringify(state))}catch(e){}}
+function go(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+ document.getElementById(id).classList.add('active');window.scrollTo(0,0);hideSpot()}
+
+function card(k){
+ var t=TOURS[k];
+ return '<div class="s3">'+
+  '<div class="art" style="background-image:url('+t.art+')"></div><div class="in">'+
+  '<h4>'+t.t+'</h4><p>'+t.one+'</p>'+
+  '<div class="row">'+
+   '<button class="btn btn-primary btn-sm" onclick="openTour(\''+k+'\')">Start tour</button>'+
+  '<span class="time">About '+t.time+'</span>'+
+  '</div></div></div>';
+}
+
+function render(){
+ var g=document.getElementById('steps3');
+ g.innerHTML=ORDER.map(card).join('');
+ document.getElementById('rows').innerHTML=Object.keys(TOURS).filter(function(k){return TOURS[k].g==='u'})
+  .map(function(k){var t=TOURS[k];
+   return '<div class="row-i"><span class="sq '+t.a+'">'+I[t.i]+'</span><div class="txt">'+
+    '<h4>'+t.t+'</h4><p>'+t.one+'</p></div>'+
+    '<div class="right"><span class="time">About '+t.time+'</span>'+
+    '<button class="lnk" onclick="openTour(\''+k+'\')">Start tour</button></div></div>';
+  }).join('');
+}
+
+/* card goes straight to readiness, no preview screen */
+function openTour(key){
+ state.tour=key; save();
+ var t=TOURS[key];
+ document.getElementById('r-h1').textContent='Setting up your '+t.t+' workspace';
+ document.getElementById('r-sub').textContent='About '+t.time+'. Ends with a published data product.';
+ var st=t.stages;
+ document.getElementById('r-stages').innerHTML=st.map(function(s,i){
+  return '<li><span class="n">'+(i+1)+'</span><span><b style="color:var(--midnight-blue)">'+s[0]+'.</b> '+s[1]+'</span></li>';
+ }).join('');
+ go('s-ready'); runProvision();
+}
+
+function runProvision(){
+ var li=document.querySelectorAll('#plist li');
+ li.forEach(function(x){x.classList.remove('done')});
+ document.getElementById('pbar').style.width='0%';
+ document.getElementById('pgo').disabled=true;
+ var i=0,tk=setInterval(function(){
+  li[i].classList.add('done');
+  document.getElementById('pbar').style.width=((i+1)/li.length*100)+'%';
+  if(++i>=li.length){clearInterval(tk);document.getElementById('pgo').disabled=false}
+ },420);
+}
+function openWorkspace(){
+ if(state.tour!=='engineer'){
+  alert('Only the Data Engineer workspace is built out in this prototype.\n\nOpening that one so you can see the interaction model.');
+  state.tour='engineer';save();
+ }
+ buildTree();resetWS();go('s-ws');renderStep();
+}
+
+var VIEWS=[{n:'accounts',s:'bank'},{n:'customers',s:'bank'},{n:'loan_officers',s:'bank'},
+ {n:'loan_payments',s:'bank'},{n:'loan_policy_knowledge',s:'banking_rag'},{n:'loan_rates',s:'bank'},
+ {n:'loan_underwriting',s:'bank'},{n:'loans',s:'bank'},{n:'properties',s:'bank'}];
+var COLS={customers:['customer_id','last_name<span class="pii">PII</span>','loyalty_classification','income_band'],
+ loans:['loan_id','customer_id','loan_amount','status'],
+ loan_payments:['payment_id','loan_id','payment_amount','payment_date']};
+var picked=[],joined=false,metaSaved=false,published=false;
+function buildTree(){document.getElementById('tviews').innerHTML=VIEWS.map(function(v){
+ return '<div class="t-i" data-v="'+v.n+'" onclick="toggleView(\''+v.n+'\')">'+v.n+
+ '<span class="src">'+v.s+'</span></div>'}).join('')}
+function resetWS(){picked=[];joined=metaSaved=published=false;state.stepIdx=0;save();
+ document.getElementById('meta').hidden=true;document.getElementById('preview').hidden=true;
+ document.getElementById('f-desc').value='';document.getElementById('btn-save').textContent='Save metadata';
+ document.querySelectorAll('.tagbtn').forEach(function(b){b.classList.remove('on')});draw()}
+function toggleView(n){var i=picked.indexOf(n);if(i>=0)picked.splice(i,1);else picked.push(n);
+ joined=false;document.getElementById('preview').hidden=true;draw();checkTask()}
+function draw(){
+ document.querySelectorAll('#tviews .t-i').forEach(function(e){e.classList.toggle('sel',picked.indexOf(e.dataset.v)>=0)});
+ var c=document.getElementById('canvas');
+ if(!picked.length){c.innerHTML='<p class="empty">Select views from the tree to add them here.</p>';return}
+ c.innerHTML=picked.map(function(n,i){
+  var cols=(COLS[n]||['id','...']).map(function(x){return '<li>'+x+'</li>'}).join('');
+  return (i?'<span class="joinline">'+(joined?'joined':'?')+'</span>':'')+
+   '<div class="node"><header>'+n+'</header><ul>'+cols+'</ul></div>'}).join('')
+}
+function runWizard(){if(picked.length<2){alert('Add at least two views to the canvas first.');return}
+ joined=true;draw();document.getElementById('meta').hidden=false;
+ document.getElementById('preview').hidden=false;checkTask()}
+function saveMeta(){if(!joined){alert('Join the views first.');return}
+ if(document.getElementById('f-desc').value.trim().length<15){
+  alert('Add a business description of at least 15 characters.\n\nThis is what an analyst, or an AI agent, reads to decide whether this product answers their question.');return}
+ metaSaved=true;document.getElementById('btn-save').textContent='Metadata saved';checkTask()}
+function publish(){if(!metaSaved){alert('Save the view metadata before publishing.');return}
+ published=true;checkTask();setTimeout(function(){finish()},420)}
+
+var ALLSTEPS=[
+ {st:0,sel:'[data-v="customers"]',t:'Start with the customer view',
+  b:'Under <b>03 Data Products</b>, select <code>customers</code>. It comes from the <code>bank</code> data source and is already described field by field.',
+  w:'<b>Why this matters.</b> Nothing is imported or copied. The view is a definition that reads from the source when queried.',
+  k:'Select <code>customers</code> in the tree',d:function(){return picked.indexOf('customers')>=0}},
+ {st:0,sel:'[data-v="loans"]',t:'Add the loans view',
+  b:'Now select <code>loans</code>. Each loan carries a <code>customer_id</code>, so Denodo already knows how these two relate.',
+  w:'<b>Why this matters.</b> The relationship is declared once, in the model, not rewritten in every report that needs it.',
+  k:'Select <code>loans</code> in the tree',d:function(){return picked.indexOf('loans')>=0}},
+ {st:0,sel:'[data-v="loan_payments"]',t:'Add repayment history',
+  b:'Add <code>loan_payments</code>. This is what turns a list of loans into a question you can answer about repayment behaviour.',
+  w:'<b>Why this matters.</b> Three views, one query, no staging table in between.',
+  k:'Select <code>loan_payments</code> in the tree',d:function(){return picked.indexOf('loan_payments')>=0}},
+ {st:1,sel:'#btn-wizard',t:'Combine them with the Modeling Wizard',
+  b:'Open the <b>Data Modeling Wizard</b>. It proposes the joins from the declared relationships, <code>customer_id</code> and <code>loan_id</code>, so you confirm rather than hand write them.',
+  w:'<b>Why this matters.</b> The result is one logical view. Denodo decides at query time how much work each source does.',
+  k:'Run the Data Modeling Wizard',d:function(){return joined}},
+ {st:1,sel:'#meta',t:'Describe it for the next person',
+  b:'Name the view and write a description saying what it answers and what it must not be used for. Tag it <code>ai_banking</code> and <code>mcp</code> so AI clients can discover it.',
+  w:'<b>Why this matters.</b> This description is what an analyst reads in the Marketplace and what an agent reads over MCP. Undocumented products do not get reused.',
+  k:'Write a description, then click <b>Save metadata</b>',d:function(){return metaSaved}},
+ {st:2,sel:'#btn-publish',t:'Publish it once, for everyone',
+  b:'Publish as a data product. The same definition is now reachable through the Marketplace, SQL, the REST service and MCP.',
+  w:'<b>Why this matters.</b> One definition, one set of permissions, four ways to consume it. This is the step that makes it reusable instead of a one off report.',
+  k:'Click <b>Publish as data product</b>',d:function(){return published}}
+];
+function steps(){ return ALLSTEPS }
+function renderStep(){
+ var S=steps(),i=Math.min(state.stepIdx||0,S.length-1),s=S[i];
+ document.getElementById('g-tour').textContent=TOURS[state.tour].t+' tour';
+ document.getElementById('gt').innerHTML=s.t;document.getElementById('gb').innerHTML=s.b;
+ document.getElementById('gw').innerHTML=s.w;document.getElementById('gkt').innerHTML=s.k;
+ document.getElementById('gcnt').textContent='Step '+(i+1)+' of '+S.length;
+ var nst=3;
+ var bars='';for(var x=0;x<nst;x++){
+  bars+='<span class="'+(x<s.st?'on':(x===s.st?'cur':''))+'"></span>'}
+ document.getElementById('gstages').innerHTML=bars;
+ document.getElementById('gback').disabled=(i===0);
+ checkTask();spotlight(s.sel);
+}
+function checkTask(){
+ var S=steps(),s=S[Math.min(state.stepIdx||0,S.length-1)];if(!s)return;
+ var ok=s.d();
+ document.getElementById('gk').classList.toggle('ok',ok);
+ document.getElementById('gki').textContent=ok?'✓':'○';
+ var n=document.getElementById('gnext');n.disabled=!ok;
+ n.textContent=((state.stepIdx||0)===S.length-1)?'Finish':'Next';
+ if(ok)spotlight(s.sel);
+}
+function step(d){var S=steps(),i=(state.stepIdx||0)+d;if(i<0)return;
+ if(i>=S.length){finish();return}state.stepIdx=i;save();renderStep()}
+function finish(){ go('s-done') }
+function dismiss(){document.getElementById('guide').style.display='none';
+ document.getElementById('resume').classList.add('show');hideSpot()}
+function resumeTour(){document.getElementById('guide').style.display='';
+ document.getElementById('resume').classList.remove('show');renderStep()}
+function exitTour(){if(confirm('Exit the tour? Your progress is kept and you can resume from the welcome page.'))go('s-welcome')}
+function spotlight(sel){
+ var el=document.querySelector(sel),sp=document.getElementById('spot'),h=document.getElementById('hole');
+ if(!el){hideSpot();return}
+ var r=el.getBoundingClientRect(),p=5;
+ h.style.left=(r.left-p)+'px';h.style.top=(r.top-p)+'px';
+ h.style.width=(r.width+p*2)+'px';h.style.height=(r.height+p*2)+'px';
+ sp.classList.add('on');
+}
+function hideSpot(){document.getElementById('spot').classList.remove('on')}
+window.addEventListener('resize',function(){
+ if(document.getElementById('s-ws').classList.contains('active'))renderStep()});
+
+/* =================== AUTOPLAY ANIMATION =================== */
+/* Illustration of the product, not a window onto the running instance.
+   Every object named below exists in bank_demo or pharm_ai. */
+
+var TABS=['Sources','Model','Marketplace','Services'];
+
+var DATASETS=[
+ {who:'Crestbank',
+  src:[['bank','PostgreSQL'],['banking_rag','PostgreSQL']],
+  views:[['customers',['pii_data','bank']],['loans',['bank']],['loan_payments',['bank']]],
+  dp:['loan_repayment_360',['mcp','ai_banking']]},
+ {who:'Medixit',
+  src:[['sec_clinical_trials','PostgreSQL'],['gp_details_service','REST API']],
+  views:[['ct_patients',['pii_data','sec_clinical_trials']],
+         ['ct_clinical_trials',['sec_clinical_trials']],
+         ['gp_details',['gp_details_service']]],
+  dp:['trial_health_360',['mcp','ai_pharma']]}
+];
+var USERS=['Data Marketplace','SQL','REST service','MCP tool'];
+var dsi=Math.floor(Math.random()*DATASETS.length);   /* which one we open on */
+
+function tick(){return '<span class="tick"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg></span>'}
+function tags(list){return list.map(function(t){
+ var c=t==='pii_data'?' pii':(t==='mcp'?' mcp':'');
+ return '<span class="an-tag'+c+'">'+t+'</span>'}).join('')}
+function rowW(l){return '<div class="an-row w"><span class="sp"></span>'+l+'<span class="dots">\u2022</span></div>'}
+function rowD(l){return '<div class="an-row d">'+l+tick()+'</div>'}
+
+function buildBoard(){
+ var d=DATASETS[dsi];
+ document.getElementById('antabs').innerHTML=TABS.map(function(t,i){
+  return '<span id="tab'+i+'">'+t+'</span>'}).join('');
+ document.getElementById('anboard').innerHTML=
+  '<div class="an-col" id="colA"><h5>Connected sources <em>'+d.src.length+'</em></h5>'+
+   d.src.map(function(x){return '<div class="an-card"><div class="cb"><div class="nm">'+x[0]+
+    '</div><span class="an-tag">'+x[1]+'</span></div></div>'}).join('')+'</div>'+
+  '<div class="an-col" id="colB"><h5>Governed views <em>'+d.views.length+'</em></h5>'+
+   d.views.map(function(v,i){return '<div class="an-card" id="c'+(i+1)+'"><div class="cb"><div class="nm">'+
+    v[0]+'</div>'+tags(v[1])+'</div>'+rowW('Reading schema')+rowD('Validated')+'</div>'}).join('')+'</div>'+
+  '<div class="an-col" id="colC"><h5>Data product <em id="dpn">0</em></h5>'+
+   '<div class="an-card hidden" id="dp"><div class="cb"><div class="nm">'+d.dp[0]+'</div>'+
+   tags(d.dp[1])+'</div>'+rowW('Combining '+d.views.length+' views')+rowD('Published')+'</div></div>'+
+  '<div class="an-col" id="colD"><h5>Reachable from <em id="cn">0</em></h5>'+
+   USERS.map(function(u,i){return '<div class="an-card hidden" id="u'+(i+1)+'"><div class="cb"><div class="nm">'+
+    u+'</div></div>'+rowD('Live')+'</div>'}).join('')+'</div>';
+}
+
+var anI=0, anTimer=null, anOn=true;
+function el(id){return document.getElementById(id)}
+function cls(id,c,on){var e=el(id); if(e) e.classList.toggle(c,!!on)}
+function tab(i){TABS.forEach(function(_,n){cls('tab'+n,'on',n===i)}); cur('#tab'+i,undefined,10)}
+function cur(sel,dx,dy){
+ var t=document.querySelector(sel), f=el('anim'), c=el('cur');
+ if(!t||!f||!c) return;
+ var a=t.getBoundingClientRect(), b=f.getBoundingClientRect();
+ c.style.left=(a.left-b.left+(dx===undefined?a.width*0.55:dx))+'px';
+ c.style.top=(a.top-b.top+(dy===undefined?a.height*0.55:dy))+'px';
+}
+function anReset(){
+ dsi=(dsi+1)%DATASETS.length;      /* alternate the dataset on every loop */
+ buildBoard();
+ tab(0); cur('#colA',24,14);
+}
+var AN=[
+ function(){anReset()},
+ function(){tab(1)},
+ function(){cur('#c1'); cls('c1','work',1); cls('c1','lit',1)},
+ function(){cls('c1','work',0); cls('c1','done',1); cls('c1','lit',0); cur('#c2')},
+ function(){cls('c2','work',1); cls('c2','lit',1)},
+ function(){cls('c2','work',0); cls('c2','done',1); cls('c2','lit',0); cur('#c3')},
+ function(){cls('c3','work',1); cls('c3','lit',1)},
+ function(){cls('c3','work',0); cls('c3','done',1); cls('c3','lit',0)},
+ function(){tab(2)},
+ function(){cls('dp','hidden',0); cls('dp','work',1); cls('dp','lit',1); el('dpn').textContent='1'; cur('#dp')},
+ function(){},
+ function(){cls('dp','work',0); cls('dp','done',1); cls('dp','lit',0)},
+ function(){tab(3)},
+ function(){cls('u1','hidden',0); el('cn').textContent='1'; cur('#u1')},
+ function(){cls('u2','hidden',0); el('cn').textContent='2'; cur('#u2')},
+ function(){cls('u3','hidden',0); el('cn').textContent='3'; cur('#u3')},
+ function(){cls('u4','hidden',0); el('cn').textContent='4'; cur('#u4')},
+ function(){},
+ function(){}
+];
+function anStep(){ AN[anI](); anI=(anI+1)%AN.length }
+var PZ_PAUSE='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+var PZ_PLAY='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>';
+function anPlay(){ if(anTimer) return; anOn=true; anTimer=setInterval(anStep,780); el('pz').innerHTML=PZ_PAUSE }
+function anStop(){ clearInterval(anTimer); anTimer=null; anOn=false; el('pz').innerHTML=PZ_PLAY }
+function toggleAnim(){ anOn?anStop():anPlay() }
+if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+ anReset(); AN.slice(1).forEach(function(f){f()}); anStop();
+} else { anReset(); anPlay(); }
+
+render();
+</script>
+</body>
+</html>
