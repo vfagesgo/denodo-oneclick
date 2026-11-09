@@ -42,7 +42,7 @@
     el.className = 'td-challenge-banner';
     el.setAttribute('role', 'region');
     el.setAttribute('aria-label', 'Selected business challenge');
-    el.innerHTML = '<div class="td-challenge-banner__name"></div><a class="td-challenge-banner__link" href="index.html">Change challenge</a>';
+    el.innerHTML = '<div class="td-challenge-banner__name"></div><a class="td-challenge-banner__link" href="/index.html">Change challenge</a>';
     const name = el.querySelector('.td-challenge-banner__name');
     name.textContent = selected.label;
     const detail = document.createElement('span');
