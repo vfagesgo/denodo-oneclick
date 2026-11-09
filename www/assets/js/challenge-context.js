@@ -102,7 +102,7 @@
     if (nativeLink && /get started/i.test(nativeLink.textContent || '')) {
       // Existing nav's "Get started" should stay on the welcome page,
       // instead of returning to the new industry selector.
-      nativeLink.setAttribute('href', 'index_v3.html?challenge=' + key);
+      nativeLink.setAttribute('href', '/index.html?challenge=' + key);
     }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialise, {once:true});
