@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Welcome to your Denodo trial</title>
+<link rel="shortcut icon" href="../assets/images/favicon.ico">
 <link rel="stylesheet" href="../assets/css/challenge-context.css">
 <!--
   Try Denodo: guided persona tours.
@@ -580,9 +581,9 @@ document.getElementById('resume').onclick=()=>start(state.role);
 
 /* ============ The guide window ============ */
 const GUIDE_CSS=`
-@font-face{font-family:"Proxima Nova";src:url("${asset('fonts/Proxima%20Nova/proximanova-regular-webfont.woff2')}") format("woff2");font-weight:400}
-@font-face{font-family:"Proxima Nova";src:url("${asset('fonts/Proxima%20Nova/proximanova-medium-webfont.woff2')}") format("woff2");font-weight:500}
-@font-face{font-family:"Proxima Nova";src:url("${asset('fonts/Proxima%20Nova/proximanova-semibold-webfont.woff2')}") format("woff2");font-weight:600}
+@font-face{font-family:"Proxima Nova";src:url("${asset('../assets/fonts/Proxima%20Nova/proximanova-regular-webfont.woff2')}") format("woff2");font-weight:400}
+@font-face{font-family:"Proxima Nova";src:url("${asset('../assets/fonts/Proxima%20Nova/proximanova-medium-webfont.woff2')}") format("woff2");font-weight:500}
+@font-face{font-family:"Proxima Nova";src:url("${asset('../assets/fonts/Proxima%20Nova/proximanova-semibold-webfont.woff2')}") format("woff2");font-weight:600}
 :root{--midnight-blue:#112533;--peacock-blue:#006699;--peacock-blue-hover:#3276b1;--green-success:#42b044;--highlight-orange:#ff9933;
  --gunmetal:#4f5e69;--light-grey:#e7e9ea;--light-grey-b:#f3f4f5;--line:#dadfe3;--muted:#60707c;--r-sm:4px}
 *,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}
@@ -820,6 +821,6 @@ if(state.role&&countDone(state.role)&&countDone(state.role)<TOURS[state.role].st
 const wanted=new URLSearchParams(location.search).get('role');
 if(TOURS[wanted]){const c=document.querySelector('.s3[data-tour="'+wanted+'"]');if(c)c.scrollIntoView({block:'center'})}
 </script>
-<script src="..assets/js/challenge-context.js"></script>
+<script src="../assets/js/challenge-context.js"></script>
 </body>
 </html>

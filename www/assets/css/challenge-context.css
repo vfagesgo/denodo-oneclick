@@ -1,4 +1,4 @@
-/* Optional scenario context bar for the existing index_v3.html.
+/* Optional scenario context bar for the existing guided-personas.html.
    Scoped styles deliberately avoid changing the existing Denodo layout. */
 .td-challenge-banner{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:11px max(25px,calc((100vw - 1190px)/2));background:#f2f7fa;border-bottom:1px solid #dbe8ee;color:#284a62;font-family:"Proxima Nova","proxima-nova",Roboto,sans-serif;position:relative;z-index:3}
 .td-challenge-banner__name{font-size:13px;line-height:1.4;font-weight:700}

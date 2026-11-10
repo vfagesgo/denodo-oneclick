@@ -191,7 +191,7 @@
       <img src="assets/images/denodo_logo_black.png" alt="Denodo">
       <span class="fallback-logo" hidden>denodo<span class="logo-mark">✣</span></span>
     </a>
-    <a class="header-link" href="pages/welcome.html?challenge=crestbank">Skip selection <span aria-hidden="true">→</span></a>
+    <a class="header-link" href="pages/welcome.html">Skip selection <span aria-hidden="true">→</span></a>
   </header>
   <main class="page" id="main">
     <div class="heading">
@@ -309,7 +309,7 @@
         button.addEventListener('click', function() {
           const challenge = button.dataset.challenge;
           try { sessionStorage.setItem(KEY, challenge); } catch (e) { /* session storage may be unavailable in preview */ }
-          const url = new URL('pages/welcome.html', window.location.href);
+          const url = new URL('pages/guided-personas.html', window.location.href);
           url.searchParams.set('challenge', challenge);
           window.location.assign(url.href);
         });
