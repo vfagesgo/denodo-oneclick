@@ -1093,7 +1093,7 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
   log_step "Java config: adjusting -XX:ReservedCodeCacheSize= in VDBConfiguration.properties"
   change_config "-XX:ReservedCodeCacheSize=" "/opt/denodo/denodo-platform/conf/vdp/VDBConfiguration.properties" "256m"
   log_step "Java config: adjusting -Xmx in resources/apache-tomcat/conf/tomcat.properties"
-  change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/tomcat.properties" "1024m"
+  change_config "-Xmx" "/opt/denodo/denodo-platform/resources/apache-tomcat/conf/tomcat.properties" "2048m"
 
   /opt/denodo/denodo-platform/bin/regenerateFiles.sh
 
