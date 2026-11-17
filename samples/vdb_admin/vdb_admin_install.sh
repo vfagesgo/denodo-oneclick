@@ -133,7 +133,7 @@ PYTHON="$PYENV_ROOT/versions/$PYTHON_VERSION/bin/python"
 #"$PYTHON" "$SCRIPT_DIR/../DM_import_tools/5_import_asset_extensions.py" --file "$SCRIPT_DIR/5_asset_extensions.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --server-id 1 --sync
 
 export OPENAI_API_KEY=$OPENAI_API_KEY   # replaces ${OPENAI_API_KEY} in the JSON
-"$PYTHON" "$SCRIPT_DIR/../DM_import_tools/6_import_dm-config.py"         --file "6_dm-config.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --no-backup --server-id 1 
+"$PYTHON" "$SCRIPT_DIR/../DM_import_tools/6_import_dm-config.py"         --file "$SCRIPT_DIR/6_dm-config.json" --base-url http://localhost/denodo-data-catalog --user admin --password $DENODO_VDP_PWD --no-backup --server-id 1 
 
 # ---------------------------------------------------------------------------
 log_section "5" "Wait for Denodo AI SDK to start"
