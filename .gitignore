@@ -1,3 +1,6 @@
+# macOS Finder metadata
+.DS_Store
+**/.DS_Store
 __pycache__
 .*/*
 *.lic
@@ -7,7 +10,6 @@ headers.txt
 !README.md
 !**/www/**/*.md
 !**/skills/**/*.md
-.DS_Store
 tmp/
 www/mcp-api-v2-docs.html
 www/mcp-api-v1-dashboard.html
