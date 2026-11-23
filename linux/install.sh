@@ -1277,9 +1277,9 @@ dl_end
 
 ## VFG AISDK Agents
 ## Creating AISDK Agents
-cp -a /opt/denodo-oneclick/samples/ai-sdk/chatbot_agent/custom/. \
-      /opt/denodo/denodo-aisdk/api/agents/custom/
-chown -R denodo:denodo /opt/denodo/denodo-aisdk/api/agents/custom/
+#cp -a /opt/denodo-oneclick/samples/ai-sdk/chatbot_agent/custom/. \
+#      /opt/denodo/denodo-aisdk/api/agents/custom/
+#chown -R denodo:denodo /opt/denodo/denodo-aisdk/api/agents/custom/
 
 # Section 13:
 # The AI SDK depends on a fairly large native/Python build toolchain on
