@@ -21,7 +21,7 @@ CREATE OR REPLACE USER crestbank_engineer 'try-Denodo9' SHA512 'Crestbank Data E
 
 CREATE OR REPLACE USER crestbank_rm 'try-Denodo9' SHA512 'Crestbank relationship manager, Business Analyst tour';
 
-CREATE OR REPLACE USER data_analyst 'try-Denodo9' SHA512 ENCRYPTED HASH SHA512  'Crestbank Business Analyst';
+CREATE OR REPLACE USER data_analyst 'try-Denodo9' SHA512 'Crestbank Business Analyst';
 
 
 # #######################################
