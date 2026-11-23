@@ -120,7 +120,7 @@ a{color:var(--peacock-blue)}
 
 .masked{color:var(--warning-red);font-weight:600}
 .result-note{font-size:12.5px;color:var(--gunmetal);line-height:1.55;margin-top:12px;
-  border-left:3px solid var(--grey);padding-left:11px}
+  background:var(--light-grey-b);border-radius:6px;padding:10px 12px}
 .skel{height:13px;background:var(--light-grey);border-radius:3px;animation:p 1.1s ease-in-out infinite}
 @keyframes p{0%,100%{opacity:.45}50%{opacity:.9}}
 
@@ -168,7 +168,7 @@ a{color:var(--peacock-blue)}
 .an-pause:hover{border-color:var(--peacock-blue)}
 .an-cap{font-size:12.5px;color:var(--muted);margin-top:10px;text-align:center}
 .rbar{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);
-  border-left:3px solid var(--highlight-orange);border-radius:var(--r-md);padding:13px 18px;
+  border-radius:var(--r-md);padding:13px 18px;
   margin-bottom:18px;font-size:13.5px}
 .rbar .sp{margin-left:auto;display:flex;gap:10px;align-items:center}
 @media(max-width:860px){.an-board{grid-template-columns:repeat(2,1fr)}.an-cursor{display:none}}
@@ -203,7 +203,7 @@ a{color:var(--peacock-blue)}
 .split-l .mark{margin-bottom:36px}
 .split-l h1{font-size:30px;margin-bottom:10px}
 .split-l .subl{color:var(--gunmetal);font-size:15px;margin-bottom:26px}
-.r-note{max-width:470px;margin:-8px 0 22px;padding:12px 14px;background:#fff7ed;border-left:3px solid var(--highlight-orange);font-size:13.5px;line-height:1.55;color:#4a3a28}
+.r-note{max-width:470px;margin:-8px 0 22px;padding:12px 14px;background:#fff7ed;border:1px solid #f3dcc0;border-radius:6px;font-size:13.5px;line-height:1.55;color:#4a3a28}
 .stagelist{list-style:none;padding:0;margin:0 0 26px;max-width:470px}
 .stagelist li{display:flex;gap:11px;padding:7px 0;font-size:13.5px;line-height:1.5;color:var(--gunmetal)}
 .stagelist .n{width:20px;height:20px;border-radius:50%;background:var(--light-grey);color:var(--midnight-blue);
@@ -295,7 +295,7 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
 .g-b{padding:20px;flex:1 1 auto;overflow:auto}
 .g-b h4{font-size:17px;margin-bottom:10px}
 .g-b p{font-size:13.5px;line-height:1.6;color:var(--gunmetal)}
-.why{margin-top:14px;background:var(--light-grey-b);border-left:3px solid var(--peacock-blue);
+.why{margin-top:14px;background:var(--light-grey-b);border:1px solid var(--line);border-radius:6px;
   padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--gunmetal)}
 .why b{color:var(--midnight-blue)}
 .task{margin-top:15px;display:flex;gap:9px;font-size:13px;background:#fff7ed;border:1px solid #ffddb3;
@@ -317,9 +317,9 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
 
 .doneic{width:46px;height:46px;border-radius:50%;background:#eaf6ec;color:var(--green-success);
   display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.callout{background:var(--light-grey-b);border-left:3px solid var(--highlight-orange);
+.callout{background:var(--light-grey-b);border:1px solid var(--line);border-radius:6px;
   padding:16px 18px;margin:24px 0;font-size:14px;line-height:1.6}
-.note{font-size:12.5px;color:var(--muted);line-height:1.6;border-left:3px solid var(--grey);
+.note{font-size:12.5px;color:var(--muted);line-height:1.6;
   padding-left:12px;margin-top:24px}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .opt{border:1px solid var(--line);border-radius:8px;padding:22px;background:#fff;display:flex;flex-direction:column}
@@ -396,9 +396,28 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
   .resume{top:auto;bottom:0;right:12px;transform:none;writing-mode:horizontal-tb;
     border-radius:4px 4px 0 0;padding:10px 16px}
 }
+.hero-sub{color:#fff;opacity:.92;text-align:center;font-size:17px;line-height:1.55;max-width:760px;margin:12px auto 0;position:relative;z-index:1;padding:0 20px}
+@media (max-width:760px){.hero-sub{font-size:15px}}
+.rows.off{opacity:.45;filter:grayscale(1);pointer-events:none;user-select:none}
+.soon{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#60707c;background:#eef0f2;border-radius:3px;padding:3px 8px;vertical-align:middle;margin-left:8px}
+.pv-bar{background:#fff4dc;color:#5c3d00;border-bottom:2px solid #e0a800;font-size:14px;line-height:1.5;padding:10px 24px;text-align:center}
+.pv-bar b{background:#e0a800;color:#fff;letter-spacing:.08em;padding:2px 8px;border-radius:3px;margin-right:8px}
+.pv-off{opacity:.45;pointer-events:none;cursor:default}
 </style>
 </head>
 <body>
+<script>
+/* Offline preview: set to true in the preview package. Nothing connects to Denodo. */
+var PREVIEW=false;
+if(PREVIEW){document.addEventListener('DOMContentLoaded',function(){
+ var b=document.createElement('div');b.className='pv-bar';b.setAttribute('role','note');
+ b.innerHTML='<b>PREVIEW</b>This is an offline preview of the Try Denodo guided tours. It does not connect to Denodo: watch each step, then try it in the live trial.';
+ document.body.insertBefore(b,document.body.firstChild);
+ document.querySelectorAll('a[href*="denodo-design-studio"],a[href*="denodo-data-catalog"],a[href*="/chatbot/"],a[data-app="ds"],a[data-app="dm"],a[data-app="chat"]').forEach(function(a){
+  a.classList.add('pv-off');a.setAttribute('aria-disabled','true');a.setAttribute('tabindex','-1');a.title='Available in the live trial';a.removeAttribute('href')});
+});}
+</script>
+
 
 <!-- ======== SCREEN A: WELCOME ======== -->
 <section id="s-welcome" class="screen active">
@@ -410,9 +429,9 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
    <div class="nav-s">Tools</div>
    <a href="/denodo-design-studio/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5zM3 7l9 5 9-5M12 12v10"/></svg>Design Studio</a>
    <a href="/denodo-data-catalog/#/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Data Marketplace</a>
-   <a href="/chatbot/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l2 6.2L20 10l-6 1.8L12 18l-2-6.2L4 10l6-1.8L12 2z"/></svg>Ask a Question</a>
-   <a href="mcp-api.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6L11.8 6.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6l1.2-1.2"/></svg>MCP and API</a>
-   <a href="documentation.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Documentation</a>
+   <a href="https://www.denodo.com/en/contact-us" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l2 6.2L20 10l-6 1.8L12 18l-2-6.2L4 10l6-1.8L12 2z"/></svg>Ask a Question</a>
+   <a href="/chatbot/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6L11.8 6.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6l1.2-1.2"/></svg>MCP and API</a>
+   <a href="https://community.denodo.com/docs/html/browse/9.6/en/" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Documentation</a>
   </aside>
 
   <div class="main">
@@ -425,6 +444,7 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
      <path d="M120 40L170 90M70 140L170 90M220 30L170 90M1080 60L1130 120M1020 160L1130 120M980 40L1080 60" stroke="#2f6f93" stroke-width="1" fill="none"/>
     </svg>
     <h1>Welcome to your Denodo trial!</h1>
+    <p class="hero-sub">Denodo federates, governs, and unifies your entire data estate in real time, giving AI systems and business users the live, trusted context they need to solve complex business problems.</p>
    </div>
 
    <div class="wrap">
@@ -454,10 +474,10 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
     <!-- use cases -->
     <div class="panel" style="margin-top:20px">
      <div class="panel-p" style="padding-bottom:2px">
-      <h2>Or choose a tour by use case</h2>
-      <p class="sub">Scenario led tours built on the sample data already loaded in your trial.</p>
+      <h2>Or choose a tour by use case <span class="soon">Coming soon</span></h2>
+      <p class="sub">Scenario-led tours on other sample data. They are not available in this trial yet.</p>
      </div>
-     <div class="rows" id="rows"></div>
+     <div class="rows off" id="rows" aria-disabled="true"></div>
     </div>
 
     <div class="duo">
@@ -467,14 +487,13 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
       <div class="jump">
        <a class="lnk" href="/denodo-design-studio/">Design Studio</a>
        <a class="lnk" href="/denodo-data-catalog/#/">Data Marketplace</a>
-       <a class="lnk" href="/chatbot/">Ask a Question</a>
-       <a class="lnk" href="mcp-api.html">MCP and API</a>
-       <a class="lnk" href="documentation.html">Documentation</a>
+       <a class="lnk" href="https://www.denodo.com/en/contact-us" target="_blank" rel="noopener">Ask a Question</a>
+       <a class="lnk" href="/chatbot/">MCP and API</a>
+       <a class="lnk" href="https://community.denodo.com/docs/html/browse/9.6/en/" target="_blank" rel="noopener">Documentation</a>
       </div>
      </div>
      <div class="panel panel-p help">
       <h3>We are here to help</h3>
-      <a href="documentation.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Trial quick start guide</a>
       <a href="mcp-api.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6"/></svg>Connect your own AI client over MCP</a>
       <a href="https://community.denodo.com"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20v-1.5c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5V20M17 6a3 3 0 0 1 0 6M18.5 14c2 .7 3 2.1 3 4v2h-3.5"/></svg>Ask the Denodo Community</a>
      </div>
@@ -487,160 +506,6 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
 </section>
 
 <!-- ======== SCREEN B: GETTING READY (path preview folded in) ======== -->
-<section id="s-ready" class="screen">
- <div class="split">
-  <div class="split-l">
-   <span class="mark"><img alt="Denodo" class="lg"><em>Trial</em></span>
-   <h1 id="r-h1">Setting up your workspace</h1>
-   <p class="subl" id="r-sub"></p>
-   <ul class="stagelist" id="r-stages"></ul>
-   <p class="r-note" id="r-note" hidden>The guided workspace for this tour is not built yet. The Data Engineer workspace shows how every tour works: the same guidance panel, step checks and completion screen.</p>
-   <div class="bar"><i id="pbar"></i></div>
-   <ul class="chk" id="plist">
-    <li><span class="d"></span>Denodo Platform 9.6 running</li>
-    <li><span class="d"></span><span id="r-src">Data sources <code>bank</code> and <code>banking_rag</code> connected</span></li>
-    <li><span class="d"></span><span id="r-pack">Crestbank sample data products loaded</span></li>
-    <li><span class="d"></span>Your personal workspace folder created</li>
-   </ul>
-   <div style="display:flex;gap:10px;flex-wrap:wrap">
-    <button class="btn btn-primary" id="pgo" disabled onclick="openWorkspace()">Open guided workspace</button>
-    <button class="btn btn-ghost" onclick="go('s-welcome')">Back</button>
-   </div>
-  </div>
-  <div class="split-r">
-   <svg id="r-art" viewBox="0 0 400 330" width="100%" style="max-width:400px" aria-hidden="true"></svg>
-  </div>
- </div>
-</section>
-
-<!-- ======== SCREEN C: GUIDED WORKSPACE ======== -->
-<section id="s-ws" class="screen">
- <div class="ws">
-  <div class="ws-top"><img alt="Denodo" src="../assets/images/denodo_logo_white.svg"><span class="app-n">Design Studio</span>
-   <span class="env">Crestbank, trial workspace</span></div>
-  <div class="ws-body">
-   <aside class="ws-tree">
-    <div class="t-h">Crestbank</div>
-    <div class="t-f">01 Data Sources</div>
-    <div class="t-i" style="cursor:default">bank</div>
-    <div class="t-i" style="cursor:default">banking_rag</div>
-    <div class="t-f">03 Data Products</div>
-    <div id="tviews"></div>
-   </aside>
-   <main class="ws-main">
-    <h3>New view, untitled</h3>
-    <div class="canvas" id="canvas"><p class="empty">Select views from the tree to add them here.</p></div>
-    <div class="toolbar">
-     <button class="btn btn-ghost" id="btn-wizard" onclick="runWizard()">Data Modeling Wizard</button>
-     <button class="btn btn-ghost" id="btn-save" onclick="saveMeta()">Save metadata</button>
-     <button class="btn btn-primary" id="btn-publish" onclick="publish()">Publish as data product</button>
-    </div>
-    <div class="pg" id="pg" hidden>
-     <div class="pg-h"><span class="pg-app">Data Marketplace</span><b>Product card</b><code>loan_repayment_360</code></div>
-     <div class="pg-grid">
-      <div class="pg-card"><h5>Data Product Details <span class="ai-chip">AI usage on</span></h5>
-       <label class="pg-row"><span>Domain</span><input value="Finance &gt; Accounting"></label>
-       <label class="pg-row"><span>Version</span><input value="1.0.0"></label>
-       <label class="pg-row"><span>Status</span><select><option>🟢 Active</option><option>🟡 Draft</option><option>🟠 Deprecated</option><option>🔴 Retired</option></select></label>
-       <label class="pg-row"><span>Data Classification</span><select id="pg-class" class="need"><option value="">Choose</option><option>🌐 Public</option><option>🏢 Internal</option><option>🔒 Confidential</option><option>🛡️ PII / Sensitive</option></select></label>
-       <label class="pg-row"><span>Refresh Frequency</span><select><option>⚡ Real-time</option><option>⏱️ Hourly</option><option selected>📅 Daily</option><option>🗓️ Weekly</option><option>🐢 Monthly</option><option>✋ Manual</option></select></label>
-       <label class="pg-row"><span>Certification Tier</span><select id="pg-cert" class="need"><option value="">Choose</option><option>🥇 Gold - Verified</option><option>🥈 Silver - Reviewed</option><option>🥉 Bronze - Experimental</option></select></label>
-       <label class="pg-row"><span>Source Systems</span><input value="Bank core system (customers, loans, payments)"></label>
-      </div>
-      <div class="pg-card"><h5>Data Product Owners <span class="ai-chip">AI usage on</span></h5>
-       <label class="pg-row"><span>Department / Domain Team</span><input value="Retail Banking"></label>
-       <label class="pg-row"><span>Business Owner</span><input value="retail.banking.owner@yourcompany.com"></label>
-       <label class="pg-row"><span>Technical Owner / Data Steward</span><input value="retail.banking.steward@yourcompany.com"></label>
-       <label class="pg-row"><span>Support Contact</span><input value="retail.banking.support@yourcompany.com"></label>
-      </div>
-     </div>
-     <div class="pg-skills" id="pg-skills">
-      <h5>Agent skills for these views</h5>
-      <p class="n">From the Agent Skill Server. Each one is a reviewed set of instructions and VQL that an agent follows instead of guessing. Denodo Assistant in the Data Marketplace can use them too.</p>
-      <div class="skill"><i><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.4L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.6z"/></svg></i><div><code>bank-demo-verified-queries</code><br>Ten verified queries for common bank questions, including customers ranked by amount repaid.</div></div>
-      <div class="skill"><i><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.4L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.6z"/></svg></i><div><code>bank-demo-customer-360</code><br>Profile, deposits, loans and repayments for one customer.</div></div>
-      <div class="skill"><i><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.4L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.6z"/></svg></i><div><code>bank-demo-best-customer-report</code><br>Best customer by deposits, by lending and blended, side by side.</div></div>
-     </div>
-     <div class="pg-f"><button class="btn btn-primary" id="btn-pg" onclick="savePG()">Save to Data Marketplace</button></div>
-    </div>
-    <div id="meta" hidden>
-     <div class="field"><label for="f-name">View name</label><input id="f-name" value="loan_repayment_360"></div>
-     <div class="field"><label for="f-desc">Business description</label>
-      <textarea id="f-desc" rows="3" placeholder="What this answers, and what it must not be used for."></textarea></div>
-     <div class="field"><label>Tags</label><div class="tagrow">
-      <button class="tagbtn" onclick="this.classList.toggle('on')">ai_banking</button>
-      <button class="tagbtn" onclick="this.classList.toggle('on')">mcp</button>
-      <button class="tagbtn" onclick="this.classList.toggle('on')">pii_data</button></div></div>
-    </div>
-    <div id="preview" hidden>
-     <h3 style="margin-top:22px">Result preview, first 4 rows</h3>
-     <div class="result"><table>
-      <thead><tr><th>customer_id</th><th>last_name</th><th>loyalty</th><th>loan_amount</th><th>status</th><th>payment_date</th><th>payment_amount</th></tr></thead>
-      <tbody>
-       <tr><td>1042</td><td>Okonjo</td><td>Platinum</td><td>480,000</td><td>approved</td><td>2024-03-01</td><td>2,100</td></tr>
-       <tr><td>1177</td><td>Marchetti</td><td>Gold</td><td>265,000</td><td>approved</td><td>2024-09-01</td><td>1,450</td></tr>
-       <tr><td>1203</td><td>Lindqvist</td><td>Platinum</td><td>612,500</td><td>approved</td><td>2025-02-01</td><td>2,900</td></tr>
-       <tr><td>1318</td><td>Baptiste</td><td>Gold</td><td>225,000</td><td>approved</td><td>2025-08-01</td><td>3,700</td></tr>
-      </tbody></table></div>
-    </div>
-   </main>
-   <aside class="guide" id="guide">
-    <div class="g-h">
-     <div class="r"><span class="ttl" id="g-tour">Data Engineer tour</span>
-      <button class="x" title="Dismiss" onclick="dismiss()">×</button></div>
-     <div class="g-stages" id="gstages"></div>
-     <div class="cnt" id="gcnt"></div>
-    </div>
-    <div class="g-b">
-     <h4 id="gt"></h4><p id="gb"></p>
-     <div class="why" id="gw"></div>
-     <div class="task" id="gk"><span id="gki">○</span><span id="gkt"></span></div>
-    </div>
-    <div class="g-f">
-     <button class="btn btn-ghost" id="gback" onclick="step(-1)">Back</button>
-     <button class="lnk" onclick="exitTour()" style="padding:8px 4px">Exit</button>
-     <span class="sp"></span>
-     <button class="btn btn-primary" id="gnext" onclick="step(1)">Next</button>
-    </div>
-   </aside>
-  </div>
- </div>
- <button class="resume" id="resume" onclick="resumeTour()">Resume tour</button>
- <div class="toast" id="toast" role="status" aria-live="polite"></div>
- <div class="spot" id="spot"><div class="hole" id="hole"></div></div>
-</section>
-
-<!-- ======== SCREEN D: COMPLETION ======== -->
-<section id="s-done" class="screen">
- <div class="backdrop">
-  <div class="sheet" style="max-width:800px">
-   <div class="sheet-pad">
-    <div class="doneic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg></div>
-    <h1 style="font-size:30px;margin-bottom:12px" id="done-h">You published a data product</h1>
-    <p style="font-size:15px;color:var(--gunmetal);line-height:1.6" id="done-p"><code>loan_repayment_360</code>
-     is published and discoverable in the Data Marketplace.</p>
-    <div class="callout" id="done-c"><b>What you actually did.</b> You combined <code>customers</code>,
-     <code>loans</code> and <code>loan_payments</code> into one governed view, described it so a person or an
-     AI agent can use it correctly, classified it PII / Sensitive at Bronze certification, and published it once for every consumer, covering SQL, REST, the
-     Marketplace and MCP, instead of copying it into each.</div>
-    <h3 style="font-size:16px;margin-bottom:14px">Keep going with the same data product</h3>
-    <div class="opts">
-     <div class="opt"><span class="sq sq-teal" id="d1"></span><h3>Consume it as an analyst</h3>
-      <ul><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg><span>Find it in the Data Marketplace</span></li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg><span>Run the same question</span></li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg><span>Ask Denodo Assistant in plain English</span></li></ul>
-      <button class="btn-select" onclick="openTour('analyst')">Select</button></div>
-     <div class="opt"><span class="sq sq-violet" id="d2"></span><h3>Turn it into an agent tool</h3>
-      <ul><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg><span>Expose it over Denodo MCP Server</span></li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg><span>Wire it into your own client</span></li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg><span>Watch governance hold</span></li></ul>
-      <button class="btn-select" onclick="openTour('ai')">Select</button></div>
-    </div>
-    <p class="note"><b>Prototype note.</b> Publication here is simulated. In the trial, this step is confirmed by
-     reading the published view back from the running server before the tour is marked complete. Clicking the
-     button is not treated as success.</p>
-    <div style="margin-top:24px"><button class="btn btn-ghost" onclick="go('s-welcome')">Back to all tours</button></div>
-   </div>
-  </div>
- </div>
-</section>
-
 <script>
 /* Swap for ../assets/images/denodo_logo_black.png when this file is placed in www/ */
 var LOGO='../assets/images/denodo_logo_black.png';
@@ -662,20 +527,20 @@ var I={
 /* =================== TOURS =================== */
 var TOURS={
  analyst:{g:'p',i:'users',a:'sq-teal',t:'Business Analyst',art:'../assets/images/persona-analyst.jpg',
-  time:'8 min',
-  one:'Use Denodo’s Data Marketplace to find, review and get analytical insights from data products using natural language.',
+  time:'4 min',
+  one:'Use Denodo’s Data Marketplace to find a governed data product, query it without writing SQL, export the answer and ask Denodo Assistant in plain English.',
   stages:[['Find it','Search the Data Marketplace and read what the product is for.'],
           ['Review and request','Run the question, then request access to a restricted column.'],
           ['Ask in plain English','Put the same question to Denodo Assistant and compare.']]},
  engineer:{g:'p',i:'db',a:'sq-blue',t:'Data Engineer',art:'../assets/images/persona-engineer.jpg',
-  time:'10 min',
-  one:'Federate live data sources, create a data model, add metadata, and publish it as a reusable data product in Denodo, all without writing code.',
+  time:'5 min',
+  one:'Federate live data sources, create a data model, add metadata and publish it as a reusable data product in Denodo, without writing code.',
   stages:[['Open the governed views','Add customers, loans and loan_payments to a new view.'],
           ['Model and describe','Combine them with the Data Modeling Wizard, add a description and tags.'],
           ['Publish and classify','Publish it, then set its classification, certification and owners in the Data Marketplace.']]},
  ai:{g:'p',i:'agent',a:'sq-violet',t:'AI Builder',art:'../assets/images/persona-ai.jpg',
-  time:'12 min',
-  one:'Build AI agents and applications using Denodo AI SDK, or connect existing AI agents to governed enterprise data through Denodo MCP Server.',
+  time:'3 min',
+  one:'Build AI agents and applications with the Denodo AI SDK, or connect your existing AI agents to governed enterprise data through the Denodo MCP Server.',
   stages:[['Expose the tool','Tag the product mcp so the Denodo MCP Server adds a dedicated tool for it.'],
           ['Connect your client','Point VS Code, Claude Desktop or Cursor at the MCP endpoint.'],
           ['Build and test the agent','Answer the question, then test the permission boundary.']]},
@@ -726,19 +591,19 @@ function render(){
    return '<div class="row-i"><span class="sq '+t.a+'">'+I[t.i]+'</span><div class="txt">'+
     '<h4>'+t.t+'</h4><p>'+t.one+'</p></div>'+
     '<div class="right"><span class="time">About '+t.time+'</span>'+
-    '<button class="lnk" onclick="openTour(\''+k+'\')">Start tour</button></div></div>';
+    '<button class="lnk" type="button" disabled>Coming soon</button></div></div>';
   }).join('');
 }
 
 /* card goes straight to readiness, no preview screen */
 function openTour(key){
+ if(ORDER.indexOf(key)>-1){location.href='guided-personas.html?role='+key+'&start=1';return}
  state.tour=key; save();
  var t=TOURS[key];
  document.getElementById('r-h1').textContent='Setting up your '+t.t+' workspace';
  var END={analyst:'Ends with an answer you can export.',engineer:'Ends with a published data product.',ai:'Ends with your own agent answering through MCP.'};
  document.getElementById('r-sub').textContent='About '+t.time+'.'+(END[key]?' '+END[key]:'');
- var built=(key==='engineer'), note=document.getElementById('r-note');
- note.hidden=built;
+ var built=(key==='engineer');
  document.getElementById('pgo').textContent=built?'Open guided workspace':'Preview the Data Engineer workspace';
  var st=t.stages;
  document.getElementById('r-stages').innerHTML=st.map(function(s,i){
@@ -835,7 +700,7 @@ function savePG(){
  if(c.indexOf('PII')<0){say('customers is classified PII / Sensitive in the Data Marketplace, and this product includes last_name. A product inherits the strictest classification of what it contains.');return}
  if(t.indexOf('Bronze')<0){say('Nobody has reviewed this product yet. New products start at Bronze - Experimental; a data steward promotes them after review.');return}
  pgSaved=true;document.getElementById('btn-pg').textContent='Saved';checkTask()}
-['pg-class','pg-cert'].forEach(function(i){var e=document.getElementById(i);e.addEventListener('change',function(){e.classList.toggle('need',!e.value)})});
+['pg-class','pg-cert'].forEach(function(i){var e=document.getElementById(i);if(e)e.addEventListener('change',function(){e.classList.toggle('need',!e.value)})});
 
 var ALLSTEPS=[
  {st:0,sel:'[data-v="customers"]',t:'Start with the customer view',
@@ -909,7 +774,7 @@ function spotlight(sel){
 }
 function hideSpot(){document.getElementById('spot').classList.remove('on')}
 function repos(){
- if(!document.getElementById('s-ws').classList.contains('active')) return;
+ var ws=document.getElementById('s-ws'); if(!ws||!ws.classList.contains('active')) return;
  if(document.getElementById('guide').style.display==='none') return;
  var S=steps(); spotlight(S[Math.min(state.stepIdx||0,S.length-1)].sel);
 }
@@ -1025,22 +890,22 @@ if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matc
 function renderResume(){
  var bar=document.getElementById('resumebar');
  if(!bar) return;
- if(!state.tour||!state.stepIdx){bar.innerHTML='';return}
- var t=TOURS[state.tour]; if(!t){bar.innerHTML='';return}
+ var g={};try{g=JSON.parse(localStorage.getItem('denodo.guided.crestbank.v3')||'{}')}catch(e){}
+ var r=g.role,t=TOURS[r],n=0;
+ if(t&&g.done&&g.done[r]){for(var k in g.done[r]){if(g.done[r][k])n++}}
+ if(!t||(!n&&!g.step)){bar.innerHTML='';return}
  bar.innerHTML='<div class="rbar"><span>You were part way through the <b>'+t.t+
-  '</b> tour, at step '+(state.stepIdx+1)+'.</span><span class="sp">'+
-  '<button class="btn btn-primary btn-sm" onclick="resumeFromStart()">Resume</button>'+
-  '<button class="lnk" onclick="clearProgress()">Start over</button></span></div>';
+  '</b> tour, at step '+((g.step||0)+1)+'.</span><span class="sp">'+
+  '<a class="btn btn-primary btn-sm" href="guided-personas.html?role='+r+'&start=1">Resume</a></span></div>';
 }
-function resumeFromStart(){
- var keep=state.stepIdx; buildTree(); resetWS(); state.stepIdx=keep; save();
- go('s-ws'); renderStep();
-}
-function clearProgress(){ state.tour=null; state.stepIdx=0; save(); renderResume() }
-
 render();
 renderResume();
 </script>
 <script src="../assets/js/challenge-context.js"></script>
+<script>
+/* Opened from a laptop for testing, Denodo links use the trial server */
+(function(){var L=!/^https?:$/.test(location.protocol)||/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+ if(!L)return;document.querySelectorAll('a[href^="/denodo-"],a[href^="/chatbot/"],a[href^="/aisdk"]').forEach(function(a){a.href='https://try-dev.dimv.foo'+a.getAttribute('href')})})();
+</script>
 </body>
 </html>

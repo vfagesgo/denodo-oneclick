@@ -1275,8 +1275,9 @@ else
 fi
 dl_end
 
+## VFG AISDK Agents
 ## Creating AISDK Agents
-cp -a /opt/denodo-oneclick/samples/chatbot_agent/custom/. \
+cp -a /opt/denodo-oneclick/samples/ai-sdk/chatbot_agent/custom/. \
       /opt/denodo/denodo-aisdk/api/agents/custom/
 chown -R denodo:denodo /opt/denodo/denodo-aisdk/api/agents/custom/
 
@@ -1656,16 +1657,16 @@ export DENODO_VDP_PWD="${DENODO_VDP_PWD:-admin}"
 export OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 
 log_step "Importing admin VDB"
-"$REPO_ROOT/samples/vdb_admin/vdb_admin_install.sh"
+"$REPO_ROOT/samples/demo-models/vdb_admin/vdb_admin_install.sh"
 
 log_step "Importing asset_extensions VDB"
-"$REPO_ROOT/samples/vdb_asset_extensions/vdb_asset_extensions_install.sh"
+"$REPO_ROOT/samples/demo-models/vdb_asset_extensions/vdb_asset_extensions_install.sh"
 
 log_step "Importing bank_demo VDB"
-"$REPO_ROOT/samples/vdb_bank_demo/vdb_bank_demo_install.sh"
+"$REPO_ROOT/samples/demo-models/vdb_bank_demo/vdb_bank_demo_install.sh"
 
 log_step "Importing pharm_ai VDB"
-"$REPO_ROOT/samples/vdb_pharm_ai/vdb_pharm_ai_install.sh"
+"$REPO_ROOT/samples/demo-models/vdb_pharm_ai/vdb_pharm_ai_install.sh"
 
 
 # Started here, at the very end, rather than back in Section 01 right after
