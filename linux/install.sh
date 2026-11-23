@@ -127,6 +127,9 @@ aisdk_has_openai_key() {
   [ -n "$value" ]
 }
 
+
+
+
 # Writes $OPENAI_API_KEY into the AI SDK/chatbot config files. Used by both
 # Section 12 (install/upgrade) and the refresh action.
 #
@@ -138,7 +141,7 @@ aisdk_has_openai_key() {
 # undoing a previously working AI SDK key on every plain --upgrade).
 configure_aisdk_openai_key() {
   local sdk_config="$AISDK_INSTALL_DIR/api/utils/sdk_config.env"
-  local chatbot_config="$AISDK_INSTALL_DIR/sample_chatbot/chatbot_config.env"
+  local chatbot_config="$AISDK_INSTALL_DIR/sample_chatbot/utils/chatbot_config.env"
 
   if [ ! -f "$sdk_config" ]; then
     if [ ! -f "$sdk_config.example" ]; then
@@ -1277,9 +1280,10 @@ dl_end
 
 ## VFG AISDK Agents
 ## Creating AISDK Agents
-#cp -a /opt/denodo-oneclick/samples/ai-sdk/chatbot_agent/custom/. \
-#      /opt/denodo/denodo-aisdk/api/agents/custom/
-#chown -R denodo:denodo /opt/denodo/denodo-aisdk/api/agents/custom/
+mkdir -p /opt/denodo/denodo-aisdk/api/agents/custom
+cp -a /opt/denodo-oneclick/samples/ai-sdk/chatbot_agent/custom/. \
+      /opt/denodo/denodo-aisdk/api/agents/custom/
+chown -R denodo:denodo /opt/denodo/denodo-aisdk/api/agents/custom/
 
 # Section 13:
 # The AI SDK depends on a fairly large native/Python build toolchain on
