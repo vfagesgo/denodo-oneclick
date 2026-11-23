@@ -141,10 +141,10 @@ a{color:var(--peacock-blue)}
 <li>MCP tools to search metadata, list views, get view schemas, and execute and validate VQL queries</li>
 <li>Tag-based metadata visibility across multiple databases</li>
 </ul>
-<p><strong>MCP Endpoint:</strong> <code>https://try-dev.dimv.foo/mcp/admin/mcp</code></p>
+<p><strong>MCP Endpoint:</strong> <code>${window.location.protocol}//${window.location.host}/mcp/admin/mcp</code></p>
 <h3>1.2 AI-SDK MCP</h3>
 <p>Connect the AI-SDK as an MCP server to any MCP-compatible client (Visual Studio Code, Claude Desktop, Cursor…) via remote MCP (HTTP).</p>
-<p><strong>AI-SDK MCP Endpoint:</strong> <code>https://try-dev.dimv.foo/aisdk/mcp</code></p>
+<p><strong>AI-SDK MCP Endpoint:</strong> <code>${window.location.protocol}//${window.location.host}/aisdk/mcp</code></p>
 <h3>1.3 Authentication</h3>
 <h4>1.3.1 Basic Authentication</h4>
 <ol>
@@ -154,7 +154,7 @@ a{color:var(--peacock-blue)}
 <pre><code class="language-json">{
   &quot;servers&quot;: {
     &quot;Denodo&quot;: {
-      &quot;url&quot;: &quot;https://try-dev.dimv.foo/mcp/admin/mcp&quot;,
+      &quot;url&quot;: &quot;${window.location.protocol}//${window.location.host}/mcp/admin/mcp&quot;,
       &quot;type&quot;: &quot;http&quot;,
       &quot;headers&quot;: {
         &quot;Authorization&quot;: &quot;Basic YWRtaW46YWRtaW4=&quot;
@@ -224,7 +224,7 @@ a{color:var(--peacock-blue)}
 <li>
 <p>Click <strong>Install</strong>.</p>
 </li>
-<li>Enter the Hostname <code>try-dev.dimv.foo</code>.</li>
+<li>Enter the Hostname <code>${window.location.host}</code>.</li>
 </ol>
 <p><figure><img alt="Claude Desktop - Denodo connector configuration" src="images/claude-desktop-connector-config.png"><figcaption>Claude Desktop - Denodo connector configuration</figcaption></figure>
 5. Select the authentication mode and enter your credentials. Use either the Basic or Oauth.</p>
@@ -247,35 +247,46 @@ a{color:var(--peacock-blue)}
 <li><strong>Model &amp; Vector Store Agnostic:</strong> Switch between LLMs and vector databases as needed.</li>
 </ul>
 <h4>AI-SDK API Swagger documentation</h4>
-<p><code>https://try-dev.dimv.foo/aisdk/docs</code></p>
+<p><code>${window.location.protocol}//${window.location.host}/aisdk/docs</code></p>
 <p><figure><img alt="AI-SDK Swagger" src="images/aisdk-swagger.png"><figcaption>AI-SDK Swagger</figcaption></figure></p>
 <h3>2.2 Data Marketplace</h3>
 <p>The Data Marketplace REST API performs programmatically all the tasks available in the GUI.</p>
 <h4>DM API Swagger documentation</h4>
-<p><code>https://try-dev.dimv.foo/denodo-data-catalog/swagger-ui/index.html</code></p>
+<p><code>${window.location.protocol}//${window.location.host}/denodo-data-catalog/swagger-ui/index.html</code></p>
 <p><figure><img alt="Data Marketplace Swagger" src="images/data-marketplace-swagger.png"><figcaption>Data Marketplace Swagger</figcaption></figure></p>
 <h3>2.3 GraphQL</h3>
 <p>Run GraphQL queries against the Denodo virtual data model.</p>
-<p><strong>GraphQL Endpoint:</strong> <code>https://try-dev.dimv.foo/denodo-graphql-service/graphql/&lt;database&gt;/schema.json</code></p>
+<p><strong>GraphQL Endpoint:</strong> <code>${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/&lt;database&gt;/schema.json</code></p>
 <p><strong>Examples:</strong></p>
 <ul>
-<li><code>https://try-dev.dimv.foo/denodo-graphql-service/graphql/bank_demo/schema.json</code></li>
-<li><code>https://try-dev.dimv.foo/denodo-graphql-service/graphql/medixit/schema.json</code></li>
+<li><code>${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/bank_demo/schema.json</code></li>
+<li><code>${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/medixit/schema.json</code></li>
 </ul>
 <h3>2.4 VDP RESTful</h3>
 <p>The RESTful web service publishes the contents of the entire Virtual DataPort server over HTTP.</p>
-<p><strong>RESTful web service Endpoint:</strong> <code>https://try-dev.dimv.foo/denodo-restfulws/&lt;database&gt;</code></p>
+<p><strong>RESTful web service Endpoint:</strong> <code>${window.location.protocol}//${window.location.host}/denodo-restfulws/&lt;database&gt;</code></p>
 <p><strong>Examples:</strong></p>
 <ul>
-<li><code>https://try-dev.dimv.foo/denodo-restfulws/admin</code> returns the list of views of the database <code>admin</code>.</li>
-<li><code>https://try-dev.dimv.foo/denodo-restfulws/admin/views/customer</code> returns the content of the view <code>customer</code>.</li>
-<li><code>https://try-dev.dimv.foo/denodo-restfulws/admin/views/customer/1/orders</code> browses the <code>orders</code> mapping of the <code>customer</code> row with primary key 1.</li>
-<li><code>https://try-dev.dimv.foo/denodo-restfulws/OpenAPIv3/openapi.json</code> returns the OpenAPI 3 document in JSON.</li>
-<li><code>https://try-dev.dimv.foo/denodo-restfulws/OpenAPIv3/openapi.yaml?database=db1&amp;database=db2&amp;tag=tag1&amp;tag=tag2</code> returns the OpenAPI 3 document in YAML for views in databases <code>db1</code> or <code>db2</code> with tags <code>tag1</code> or <code>tag2</code>.</li>
+<li><code>${window.location.protocol}//${window.location.host}/denodo-restfulws/admin</code> returns the list of views of the database <code>admin</code>.</li>
+<li><code>${window.location.protocol}//${window.location.host}/denodo-restfulws/admin/views/customer</code> returns the content of the view <code>customer</code>.</li>
+<li><code>${window.location.protocol}//${window.location.host}/denodo-restfulws/admin/views/customer/1/orders</code> browses the <code>orders</code> mapping of the <code>customer</code> row with primary key 1.</li>
+<li><code>${window.location.protocol}//${window.location.host}/denodo-restfulws/OpenAPIv3/openapi.json</code> returns the OpenAPI 3 document in JSON.</li>
+<li><code>${window.location.protocol}//${window.location.host}/denodo-restfulws/OpenAPIv3/openapi.yaml?database=db1&amp;database=db2&amp;tag=tag1&amp;tag=tag2</code> returns the OpenAPI 3 document in YAML for views in databases <code>db1</code> or <code>db2</code> with tags <code>tag1</code> or <code>tag2</code>.</li>
 </ul></div></div></section>
   <p class="foot">Property of Denodo. &copy; Copyright Denodo 2026</p>
  </div>
 </div>
 </div>
+<script>
+(function(){
+  var T=window.location.protocol+'//'+window.location.host, H=window.location.host;
+  var tok='${window.location.protocol}//${window.location.host}', htok='${window.location.host}';
+  function fix(s){return s.split(tok).join(T).split(htok).join(H);}
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n,a=[];
+  while((n=w.nextNode()))a.push(n);
+  a.forEach(function(t){if(t.nodeValue.indexOf('${window.location')>-1)t.nodeValue=fix(t.nodeValue);});
+  document.querySelectorAll('a[href]').forEach(function(e){var h=e.getAttribute('href');if(h.indexOf('${window.location')>-1)e.setAttribute('href',fix(h));});
+})();
+</script>
 </body>
 </html>

@@ -14,6 +14,10 @@ ENTER SINGLE USER MODE;
 # #######################################
 # ROLE CREATION
 # #######################################
+CREATE OR REPLACE ROLE denodooneclickrole '';
+
+CREATE OR REPLACE ROLE enduser_executeonly 'metadata and execute access only';
+
 
 # 0 ====================================================================
 
@@ -1574,7 +1578,13 @@ ALTER VIEW mv_clinical_trials
 # #######################################
 # USER PRIVILEGES
 # #######################################
-# No user
+ALTER USER ai_builder
+GRANT ROLE allusers,execute_only,enduser_executeonly,use_large_language_model,serveradmin,assignprivileges,publish_web_services_without_authentication
+GRANT ADMIN ON pharm_ai;
+
+ALTER USER analyst_user
+GRANT CONNECT, METADATA, EXECUTE ON pharm_ai;
+
 # #######################################
 # ROLE PRIVILEGES
 # #######################################

@@ -71,49 +71,32 @@ a{color:var(--peacock-blue)}
 .panel h2{font-size:21px;margin-bottom:6px}
 .sub{font-size:13.5px;color:var(--gunmetal);line-height:1.5}
 
-/* ---- autoplay product animation ---- */
-.an-frame{position:relative;border-radius:14px;padding:22px;overflow:hidden;
+/* ---- product showcase: short highlight clips of real Denodo screens, cycling by themselves ---- */
+.an-frame{position:relative;border-radius:14px;padding:14px;overflow:hidden;
   background:#fff radial-gradient(var(--line) 1px,transparent 1px) 0 0/22px 22px;
   border:1px solid var(--line)}
+.sc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:32px;align-items:center}
+.sc-txt{padding:6px 4px 6px 10px}
+.sc-eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--peacock-blue);margin:0 0 10px}
+.sc-txt h3{font-size:24px;line-height:1.2;color:var(--midnight-blue);margin:0 0 10px;min-height:1.2em}
+.sc-txt p.sc-c{font-size:15px;line-height:1.55;color:var(--gunmetal);margin:0 0 18px;min-height:4.65em}
+.sc-foot{display:flex;align-items:center;gap:14px}
+.sc-dots{display:flex;gap:6px}
+.sc-dots i{width:22px;height:4px;border-radius:2px;background:var(--light-grey);overflow:hidden;position:relative}
+.sc-dots i.done{background:var(--peacock-blue)}
+.sc-dots i b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--peacock-blue)}
+.sc-n{font-size:12.5px;color:var(--muted);min-width:3.6em}
 .an-win{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;
   box-shadow:0 6px 26px rgba(17,37,51,.09)}
-.an-tabs{display:flex;gap:20px;padding:15px 18px 0;border-bottom:1px solid var(--light-grey)}
-.an-tabs span{font-size:13px;color:var(--muted);padding-bottom:9px;border-bottom:2px solid transparent}
-.an-tabs span.on{color:var(--peacock-blue);font-weight:600;border-bottom-color:var(--peacock-blue)}
-.an-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 18px 20px;
-  background:var(--light-grey-b);min-height:316px}
-.an-col{background:#eef1f4;border-radius:7px;padding:10px}
-.an-col h5{font-size:12px;font-weight:600;color:var(--gunmetal);margin:0 0 10px;
-  display:flex;align-items:center;gap:7px;letter-spacing:.01em}
-.an-col h5 em{font-style:normal;color:var(--muted);font-weight:400}
-.an-card{background:#fff;border:1px solid var(--line);border-radius:6px;margin-bottom:9px;
-  opacity:1;transform:translateY(0);transition:opacity .35s,transform .35s,border-color .25s}
-.an-card.hidden{opacity:0;transform:translateY(8px)}
-.an-card.lit{border-color:var(--peacock-blue)}
-.an-card .cb{padding:10px 11px 9px}
-.an-card .nm{font-size:12.5px;font-weight:600;line-height:1.35;margin-bottom:7px}
-.an-card .nm{overflow-wrap:anywhere}
-.an-tag{display:inline-block;font-size:11px;font-weight:600;border:1px solid var(--line);
-  border-radius:3px;padding:1px 6px;margin:0 4px 2px 0;color:var(--gunmetal)}
-.an-tag.pii{border-color:#efc3bf;color:#b8342c}
-.an-tag.mcp{border-color:#b9cfdc;color:var(--peacock-blue)}
-.an-row{display:none;align-items:center;gap:7px;padding:7px 11px;border-top:1px solid var(--light-grey);
-  background:#f7f9fa;font-size:11.5px;color:var(--gunmetal)}
-.an-card.work .an-row.w{display:flex}
-.an-card.done .an-row.d{display:flex}
-.an-row .sp{width:11px;height:11px;border:2px solid var(--grey);border-top-color:var(--peacock-blue);
-  border-radius:50%;animation:sp .7s linear infinite;flex:none}
-@keyframes sp{to{transform:rotate(360deg)}}
-.an-row .tick{width:13px;height:13px;border-radius:50%;background:var(--green-success);flex:none;
-  display:flex;align-items:center;justify-content:center;margin-left:auto}
-.an-row .dots{margin-left:auto;color:var(--grey)}
-.an-cursor{position:absolute;width:19px;height:25px;pointer-events:none;z-index:5;
-  transition:left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
-.an-pause{position:absolute;right:18px;bottom:18px;width:40px;height:40px;border-radius:50%;
+.sc-view{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--light-grey-b)}
+.sc-view video,.sc-view img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .35s}
+.sc-view.fade video,.sc-view.fade img{opacity:0}
+.an-pause{width:34px;height:34px;border-radius:50%;flex:none;
   background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 10px rgba(17,37,51,.14);z-index:6}
+  box-shadow:0 2px 8px rgba(17,37,51,.1)}
 .an-pause:hover{border-color:var(--peacock-blue)}
-.an-cap{font-size:12.5px;color:var(--muted);margin-top:10px;text-align:center}
+.an-pause[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.sc-view video,.sc-view img{transition:none}}
 
 
 .steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:20px}
@@ -156,18 +139,12 @@ a{color:var(--peacock-blue)}
   .hero h1{font-size:22px;line-height:1.25}
   .panel-p{padding:20px 18px}
   .panel h2{font-size:19px;line-height:1.25}
-  /* the board is a 4-column desktop layout: stack it so nothing is clipped */
+  /* showcase: clip above the text on narrow screens */
   .an-frame{padding:12px}
-  .an-board{grid-template-columns:1fr;gap:10px;min-height:0;padding:12px}
-  .an-col{padding:10px 12px}
-  .an-col h5{margin-bottom:8px}
-  .an-card{margin-bottom:7px}
-  .an-tabs{gap:14px;padding:12px 12px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .an-tabs span{white-space:nowrap;font-size:12.5px}
-  .an-cursor{display:none}
-  .an-card.hidden{display:none}
-  .an-pause{right:12px;bottom:12px}
-  .an-cap{font-size:12px;padding:0 4px}
+  .sc{grid-template-columns:1fr;gap:14px}
+  .sc-txt{padding:0 4px;order:2}
+  .sc-txt h3{font-size:19px}
+  .sc-txt p.sc-c{font-size:13.5px;min-height:0;margin-bottom:12px}
   .s3 .art{height:150px}
   .s3 .in{padding:16px}
   .s3 h4{font-size:17px}
@@ -198,14 +175,14 @@ if(PREVIEW){document.addEventListener('DOMContentLoaded',function(){
  <aside class="nav">
   <div class="brand"><img src="../assets/images/denodo_logo_black.png" alt="Denodo"></div>
   <div class="nav-s">Trial</div>
-  <a href="welcome.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-5 2 2-5 5-2z"/></svg>Get started</a>
+  <a href="welcome.html?challenge=crestbank"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-5 2 2-5 5-2z"/></svg>Get started</a>
   <a class="on" href="guided-personas.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4V5z"/><path d="M8 9h8M8 12h5"/></svg>Guided tours</a>
   <div class="nav-s">Tools</div>
   <a data-app="ds" href="/denodo-design-studio/" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5zM3 7l9 5 9-5M12 12v10"/></svg>Design Studio</a>
   <a data-app="dm" href="/denodo-data-catalog/#/" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Data Marketplace</a>
-  <a href="https://www.denodo.com/en/contact-us" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l2 6.2L20 10l-6 1.8L12 18l-2-6.2L4 10l6-1.8L12 2z"/></svg>Ask a Question</a>
-  <a data-app="chat" href="/chatbot/" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6L11.8 6.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6l1.2-1.2"/></svg>MCP and API</a>
-  <a href="https://community.denodo.com/docs/html/browse/9.6/en/" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Documentation</a>
+  <a data-app="chat" href="/chatbot/" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l2 6.2L20 10l-6 1.8L12 18l-2-6.2L4 10l6-1.8L12 2z"/></svg>Ask a Question</a>
+  <a data-app="mcp" href="mcp-api.html" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6L11.8 6.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6l1.2-1.2"/></svg>MCP and API</a>
+  <a data-app="docs" href="documentation.html" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Documentation</a>
  </aside>
 
  <div class="main">
@@ -223,18 +200,24 @@ if(PREVIEW){document.addEventListener('DOMContentLoaded',function(){
   <div class="wrap">
    <div class="notice" id="status" role="status" aria-live="polite" hidden></div>
 
-   <div class="an-frame" id="anim">
-    <div class="an-win">
-     <div class="an-tabs" id="antabs"></div>
-     <div class="an-board" id="anboard"></div>
+   <!-- product showcase: short highlight clips of real Denodo screens, cycling by themselves -->
+   <div class="an-frame" id="anim" role="region" aria-label="Denodo at work">
+    <div class="sc">
+     <div class="sc-txt">
+      <p class="sc-eyebrow">See Denodo at work</p>
+      <h3 id="sct"></h3>
+      <p class="sc-c" id="scc" aria-live="polite"></p>
+      <div class="sc-foot">
+       <button class="an-pause" id="pz" type="button" aria-label="Pause">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+       </button>
+       <span class="sc-dots" id="scd" aria-hidden="true"></span>
+       <span class="sc-n" id="scn"></span>
+      </div>
+     </div>
+     <div class="an-win"><div class="sc-view" id="scview"><img id="sci" alt=""><video id="scv" muted playsinline preload="auto" aria-hidden="true" hidden></video></div></div>
     </div>
-    <svg class="an-cursor" id="cur" viewBox="0 0 19 25" fill="#112533" stroke="#fff" stroke-width="1.4">
-     <path d="M1 1l16 11-7 1.4 3.6 8-3 1.3-3.6-8L1 20z"/></svg>
-    <button class="an-pause" id="pz" onclick="toggleAnim()" aria-label="Pause">
-     <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-    </button>
    </div>
-   <p class="an-cap">One governed view, built once, reachable four ways.</p>
 
    <div class="panel panel-p" style="margin-top:24px">
     <h2>Choose a tour and get hands on in a few minutes!</h2>
@@ -256,25 +239,6 @@ if(PREVIEW){document.addEventListener('DOMContentLoaded',function(){
     </div>
    </div>
 
-   <div class="duo">
-    <div class="panel panel-p">
-     <h3 style="font-size:16px;margin-bottom:8px">Skip the tours</h3>
-     <p class="sub" style="line-height:1.55;margin-bottom:14px">Open any tool and dive right in!</p>
-     <div class="jump">
-      <a class="lnk" data-app="ds" href="/denodo-design-studio/" target="denodo-app">Design Studio</a>
-      <a class="lnk" data-app="dm" href="/denodo-data-catalog/#/" target="denodo-app">Data Marketplace</a>
-      <a href="https://www.denodo.com/en/contact-us" target="_blank" rel="noopener">Ask a Question</a>
-      <a class="lnk" data-app="chat" href="/chatbot/" target="denodo-app">MCP and API</a>
-      <a class="lnk" href="https://community.denodo.com/docs/html/browse/9.6/en/" target="_blank" rel="noopener">Documentation</a>
-     </div>
-    </div>
-    <div class="panel panel-p help">
-     <h3>We are here to help</h3>
-     <a data-app="mcp" href="mcp-api.html" target="denodo-app"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6"/></svg>Connect your own AI client over MCP</a>
-     <a href="https://community.denodo.com" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20v-1.5c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5V20M17 6a3 3 0 0 1 0 6M18.5 14c2 .7 3 2.1 3 4v2h-3.5"/></svg>Ask the Denodo Community</a>
-    </div>
-   </div>
-
    <p style="font-size:12.5px;color:var(--muted);margin-top:28px">Property of Denodo. © Copyright Denodo 2026</p>
   </div>
  </div>
@@ -282,116 +246,78 @@ if(PREVIEW){document.addEventListener('DOMContentLoaded',function(){
 <button class="resume" id="resume" type="button" hidden>Resume tour</button>
 
 <script>
-/* ============ Product animation: copied from index_v3.html (v0006) ============ */
-var TABS=['Sources','Model','Marketplace','Services'];
-
-var DATASETS=[
- /* Connected sources match the entry-page diagram (index.html): illustrative source
-    types, not the lineage of the product. Views and data products are real objects.
-    loan_repayment_360 is what the Data Engineer tour builds. */
- {who:'Crestbank',
-  src:[['Traditional DB &amp; DW','Core systems'],['SaaS apps','CRM &amp; service'],['Streaming','Payments events']],
-  views:[['customers',['mcp','pii_data']],['loans',['ai_banking']],['loan_payments',['ai_banking']]],
-  dp:['loan_repayment_360',['mcp','ai_banking']]},
- /* Existing product. i_clinical_trials_patients_start_date is implemented by
-    v_clinical_trials_patients_start_date = clinical_trials + common_date + patients. */
- {who:'Medixit',
-  src:[['Files','X-ray images'],['Lakehouse','Research platform'],['SaaS','Clinical apps']],
-  views:[['patients',['medixit_ai']],['clinical_trials',['medixit_ai']],['common_date',['medixit_ai']]],
-  dp:['i_clinical_trials_patients_start_date',['ai_ready']]}
+/* Product showcase: seven short highlight clips (assets/videos/showcase) that play one after another by themselves.
+   Each has a still (assets/images/showcase), shown before its clip plays, and instead of the clips when the visitor
+   prefers reduced motion. The pause button stops the cycle. */
+var SC=[
+ {k:'assistant',t:'Denodo Assistant',
+  c:'Ask in plain English. Denodo Assistant answers with a verified agent skill and shows the views it used.'},
+ {k:'ai-sdk-agent',t:'AI SDK agent',
+  c:'An AI SDK agent finds the right views, writes the VQL and answers from governed data.'},
+ {k:'deepquery',t:'DeepQuery',
+  c:'Switch the chatbot to Deep Query. It plans a multi-step analysis and asks you to confirm the plan before it runs.'},
+ {k:'drag-and-drop',t:'Drag-and-drop query',
+  c:'Build a query without writing SQL: drag fields into place, then count and add them up.'},
+ {k:'modeling-wizard',t:'Data Modeling Wizard',
+  c:'Describe a view in plain English. The wizard joins the sources, validates the view and shows the rows.'},
+ {k:'ai-metadata',t:'AI-written metadata',
+  c:'The wizard suggests business-friendly field names and descriptions for the new view.'},
+ {k:'graph-360',t:'360 Graph',
+  c:'The 360 Graph draws how a data product connects to its views and data sources.'}
 ];
-var USERS=['Data Marketplace','SQL','REST service','MCP tool'];
-/* The industry chosen on the entry page pins the dataset. With no choice,
-   the loop alternates as before. */
-var CHALLENGE=(function(){try{
-  var q=new URLSearchParams(location.search).get('challenge');
-  if(!q)return 0;   /* this page defaults to Crestbank */ q=q.toLowerCase();
-  for(var i=0;i<DATASETS.length;i++) if(DATASETS[i].who.toLowerCase()===q) return i;
-  return null;
-}catch(e){return null}})();
-var dsi=CHALLENGE!==null?CHALLENGE:Math.floor(Math.random()*DATASETS.length);
-
-function tick(){return '<span class="tick"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg></span>'}
-function tags(list){return list.map(function(t){
- var c=t==='pii_data'?' pii':(t==='mcp'?' mcp':'');
- return '<span class="an-tag'+c+'">'+t+'</span>'}).join('')}
-function rowW(l){return '<div class="an-row w"><span class="sp"></span>'+l+'<span class="dots">\u2022</span></div>'}
-function rowD(l){return '<div class="an-row d">'+l+tick()+'</div>'}
-
-function buildBoard(){
- var d=DATASETS[dsi];
- document.getElementById('antabs').innerHTML=TABS.map(function(t,i){
-  return '<span id="tab'+i+'">'+t+'</span>'}).join('');
- document.getElementById('anboard').innerHTML=
-  '<div class="an-col" id="colA"><h5>Connected sources <em>'+d.src.length+'</em></h5>'+
-   d.src.map(function(x){return '<div class="an-card"><div class="cb"><div class="nm">'+x[0]+
-    '</div><span class="an-tag">'+x[1]+'</span></div></div>'}).join('')+'</div>'+
-  '<div class="an-col" id="colB"><h5>Governed views <em>'+d.views.length+'</em></h5>'+
-   d.views.map(function(v,i){return '<div class="an-card" id="c'+(i+1)+'"><div class="cb"><div class="nm">'+
-    v[0]+'</div>'+tags(v[1])+'</div>'+rowW('Reading schema')+rowD('Validated')+'</div>'}).join('')+'</div>'+
-  '<div class="an-col" id="colC"><h5>Data product <em id="dpn">0</em></h5>'+
-   '<div class="an-card hidden" id="dp"><div class="cb"><div class="nm">'+d.dp[0]+'</div>'+
-   tags(d.dp[1])+'</div>'+rowW('Combining '+d.views.length+' views')+rowD('Published')+'</div></div>'+
-  '<div class="an-col" id="colD"><h5>Reachable from <em id="cn">0</em></h5>'+
-   USERS.map(function(u,i){return '<div class="an-card hidden" id="u'+(i+1)+'"><div class="cb"><div class="nm">'+
-    u+'</div></div>'+rowD('Live')+'</div>'}).join('')+'</div>';
-}
-
-var anI=0, anTimer=null, anOn=true;
-function el(id){return document.getElementById(id)}
-function cls(id,c,on){var e=el(id); if(e) e.classList.toggle(c,!!on)}
-function tab(i){TABS.forEach(function(_,n){cls('tab'+n,'on',n===i)}); cur('#tab'+i,undefined,10)}
-function cur(sel,dx,dy){
- var t=document.querySelector(sel), f=el('anim'), c=el('cur');
- if(!t||!f||!c) return;
- var a=t.getBoundingClientRect(), b=f.getBoundingClientRect();
- c.style.left=(a.left-b.left+(dx===undefined?a.width*0.55:dx))+'px';
- c.style.top=(a.top-b.top+(dy===undefined?a.height*0.55:dy))+'px';
-}
-function anReset(){
- if(CHALLENGE===null) dsi=(dsi+1)%DATASETS.length;   /* alternate only when unpinned */
- else dsi=CHALLENGE;
- buildBoard();
- tab(0); cur('#colA',24,14);
-}
-var AN=[
- function(){anReset()},
- function(){tab(1)},
- function(){cur('#c1'); cls('c1','work',1); cls('c1','lit',1)},
- function(){cls('c1','work',0); cls('c1','done',1); cls('c1','lit',0); cur('#c2')},
- function(){cls('c2','work',1); cls('c2','lit',1)},
- function(){cls('c2','work',0); cls('c2','done',1); cls('c2','lit',0); cur('#c3')},
- function(){cls('c3','work',1); cls('c3','lit',1)},
- function(){cls('c3','work',0); cls('c3','done',1); cls('c3','lit',0)},
- function(){tab(2)},
- function(){cls('dp','hidden',0); cls('dp','work',1); cls('dp','lit',1); el('dpn').textContent='1'; cur('#dp')},
- function(){},
- function(){cls('dp','work',0); cls('dp','done',1); cls('dp','lit',0)},
- function(){tab(3)},
- function(){cls('u1','hidden',0); cls('u1','done',1); el('cn').textContent='1'; cur('#u1')},
- function(){cls('u2','hidden',0); cls('u2','done',1); el('cn').textContent='2'; cur('#u2')},
- function(){cls('u3','hidden',0); cls('u3','done',1); el('cn').textContent='3'; cur('#u3')},
- function(){cls('u4','hidden',0); cls('u4','done',1); el('cn').textContent='4'; cur('#u4')},
- function(){},
- function(){}
-];
-function anStep(){ AN[anI](); anI=(anI+1)%AN.length }
+var scI=0, scOn=true, scSeen=true, scHold=null;
+var scRM=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+var scV=document.getElementById('scv'), scImg=document.getElementById('sci'), scView=document.getElementById('scview');
 var PZ_PAUSE='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
 var PZ_PLAY='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>';
-function anPlay(){ if(anTimer) return; anOn=true; anTimer=setInterval(anStep,780); el('pz').innerHTML=PZ_PAUSE }
-function anStop(){ clearInterval(anTimer); anTimer=null; anOn=false; el('pz').innerHTML=PZ_PLAY }
-function toggleAnim(){ anOn?anStop():anPlay() }
-if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){
- anReset(); AN.slice(1).forEach(function(f){f()}); anStop();
-} else { anReset(); anPlay(); }
+document.getElementById('scd').innerHTML=SC.map(function(){return '<i><b></b></i>'}).join('');
+function scDots(p){
+ [].forEach.call(document.querySelectorAll('#scd i'),function(d,k){
+  d.className=k<scI?'done':''; d.firstChild.style.width=k===scI?Math.max(0,Math.min(1,p))*100+'%':'0'});
+}
+function scPlay(){ if(scOn&&scSeen&&!scRM){var pr=scV.play(); if(pr&&pr.catch) pr.catch(function(){})} }
+function scNext(){ scGo((scI+1)%SC.length) }
+function scGo(i){
+ var s=SC[i]; scI=i; clearTimeout(scHold);
+ scView.classList.add('fade');
+ setTimeout(function(){
+  if(scI!==i) return;
+  document.getElementById('sct').textContent=s.t;
+  document.getElementById('scc').textContent=s.c;
+  document.getElementById('scn').textContent=(i+1)+' of '+SC.length;
+  scDots(0);
+  scImg.src='../assets/images/showcase/'+s.k+'.jpg'; scImg.alt=s.t+': '+s.c; scImg.hidden=false;
+  scView.classList.remove('fade');
+  scV.hidden=true;
+  if(scRM){ if(scOn) scHold=setTimeout(scNext,7000); return }
+  scV.onplaying=function(){ if(scI===i){ scImg.hidden=true; scV.hidden=false } };
+  scV.src='../assets/videos/showcase/'+s.k+'.mp4';
+  scPlay();
+ },200);
+}
+scV.ontimeupdate=function(){ if(scV.duration) scDots(scV.currentTime/scV.duration) };
+/* hold the last frame for a moment, then move on */
+scV.onended=function(){ scDots(1); if(scOn) scHold=setTimeout(scNext,900) };
+function scSet(on){
+ scOn=on; var pz=document.getElementById('pz');
+ pz.innerHTML=on?PZ_PAUSE:PZ_PLAY; pz.setAttribute('aria-label',on?'Pause':'Play');
+ clearTimeout(scHold);
+ if(!on){ scV.pause(); return }
+ if(scRM){ scHold=setTimeout(scNext,7000); return }
+ if(scV.ended) scNext(); else scPlay();
+}
+document.getElementById('pz').onclick=function(){scSet(!scOn)};
+/* only play while the showcase is on screen */
+if('IntersectionObserver' in window){
+ new IntersectionObserver(function(en){scSeen=en[0].isIntersecting; if(scSeen) scPlay(); else scV.pause()},{threshold:.2}).observe(scView);
+}
+scGo(0);
 </script>
 
 <script>
 /* ============ Where Denodo is ============ */
-/* Served next to Denodo, links stay on this server. Opened from a laptop for testing, links use the trial server. */
-const TRIAL='https://try-dev.dimv.foo';
-const LOCAL=!/^https?:$/.test(location.protocol)||/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-const HOST=LOCAL?TRIAL:location.origin;
+/* Links to the Denodo tools open on the server that serves this page. */
+const HOST=location.origin;
 const APPS={
  ds:['/denodo-design-studio/','Design Studio'],
  dm:['/denodo-data-catalog/#/','Data Marketplace'],
@@ -412,11 +338,14 @@ if(!state.view){state.view='loan_repayment_360_'+Math.random().toString(36).repl
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
 save();
 /* Trial sign-in shown in the tours. Set TRIAL_PASSWORD to '' to stop showing the password. */
-const TRIAL_PASSWORD='pocGir-fubkox-qedza8';
+const TRIAL_PASSWORD='try-Denodo9';
 let CUR_USER='';
 const fill=s=>s.split('{HOST}').join(HOST).split('{VIEW}').join(state.view)
  .split('{USER}').join(CUR_USER||'your Denodo user')
- .split('{PWTXT}').join(TRIAL_PASSWORD?' (password: **'+TRIAL_PASSWORD+'**)':'');
+ .split('{PWTXT}').join(TRIAL_PASSWORD?' (password: **'+TRIAL_PASSWORD+'**)':'')
+ .split('{AUTHLINE}').join(TRIAL_PASSWORD&&CUR_USER
+   ?'Header **Authorization**: **Basic '+btoa(CUR_USER+':'+TRIAL_PASSWORD)+'**. This is your sign-in as **'+CUR_USER+'**, already encoded.'
+   :'Header **Authorization**: **Basic** followed by your Denodo user name and password, joined with a colon and base64-encoded. On a Mac, run: printf \''+(CUR_USER||'user')+':PASSWORD\' | base64');
 
 /* ============ The three tours ============
    Step fields:
@@ -427,9 +356,10 @@ const fill=s=>s.split('{HOST}').join(HOST).split('{VIEW}').join(state.view)
    copy   text to paste: a string, or {mac, win} for terminal steps
    hint   {mac, win}: where to run the commands
    file   [path, name]: a file to download
-   shots  [[image, caption]]: miniature screens from images/guide
+   shots  [[image, caption, always]]: miniature screens from images/guide
    clip   [video, caption]: a short silent loop from videos/guide (optional).
-          It replaces the shots, which still show when the visitor prefers reduced motion
+          It replaces the shots, which still show when the visitor prefers reduced motion.
+          A shot whose third value is true also shows above the clip.
    note   extra information (optional)
    link   [label, url] (optional)
    why    why the step matters (optional)
@@ -474,8 +404,9 @@ const TOURS={
    {t:"Filter to Gold and Platinum",app:'dmProduct',
     intro:"Crestbank wants to compare repayments from its two highest loyalty tiers. **customer_loyalty_tier** records each customer’s tier in the bank’s loyalty programme, such as Silver, Gold or Platinum. A filter keeps only Gold and Platinum customers, so the counts and totals cover those two tiers.",
     do:["Drag **customer_loyalty_tier** from **Fields** into **Filters**. The **Filter wizard** opens.",
-        "Set **Operator** to **in** and switch on **Add multiple literals**, so you can enter more than one tier.",
-        "Type **'Gold'**, select **+**, type **'Platinum'**, then select **Ok**."],
+        "Set **Operator** to **in** and switch on **Add multiple literals**, so you can enter more than one tier. Make sure **Separator** is set to **Newline**.",
+        "Type **'Gold'** and select **+**. Type **'Platinum'** and select **+** again. Then select **Ok**."],
+    clip:['ba-3-clip',"Gold and Platinum added in the Filter wizard, then the filter appears under Filters."],
     shots:[['ba-3-filter',"The Filter wizard: 'Gold' added, 'Platinum' being added."],['ba-3-filtered',"Filters now shows customer_loyalty_tier in ('Gold', 'Platinum')."]],
     ok:"Filters shows customer_loyalty_tier in ('Gold', 'Platinum')."},
    {t:"Sort and run the query",app:'dmProduct',
@@ -580,7 +511,6 @@ const TOURS={
     clip:['de-6-clip',"The four sync screens, then the Success messages."],
     shots:[['de-6-still',"A sync screen with Continue."]],
     note:"The user who runs the sync needs the METADATA privilege on every element of the catalog. If Sync with VDP is not in your Administration menu, your trial administrator can run it.",
-    link:["Denodo documentation: Synchronize with Virtual DataPort","https://community.denodo.com/docs/html/browse/latest/en/vdp/data_catalog/administration/synchronize/synchronize"],
     why:"Design Studio and the Data Marketplace are separate applications. The sync is what makes your view discoverable.",
     ok:"Success messages for views, web services and VDP tags."},
    {t:"Find your view in the Data Marketplace",app:'dm',
@@ -590,23 +520,23 @@ const TOURS={
     shots:[['de-7-still',"Your view in the Data Marketplace."]],
     ok:"{VIEW} opens with its description and eight described fields."}]},
 
- ai:{name:'AI Builder',img:'../assets/images/persona-ai.jpg',time:'About 3 min',
+ ai:{name:'AI Builder',img:'../assets/images/persona-ai.jpg',time:'About 5 min',
   one:'Build AI agents and applications with the Denodo AI SDK, or connect your existing AI agents to governed enterprise data through the Denodo MCP Server.',
-  why:'Crestbank wants staff and applications to ask repayment questions in plain English and get correct, governed answers. You see an AI SDK agent answer from the loan repayment data product, then ask the same question from your own code and from your own agent.',
+  why:'Crestbank wants staff and applications to ask repayment questions in plain English and get correct, governed answers. You see an AI SDK agent answer from the loan repayment data product, then ask the same question from your own code, and optionally from your own agent over MCP.',
   user:'ai_builder',
-  handoff:'The same governed data product now answers through an agent, from code and over MCP. Every answer uses the definitions the Data Engineer published and the permissions of the user who asks.',
-  stages:[['Chat',[0,1,2]],['Code',[3,4]],['Agents',[5]]],
+  handoff:'The same governed data product now answers through an agent, from code and over MCP. Every answer uses the definitions the Data Engineer published, and every query runs as the Denodo user who signs in.',
+  stages:[['Chat',[0,1,2]],['Code',[3]],['Agents',[4]]],
   steps:[
    {t:"Open the AI SDK chatbot",app:'chat',
     intro:"Ask a Question is the Denodo AI SDK sample chatbot.",
     do:["Select **Open Ask a Question** and sign in as **{USER}**{PWTXT}.",
-        "In the sidebar, under **AGENTS**, choose **Banking agent**. It works on bank_demo, with DeepQuery and reports turned on."],
+        "In the sidebar, under **AGENTS**, choose **Banking agent**, a sample AI SDK agent for banking questions."],
     shots:[['ai-1-chatbot',"Ask a Question, with the Banking agent in the sidebar."]],
     why:"This is a finished agent built on the AI SDK. The next steps show what it does underneath, so you can build your own.",
     ok:"The chatbot is open and the Banking agent is selected."},
    {t:"Ask the Crestbank question",app:'chat',
     do:["Paste the question below and send it.",
-        "Watch the steps the agent runs: **metadata_search** finds the views, **execute_sql** and **generate_vql** run the query on Denodo.",
+        "Watch the steps the agent runs: **metadata_search** finds the views, **execute_vql** checks the tier values, and **generate_vql** writes and runs the query on Denodo.",
         "Open a step to see the views it found and the VQL it ran."],
     copy:"Compare Gold and Platinum customer loyalty tiers in bank_demo.loan_repayment_360. Return the number of recorded payment transactions and the total payment amounts for each tier.",
     clip:['ai-2-clip',"The Banking agent runs its steps, then answers with a table for Gold and Platinum."],
@@ -615,38 +545,34 @@ const TOURS={
     ok:"Gold: 7 payments, 17,600. Platinum: 6 payments, 13,900."},
    {t:"Hand a bigger question to DeepQuery",app:'chat',optional:true,
     intro:"DeepQuery is the AI SDK research agent. It plans the analysis, runs several queries and writes a report.",
-    do:["Ask the question below.",
+    do:["Switch the chatbot to DeepQuery: select the **✦** button to the left of the send arrow, then under **SELECT MODE** choose **Deep Query**. You can also type **@deepquery** at the start of your question.",
+        "Paste the question below and send it.",
         "DeepQuery proposes an analysis plan with two options. Reply **A** to accept the recommended option.",
         "Wait while it runs the queries. A long analysis can take a few minutes."],
     copy:"Analyse recorded loan payments in bank_demo by customer loyalty tier and loan status. Which tiers contribute most, and how do approved, pending and rejected loans differ?",
     clip:['ai-3-clip',"DeepQuery proposes an analysis plan, then starts the analysis."],
-    shots:[['ai-3-still',"The DeepQuery analysis plan."]],
+    shots:[['ai-3-mode',"The ✦ button next to the send arrow opens SELECT MODE, with Deep Query second in the list.",true],['ai-3-still',"The DeepQuery analysis plan."]],
     ok:"A plan, the queries it ran and a written report."},
-   {t:"Sign in from your terminal",
-    intro:"Command-line calls to this trial need a Cloudflare Access sign-in.",
-    do:["Choose your system below.",
-        "Run the commands. Your browser opens to confirm the sign-in."],
-    copy:{mac:"brew install cloudflared\ncloudflared access login {HOST}",
-          win:"winget install --id Cloudflare.cloudflared\n# Close and reopen PowerShell, then run:\ncloudflared access login {HOST}"},
-    hint:{mac:"Run in Terminal. Uses Homebrew.",win:"Run in PowerShell. winget is part of Windows 10 and 11."},
-    ok:"The terminal shows Successfully fetched your token, and your browser shows that the sign-in succeeded."},
    {t:"Ask the same question from code",
     do:["Download **question.json**.",
         "In your terminal, go to the folder you saved it in: type **cd ~/Downloads** on a Mac or **cd $HOME\\Downloads** on Windows, and press Enter.",
-        "Paste the command below as one line and press Enter.",
+        "Select **Copy** on the command below, paste it as one line and press Enter.",
         "When the terminal asks for the host password, enter the password for **{USER}**{PWTXT}."],
     file:['guide-files/question.json','question.json'],
-    copy:{mac:"cloudflared access curl {HOST}/aisdk/answerDataQuestion -u {USER} -X POST -H \"Content-Type: application/json\" --data-binary @question.json",
-          win:"cloudflared access curl {HOST}/aisdk/answerDataQuestion -u {USER} -X POST -H \"Content-Type: application/json\" --data-binary \"@question.json\""},
-    hint:{mac:"Run in Terminal.",win:"Run in PowerShell."},
+    copy:{mac:"curl {HOST}/aisdk/answerDataQuestion -u {USER} -X POST -H \"Content-Type: application/json\" --data-binary @question.json",
+          win:"curl.exe {HOST}/aisdk/answerDataQuestion -u {USER} -X POST -H \"Content-Type: application/json\" --data-binary \"@question.json\""},
+    hint:{mac:"Run in Terminal.",win:"Run in PowerShell. Type curl.exe, not curl: in PowerShell, curl runs a different command."},
     note:"If you see Authentication failed: Invalid credentials for Data Marketplace, check that the user name is spelled exactly {USER} and that the password is correct.",
     why:"The same question and the same governed answer, from your own code. This is the endpoint your application calls.",
     ok:"A JSON answer with the VQL it generated and the same totals: Gold 7 and 17,600, Platinum 6 and 13,900."},
-   {t:"Connect your own agent over MCP",app:'mcp',optional:true,
-    do:["Open **MCP and API** and copy the **AI-SDK MCP Endpoint**: {HOST}/aisdk/mcp",
-        "Add it to an MCP-capable client, such as Visual Studio Code, with the configuration shown on that page.",
-        "Ask your agent the Crestbank question."],
-    ok:"Your client lists the Denodo tools and answers from bank_demo."}]}
+   {t:"Connect your own agent over MCP",optional:true,
+    intro:"The Denodo MCP Server gives any MCP-capable agent the AI SDK tools for finding views and querying Denodo. This step takes about 10 minutes.",
+    do:["In your MCP client, add an HTTP MCP server with the URL **{HOST}/aisdk/mcp** and one header.",
+        "{AUTHLINE}",
+        "Check that your client lists three Denodo tools: **metadata_search**, **generate_vql** and **execute_vql**.",
+        "Ask your agent: **Use the denodo tools. Compare Gold and Platinum customer loyalty tiers in bank_demo.loan_repayment_360. Return the number of recorded payment transactions and the total payment amounts for each tier.**"],
+    why:"Your own agent gets the same governed answer, signed in as the Denodo user you set up.",
+    ok:"Your client connects and lists the three Denodo tools. Asked the Crestbank question, it should return Gold 7 and 17,600, Platinum 6 and 13,900."}]}
 };
 
 const ORDER=['analyst','engineer','ai'];
@@ -868,12 +794,6 @@ function closeGuide(msg){
 function status(msg,resume){
  const s=document.getElementById('status');s.hidden=false;s.replaceChildren();
  const t=document.createElement('span');t.textContent=msg;s.append(t);
- if(false){
-  const w=document.createElement('span');w.className='sp';
-  const b=document.createElement('button');b.className='btn btn-primary btn-sm';b.type='button';b.textContent='Resume tour';b.onclick=()=>start(state.role);
-  const x=document.createElement('button');x.className='lnk';x.type='button';x.textContent='Start over';
-  x.onclick=()=>{state.done[state.role]={};state.step=0;state.role=null;save();s.hidden=true;renderCards()};
-  w.append(b,x);s.append(w)}
 }
 
 function openApp(url){
@@ -934,6 +854,12 @@ function renderGuide(){
   box.append(top);box.append(mk(d,'pre',null,text));b.append(box);
  }
  const still=!s.clip||(d.defaultView&&d.defaultView.matchMedia&&d.defaultView.matchMedia('(prefers-reduced-motion: reduce)').matches);
+ const shot=([img,cap])=>{
+  const f=mk(d,'figure','shot'),btn=mk(d,'button');btn.type='button';btn.title='Open the full screen';
+  const im=mk(d,'img');im.src=asset('../assets/images/guide/'+img+'.jpg');im.alt=cap;btn.append(im);
+  btn.onclick=()=>window.open(asset('../assets/images/guide/'+img+'-full.jpg'),'_blank');
+  f.append(btn);f.append(mk(d,'figcaption',null,cap+' Select the picture to see the full screen.'));b.append(f)};
+ if(!still)(s.shots||[]).filter(x=>x[2]===true).forEach(shot);
  if(!still){
   const [vid,cap]=s.clip,f=mk(d,'figure','shot clip'),v=mk(d,'video');
   v.src=asset('../assets/videos/guide/'+vid+'.mp4');v.muted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.setAttribute('playsinline','');
@@ -945,11 +871,7 @@ function renderGuide(){
   full.onclick=()=>d.defaultView.open(asset('../assets/videos/guide/'+vid+'.mp4'),'_blank');
   ctl.append(pz,full);f.append(v,ctl,mk(d,'figcaption',null,cap));b.append(f);
  }
- if(still)(s.shots||[]).forEach(([img,cap])=>{
-  const f=mk(d,'figure','shot'),btn=mk(d,'button');btn.type='button';btn.title='Open the full screen';
-  const im=mk(d,'img');im.src=asset('../assets/images/guide/'+img+'.jpg');im.alt=cap;btn.append(im);
-  btn.onclick=()=>window.open(asset('../assets/images/guide/'+img+'-full.jpg'),'_blank');
-  f.append(btn);f.append(mk(d,'figcaption',null,cap+' Select the picture to see the full screen.'));b.append(f)});
+ if(still)(s.shots||[]).forEach(shot);
  if(s.note)b.append(mk(d,'p','note',fill(s.note)));
  if(s.link){const p=mk(d,'p','note');const a=mk(d,'a',null,s.link[0]);a.href=s.link[1];a.target='_blank';a.rel='noopener';p.append(a);b.append(p)}
  if(s.why){const w=mk(d,'div','why');w.append(mk(d,'div','lbl','Why this matters'));w.append(mk(d,'p',null,s.why));b.append(w)}

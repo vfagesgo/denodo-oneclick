@@ -313,6 +313,17 @@ def generate(md_path):
  </div>
 </div>
 </div>
+<script>
+(function(){{
+  var T=window.location.protocol+'//'+window.location.host, H=window.location.host;
+  var tok='${{window.location.protocol}}//${{window.location.host}}', htok='${{window.location.host}}';
+  function fix(s){{return s.split(tok).join(T).split(htok).join(H);}}
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n,a=[];
+  while((n=w.nextNode()))a.push(n);
+  a.forEach(function(t){{if(t.nodeValue.indexOf('${{window.location')>-1)t.nodeValue=fix(t.nodeValue);}});
+  document.querySelectorAll('a[href]').forEach(function(e){{var h=e.getAttribute('href');if(h.indexOf('${{window.location')>-1)e.setAttribute('href',fix(h));}});
+}})();
+</script>
 </body>
 </html>
 """

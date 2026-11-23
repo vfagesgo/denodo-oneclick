@@ -12,7 +12,7 @@ In this tour you will:
 * Export the results to CSV
 * Request access to a restricted view
 
-**Data Marketplace URL:** `https://try-dev.dimv.foo/denodo-data-catalog/`
+**Data Marketplace URL:** `${window.location.protocol}//${window.location.host}/denodo-data-catalog/`
 
 ---
 
@@ -31,7 +31,7 @@ Data products created in Design Studio must be synchronized with the Data Market
 
 ## 2. Sign In
 
-1. Open `https://try-dev.dimv.foo/denodo-data-catalog/`.
+1. Open `${window.location.protocol}//${window.location.host}/denodo-data-catalog/`.
 2. Select the Virtual DataPort server.
 3. Enter the analyst credentials:
     - **User:** `<analyst_user>`

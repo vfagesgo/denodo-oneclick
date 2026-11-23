@@ -32,13 +32,13 @@ Denodo Platform also provides a large number of additional data access services 
     - Dedicated query tools for views marked with a configurable tag (deprecated).
     - Tag-based metadata visibility, which can include views from multiple databases (cross-database visibility).
 
-**MCP Endpoint: http://localhost/mcp/admin/mcp**
+**MCP Endpoint: ${window.location.protocol}//${window.location.host}/mcp/admin/mcp**
 
 ### AI-SDK MCP
  
 You can connect the AI-SDK as an MCP server (i.e, as tools) with your MCP-compatible client (Visual Studio Code, Claude Desktop, Cursor…) via remote MCP (HTTP).
 
-**AI-SDK MCP Endpoint: http://localhost/aisdk/mcp**
+**AI-SDK MCP Endpoint: ${window.location.protocol}//${window.location.host}/aisdk/mcp**
 
 ### Sample Dynamic Client Registration (DCR)
 
@@ -93,43 +93,43 @@ VS Code configuration with DCR enabled
 - **Model & Vector Store Agnostic:** Provides a flexible architecture to configure and switch between various LLMs and Vector Databases depending on your performance and privacy requirements.
 
 #### AI-SDK API Swagger documentation 
-http://localhost/aisdk/docs
+${window.location.protocol}//${window.location.host}/aisdk/docs
 
 ### Data Marketplace
 
 The Data Marketplace provides a REST API to perform programmatically all the tasks available in the GUI.
 
 #### DM API Swagger documentation 
-http://localhost/denodo-data-catalog/swagger-ui/index.html
+${window.location.protocol}//${window.location.host}/denodo-data-catalog/swagger-ui/index.html
 
 ### Graph-QL
 
 Denodo GraphQL Service enables the execution of GraphQL queries against the Denodo virtual data model, allowing graphQL-like queries on top of any data source.
 
-**GraphQL Endpoint:  http://localhost/denodo-graphql-service/graphql/<database>/schema.json**
+**GraphQL Endpoint:  ${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/<database>/schema.json**
 
 **Examples of how to invoke the GraphQL Endpoint:**
 
-- http://localhost/denodo-graphql-service/graphql/bank_demo/schema.json
-- http://localhost/denodo-graphql-service/graphql/medixit/schema.json
+- ${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/bank_demo/schema.json
+- ${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/medixit/schema.json
 
 ### VDP RESTful
 
 The RESTful Web service of the Denodo Platform is an HTTP service that publishes the contents of the entire Virtual DataPort server.
 
-**RESTful web service Endpoint:  http://localhost/denodo-restfulws/<database>/schema.json**
+**RESTful web service Endpoint:  ${window.location.protocol}//${window.location.host}/denodo-restfulws/<database>/schema.json**
 
 **Examples of how to invoke the RESTful Web service**
 
-- http://localhost/denodo-restfulws/admin returns the list of views of the database admin.
+- ${window.location.protocol}//${window.location.host}/denodo-restfulws/admin returns the list of views of the database admin.
 
-- http://localhost/denodo-restfulws/admin/views/customer returns the content of the view customer of the database admin.
+- ${window.location.protocol}//${window.location.host}/denodo-restfulws/admin/views/customer returns the content of the view customer of the database admin.
 
-- http://localhost/denodo-restfulws/admin/views/customer/1/orders browses through the mapping orders of the row of the table customer whose primary key is 1.
+- ${window.location.protocol}//${window.location.host}/denodo-restfulws/admin/views/customer/1/orders browses through the mapping orders of the row of the table customer whose primary key is 1.
 
-- http://localhost/denodo-restfulws/OpenAPIv3/openapi.json returns the OpenAPI 3 document describing the available operations in JSON format.
+- ${window.location.protocol}//${window.location.host}/denodo-restfulws/OpenAPIv3/openapi.json returns the OpenAPI 3 document describing the available operations in JSON format.
 
-- http://localhost/denodo-restfulws/OpenAPIv3/openapi.yaml?database=db1&database=db2&tag=tag1&tag=tag2 returns the OpenAPI 3 document describing the available operations in YAML format for the views in databases db1 or db2 with tags tag1 or tag2.
+- ${window.location.protocol}//${window.location.host}/denodo-restfulws/OpenAPIv3/openapi.yaml?database=db1&database=db2&tag=tag1&tag=tag2 returns the OpenAPI 3 document describing the available operations in YAML format for the views in databases db1 or db2 with tags tag1 or tag2.
 
 ## SQL Query
 

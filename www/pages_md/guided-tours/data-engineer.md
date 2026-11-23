@@ -116,8 +116,6 @@ The Data Marketplace keeps its own copy of the Virtual DataPort catalog. A new v
 
 > The user who runs the sync needs the METADATA privilege on every element of the catalog. If Sync with VDP is not in your Administration menu, your trial administrator can run it.
 
-[Denodo documentation: Synchronize with Virtual DataPort](https://community.denodo.com/docs/html/browse/latest/en/vdp/data_catalog/administration/synchronize/synchronize)
-
 **Why this matters:** Design Studio and the Data Marketplace are separate applications. The sync is what makes your view discoverable.
 
 **You should see:** Success messages for views, web services and VDP tags.

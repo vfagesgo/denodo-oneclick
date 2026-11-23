@@ -4,6 +4,8 @@ Mockup page: `www/pages/try-denodo-entry-mockup.html` (labelled MOCKUP: it is no
 
 ## What the visitor sees
 
+When the page opens, **Try Denodo** in the top navigation is highlighted with a soft pulsing ring, and a note under it reads **Start here: Choose a role and get a guided trial of Denodo.** The note can be closed with ×. Both go away once the visitor opens Try Denodo. When the visitor's device asks for reduced motion, the ring does not pulse.
+
 Selecting **Try Denodo** (top navigation) or **Try the Denodo Platform** (hero button) opens a panel on the right of denodo.com. The page behind it is blurred.
 
 ### 1. Choose a role
@@ -21,7 +23,7 @@ Not sure? Which sounds like you:
 | --- | --- | --- | --- |
 | **Data Engineer** | Federates live customer, loan and payment data into a reusable data product, without copying or moving data. | Design Studio, Data Modeling Wizard | About 5 min |
 | **Business Analyst** | Uses Data Marketplace and Denodo Assistant to compare repayments by loyalty tier and find the top customers. | Data Marketplace, Denodo Assistant | About 4 min |
-| **AI Builder** | Connects AI agents to live banking data through Denodo MCP Server to deliver accurate, up-to-date answers. | AI SDK, MCP Server | About 3 min |
+| **AI Builder** | Connects AI agents to live banking data through Denodo MCP Server to deliver accurate, up-to-date answers. | AI SDK, MCP Server | About 5 min |
 
 Other ways to try Denodo:
 - **Free download**: Install the Denodo Platform trial on your own machine. *Download now*

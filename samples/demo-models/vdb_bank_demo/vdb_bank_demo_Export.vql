@@ -14,6 +14,8 @@ ENTER SINGLE USER MODE;
 # #######################################
 # ROLE CREATION
 # #######################################
+CREATE OR REPLACE ROLE enduser_executeonly 'metadata and execute access only';
+
 
 # 0 ====================================================================
 
@@ -1029,6 +1031,7 @@ CREATE OR REPLACE VIEW iv_banks_properties_per_state FOLDER = '/2 - integration 
 
 CHOWN admin VIEW iv_banks_properties_per_state LASTMODIFICATIONUSER admin;
 
+# >>> Try Denodo guided tours (added): data product loan_repayment_360, used by the Business Analyst and AI Builder tours
 CREATE OR REPLACE VIEW loan_repayment_360 FOLDER = '/3 - data products' DESCRIPTION = 'loan_repayment_360 is a banking view that brings together customer, loan, and repayment transaction information. It identifies each customer and their loyalty tier, links them to a specific loan, captures the total loan amount and current loan status, and records individual repayment transactions with payment amounts and transaction dates. This view could be used to monitor loan repayment activity, analyze repayment patterns by customer or loyalty tier, track loan servicing status, support customer-level lending analytics, and produce operational or financial reports on loan performance and payment behavior.' 
     TAGS (ai_banking) (
     customer_identifier (description = 'Identifies the customer associated with the loan and repayment information, enabling customer-level tracking across banking relationships and account activity.'),
@@ -1045,6 +1048,7 @@ CREATE OR REPLACE VIEW loan_repayment_360 FOLDER = '/3 - data products' DESCRIPT
 ALTER VIEW loan_repayment_360
  LAYOUT (customers = [0, 0, 200, 200], loans = [0, 200, 200, 200], loan_payments = [0, 400, 200, 200]);
 CHOWN admin VIEW loan_repayment_360 LASTMODIFICATIONUSER admin;
+# <<< End of Try Denodo guided tours addition
 
 # #######################################
 # ASSOCIATIONS
@@ -1592,12 +1596,40 @@ CREATE OR REPLACE VIEWSTATSUMMARY customer_payments (
 # #######################################
 # USER PRIVILEGES
 # #######################################
-# No user
+ALTER USER ai_builder
+GRANT ROLE allusers,execute_only,enduser_executeonly,use_large_language_model,serveradmin,assignprivileges,publish_web_services_without_authentication
+GRANT ADMIN ON bank_demo;
+
+ALTER USER analyst_user
+GRANT CONNECT, METADATA, EXECUTE ON bank_demo;
+
+ALTER USER crestbank_analyst
+GRANT ROLE allusers,use_large_language_model,data_catalog_assisted_query
+GRANT CONNECT, METADATA, EXECUTE ON bank_demo;
+
+ALTER USER crestbank_engineer
+GRANT ROLE allusers,use_large_language_model,data_catalog_assisted_query,design_studio_allow_login,assign_tags,serveradmin,assignprivileges,configure_server,data_catalog_admin,data_catalog_content_admin,data_catalog_data_preparation,data_catalog_editor,data_catalog_manager
+GRANT ADMIN ON bank_demo;
+
+ALTER USER crestbank_rm
+GRANT ROLE allusers,use_large_language_model,data_catalog_assisted_query
+GRANT CONNECT, METADATA, EXECUTE ON bank_demo;
+
+ALTER USER data_analyst
+GRANT ROLE allusers,use_large_language_model,metadata_export,manage_tags,import_tags,design_studio_allow_login,data_catalog_assisted_query,assign_tags,serveradmin,assignprivileges
+GRANT CONNECT ON bank_demo
+GRANT METADATA, EXECUTE ON bank_demo.loan_repayment_360;
 # #######################################
 # ROLE PRIVILEGES
 # #######################################
 ALTER ROLE enduser_executeonly
 GRANT CONNECT, METADATA, EXECUTE ON DATABASE;
+
+ALTER ROLE denodooneclickrole
+GRANT ROLE use_large_language_model,assignprivileges
+GRANT CONNECT, METADATA, EXECUTE ON DATABASE;
+
+
 
 # #######################################
 # Closing connection with database bank_demo

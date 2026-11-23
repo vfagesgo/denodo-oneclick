@@ -38,6 +38,19 @@ a{color:inherit}
 .nav .r{margin-left:auto;display:flex;align-items:stretch;height:100%}
 .nav .try{font-weight:600;font-size:14.5px;text-transform:uppercase;padding:0 22px;letter-spacing:.02em}
 .nav .try:hover{color:var(--red)}
+/* Try Denodo highlight: a soft pulsing ring and a "Start here" note, until the visitor opens it */
+.trywrap{position:relative;display:flex}
+.nav .try{position:relative}
+.nav .try.cue{color:var(--red)}
+.nav .try.cue::after{content:"";position:absolute;left:10px;right:10px;top:50%;height:42px;margin-top:-21px;border:2px solid var(--red);border-radius:999px;pointer-events:none;animation:tryPulse 2.2s ease-out infinite}
+@keyframes tryPulse{0%{box-shadow:0 0 0 0 rgba(223,91,79,.45)}70%{box-shadow:0 0 0 12px rgba(223,91,79,0)}100%{box-shadow:0 0 0 0 rgba(223,91,79,0)}}
+.coach{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);z-index:20;width:250px;background:var(--ink);color:#fff;border-radius:8px;padding:12px 34px 12px 14px;font-size:14px;line-height:1.45;box-shadow:0 10px 28px rgba(17,37,51,.22);opacity:0;transition:opacity .3s,transform .3s}
+.coach.on{opacity:1}
+.coach::before{content:"";position:absolute;top:-6px;left:50%;margin-left:-6px;width:12px;height:12px;background:var(--ink);transform:rotate(45deg)}
+.coach b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#ffb3aa;margin-bottom:2px}
+.coach .cx{position:absolute;top:6px;right:6px;width:24px;height:24px;color:#cfd8dc;font-size:16px;line-height:24px;border-radius:4px}
+.coach .cx:hover{color:#fff;background:rgba(255,255,255,.12)}
+@media (prefers-reduced-motion:reduce){.nav .try.cue::after{animation:none}.coach{transition:none}}
 .nav .contact{background:var(--red);color:#fff;font-weight:600;font-size:14.5px;text-transform:uppercase;padding:0 22px;display:flex;align-items:center}
 .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;max-width:1180px;margin:0 auto;padding:80px 32px 90px}
 .hero h1{font-size:56px;line-height:1.05;margin:0 0 18px;letter-spacing:-.02em}
@@ -157,7 +170,7 @@ a{color:inherit}
 <header class="nav">
  <img src="../assets/images/denodo_logo_black.png" alt="Denodo">
  <nav class="m" aria-label="Main"><span>Data Management</span><span>Product &amp; Services</span><span>Solutions</span><span>Partners</span><span>Resources &amp; Events</span><span>Company</span></nav>
- <div class="r"><button class="try" type="button" data-open>Try Denodo</button><span class="contact">Contact Us</span></div>
+ <div class="r"><span class="trywrap"><button class="try cue" type="button" data-open>Try Denodo</button><span class="coach" id="coach" role="note" hidden><b>Start here</b>Choose a role and get a guided trial of Denodo.<button class="cx" type="button" id="coach-x" aria-label="Close this note">×</button></span></span><span class="contact">Contact Us</span></div>
 </header>
 
 <main class="hero">
@@ -209,7 +222,7 @@ const ROLES={
  ai:{
   name:'AI Builder',ic:'<path d="M12 2l2.2 6.3L20 10l-5.8 1.7L12 18l-2.2-6.3L4 10l5.8-1.7z"/>',q:'AI Builder',
   p:'Connects AI agents to live banking data through Denodo MCP Server to deliver accurate, up-to-date answers.',
-  meta:['About 3 min','AI SDK','MCP Server'],
+  meta:['About 5 min','AI SDK','MCP Server'],
   gets:['Ask a business question through the AI SDK','Call the same governed data from your own code','Connect your own agent over MCP'],
   pick:'I build AI agents and applications',
   mini:`<div class="bub me">Top customers by repayments?</div><div class="tool">tool: denodo.query ✓</div>
@@ -223,7 +236,12 @@ const drawer=$('drawer'),veil=$('veil'),body=$('d-b'),back=$('d-back'),crumb=$('
 let state={view:'choose',role:null,rec:null,email:'',name:''};
 let lastFocus=null;
 
+function dismissCue(){
+ document.querySelectorAll('.try.cue').forEach(b=>b.classList.remove('cue'));
+ const c=$('coach');if(c){c.classList.remove('on');c.hidden=true}
+}
 function open(){
+ dismissCue();
  lastFocus=document.activeElement;
  veil.hidden=false;drawer.hidden=false;
  requestAnimationFrame(()=>{veil.classList.add('on');drawer.classList.add('on')});
@@ -237,6 +255,8 @@ function close(){
  if(lastFocus)lastFocus.focus();
 }
 document.querySelectorAll('[data-open]').forEach(b=>b.onclick=open);
+$('coach-x').onclick=e=>{e.stopPropagation();const c=$('coach');c.classList.remove('on');c.hidden=true};
+setTimeout(()=>{const c=$('coach');if(c&&document.querySelector('.try.cue')){c.hidden=false;requestAnimationFrame(()=>c.classList.add('on'))}},700);
 $('d-x').onclick=close;veil.onclick=close;
 document.addEventListener('keydown',e=>{
  if(drawer.hidden)return;

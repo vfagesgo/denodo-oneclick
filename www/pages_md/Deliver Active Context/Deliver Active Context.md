@@ -26,13 +26,13 @@ Denodo Platform delivers governed, real-time context to AI agents through the fo
 - MCP tools to search metadata, list views, get view schemas, and execute and validate VQL queries
 - Tag-based metadata visibility across multiple databases
 
-**MCP Endpoint:** `https://try-dev.dimv.foo/mcp/admin/mcp`
+**MCP Endpoint:** `${window.location.protocol}//${window.location.host}/mcp/admin/mcp`
 
 ### 1.2 AI-SDK MCP
 
 Connect the AI-SDK as an MCP server to any MCP-compatible client (Visual Studio Code, Claude Desktop, Cursor…) via remote MCP (HTTP).
 
-**AI-SDK MCP Endpoint:** `https://try-dev.dimv.foo/aisdk/mcp`
+**AI-SDK MCP Endpoint:** `${window.location.protocol}//${window.location.host}/aisdk/mcp`
 
 ### 1.3 Authentication
 
@@ -45,7 +45,7 @@ Connect the AI-SDK as an MCP server to any MCP-compatible client (Visual Studio 
 {
   "servers": {
     "Denodo": {
-      "url": "https://try-dev.dimv.foo/mcp/admin/mcp",
+      "url": "${window.location.protocol}//${window.location.host}/mcp/admin/mcp",
       "type": "http",
       "headers": {
         "Authorization": "Basic YWRtaW46YWRtaW4="
@@ -91,7 +91,7 @@ Connect the AI-SDK as an MCP server to any MCP-compatible client (Visual Studio 
 
 
 3. Click **Install**.
-4. Enter the Hostname `try-dev.dimv.foo`.
+4. Enter the Hostname `${window.location.host}`.
 
 ![Claude Desktop - Denodo connector configuration](images/claude-desktop-connector-config.png)
 5. Select the authentication mode and enter your credentials. Use either the Basic or Oauth.
@@ -125,7 +125,7 @@ Ask Claude:
 
 #### AI-SDK API Swagger documentation
 
-`https://try-dev.dimv.foo/aisdk/docs`
+`${window.location.protocol}//${window.location.host}/aisdk/docs`
 
 ![AI-SDK Swagger](images/aisdk-swagger.png)
 
@@ -135,7 +135,7 @@ The Data Marketplace REST API performs programmatically all the tasks available 
 
 #### DM API Swagger documentation
 
-`https://try-dev.dimv.foo/denodo-data-catalog/swagger-ui/index.html`
+`${window.location.protocol}//${window.location.host}/denodo-data-catalog/swagger-ui/index.html`
 
 ![Data Marketplace Swagger](images/data-marketplace-swagger.png)
 
@@ -143,23 +143,23 @@ The Data Marketplace REST API performs programmatically all the tasks available 
 
 Run GraphQL queries against the Denodo virtual data model.
 
-**GraphQL Endpoint:** `https://try-dev.dimv.foo/denodo-graphql-service/graphql/<database>/schema.json`
+**GraphQL Endpoint:** `${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/<database>/schema.json`
 
 **Examples:**
 
-- `https://try-dev.dimv.foo/denodo-graphql-service/graphql/bank_demo/schema.json`
-- `https://try-dev.dimv.foo/denodo-graphql-service/graphql/medixit/schema.json`
+- `${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/bank_demo/schema.json`
+- `${window.location.protocol}//${window.location.host}/denodo-graphql-service/graphql/medixit/schema.json`
 
 ### 2.4 VDP RESTful
 
 The RESTful web service publishes the contents of the entire Virtual DataPort server over HTTP.
 
-**RESTful web service Endpoint:** `https://try-dev.dimv.foo/denodo-restfulws/<database>`
+**RESTful web service Endpoint:** `${window.location.protocol}//${window.location.host}/denodo-restfulws/<database>`
 
 **Examples:**
 
-- `https://try-dev.dimv.foo/denodo-restfulws/admin` returns the list of views of the database `admin`.
-- `https://try-dev.dimv.foo/denodo-restfulws/admin/views/customer` returns the content of the view `customer`.
-- `https://try-dev.dimv.foo/denodo-restfulws/admin/views/customer/1/orders` browses the `orders` mapping of the `customer` row with primary key 1.
-- `https://try-dev.dimv.foo/denodo-restfulws/OpenAPIv3/openapi.json` returns the OpenAPI 3 document in JSON.
-- `https://try-dev.dimv.foo/denodo-restfulws/OpenAPIv3/openapi.yaml?database=db1&database=db2&tag=tag1&tag=tag2` returns the OpenAPI 3 document in YAML for views in databases `db1` or `db2` with tags `tag1` or `tag2`.
+- `${window.location.protocol}//${window.location.host}/denodo-restfulws/admin` returns the list of views of the database `admin`.
+- `${window.location.protocol}//${window.location.host}/denodo-restfulws/admin/views/customer` returns the content of the view `customer`.
+- `${window.location.protocol}//${window.location.host}/denodo-restfulws/admin/views/customer/1/orders` browses the `orders` mapping of the `customer` row with primary key 1.
+- `${window.location.protocol}//${window.location.host}/denodo-restfulws/OpenAPIv3/openapi.json` returns the OpenAPI 3 document in JSON.
+- `${window.location.protocol}//${window.location.host}/denodo-restfulws/OpenAPIv3/openapi.yaml?database=db1&database=db2&tag=tag1&tag=tag2` returns the OpenAPI 3 document in YAML for views in databases `db1` or `db2` with tags `tag1` or `tag2`.

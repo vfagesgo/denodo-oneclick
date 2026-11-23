@@ -66,12 +66,14 @@ To compare loyalty tiers, you need three things: the tier, the number of repayme
 Crestbank wants to compare repayments from its two highest loyalty tiers. **customer_loyalty_tier** records each customer’s tier in the bank’s loyalty programme, such as Silver, Gold or Platinum. A filter keeps only Gold and Platinum customers, so the counts and totals cover those two tiers.
 
 1. Drag **customer_loyalty_tier** from **Fields** into **Filters**. The **Filter wizard** opens.
-2. Set **Operator** to **in** and switch on **Add multiple literals**, so you can enter more than one tier.
-3. Type **'Gold'**, select **+**, type **'Platinum'**, then select **Ok**.
+2. Set **Operator** to **in** and switch on **Add multiple literals**, so you can enter more than one tier. Make sure **Separator** is set to **Newline**.
+3. Type **'Gold'** and select **+**. Type **'Platinum'** and select **+** again. Then select **Ok**.
 
 ![The Filter wizard: 'Gold' added, 'Platinum' being added.](../../assets/images/guide/ba-3-filter.jpg)
 
 ![Filters now shows customer_loyalty_tier in ('Gold', 'Platinum').](../../assets/images/guide/ba-3-filtered.jpg)
+
+[Watch this step](../../assets/videos/guide/ba-3-clip.mp4): Gold and Platinum added in the Filter wizard, then the filter appears under Filters.
 
 **You should see:** Filters shows customer_loyalty_tier in ('Gold', 'Platinum').
 

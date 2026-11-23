@@ -1935,12 +1935,49 @@ CREATE OR REPLACE INTERFACE VIEW i_skill_metadata (
 # #######################################
 # USER PRIVILEGES
 # #######################################
-# No user
+ALTER USER ai_builder
+GRANT ROLE allusers,execute_only,enduser_executeonly,use_large_language_model,serveradmin,assignprivileges,publish_web_services_without_authentication
+GRANT ADMIN ON admin
+GRANT ADMIN ON asset_extensions;
+
+ALTER USER analyst_user
+GRANT ROLE allusers,use_large_language_model
+GRANT CONNECT ON admin
+GRANT CONNECT, METADATA, EXECUTE ON asset_extensions;
+
+ALTER USER crestbank_analyst
+GRANT ROLE allusers,use_large_language_model,data_catalog_assisted_query
+GRANT CONNECT ON admin
+GRANT CONNECT, METADATA, EXECUTE ON asset_extensions;
+
+ALTER USER crestbank_engineer
+GRANT ROLE allusers,use_large_language_model,data_catalog_assisted_query,design_studio_allow_login,assign_tags,serveradmin,assignprivileges,configure_server,data_catalog_admin,data_catalog_content_admin,data_catalog_data_preparation,data_catalog_editor,data_catalog_manager
+GRANT ADMIN ON admin
+GRANT ADMIN ON asset_extensions;
+
+ALTER USER crestbank_rm
+GRANT ROLE allusers,use_large_language_model,data_catalog_assisted_query
+GRANT CONNECT ON admin
+GRANT CONNECT, METADATA, EXECUTE ON asset_extensions;
+
+ALTER USER data_analyst
+GRANT ROLE allusers,use_large_language_model,metadata_export,manage_tags,import_tags,design_studio_allow_login,data_catalog_assisted_query,assign_tags,serveradmin,assignprivileges
+GRANT CONNECT ON admin
+GRANT ADMIN ON asset_extensions;
 # #######################################
 # ROLE PRIVILEGES
 # #######################################
+ALTER ROLE allusers
+GRANT ADMIN ON DATABASE;
+
+ALTER ROLE denodooneclickrole
+GRANT ROLE use_large_language_model,assignprivileges
+GRANT ADMIN ON DATABASE;
+
 ALTER ROLE enduser_executeonly
 GRANT CONNECT, METADATA, EXECUTE ON DATABASE;
+
+
 # #######################################
 # Closing connection with database asset_extensions
 # #######################################

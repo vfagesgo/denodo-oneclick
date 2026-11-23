@@ -10,13 +10,28 @@ ENTER SINGLE USER MODE;
 # #######################################
 # USER CREATION
 # #######################################
-# No users
+
+CREATE OR REPLACE USER ai_builder 'try-Denodo9' SHA512 '';
+
+CREATE OR REPLACE USER analyst_user 'try-Denodo9' SHA512 '';
+
+CREATE OR REPLACE USER crestbank_analyst 'try-Denodo9' SHA512 'Crestbank Business Analyst and AI Builder tours';
+
+CREATE OR REPLACE USER crestbank_engineer 'try-Denodo9' SHA512 'Crestbank Data Engineer tour';
+
+CREATE OR REPLACE USER crestbank_rm 'try-Denodo9' SHA512 'Crestbank relationship manager, Business Analyst tour';
+
+CREATE OR REPLACE USER data_analyst 'try-Denodo9' SHA512 ENCRYPTED HASH SHA512  'Crestbank Business Analyst';
+
+
 # #######################################
 # ROLE CREATION
 # #######################################
 CREATE OR REPLACE ROLE denodooneclickrole '';
-CREATE OR REPLACE ROLE execute_only 'Server-wide metadata and execute access';
+
 CREATE OR REPLACE ROLE enduser_executeonly 'metadata and execute access only';
+
+CREATE OR REPLACE ROLE execute_only 'Server-wide metadata and execute access';
 
 
 # #######################################
