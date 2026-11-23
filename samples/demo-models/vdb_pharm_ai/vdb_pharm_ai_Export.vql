@@ -14,10 +14,6 @@ ENTER SINGLE USER MODE;
 # #######################################
 # ROLE CREATION
 # #######################################
-CREATE OR REPLACE ROLE denodooneclickrole '';
-
-CREATE OR REPLACE ROLE enduser_executeonly 'metadata and execute access only';
-
 
 # 0 ====================================================================
 

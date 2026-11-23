@@ -15,8 +15,8 @@ ENTER SINGLE USER MODE;
 # ROLE CREATION
 # #######################################
 CREATE OR REPLACE ROLE denodooneclickrole '';
-
 CREATE OR REPLACE ROLE execute_only 'Server-wide metadata and execute access';
+CREATE OR REPLACE ROLE enduser_executeonly 'metadata and execute access only';
 
 
 # #######################################
