@@ -149,12 +149,18 @@
       padding-bottom: 0;
     }
   </style>
+  <link rel="stylesheet" href="../assets/css/trial-nav.css">
 </head>
 
 <body>
+ <div class="td-app">
+  <aside data-trial-nav="docs"></aside>
+  <script src="../assets/js/trial-logins.js"></script>
+  <script src="../assets/js/trial-nav.js"></script>
+  <div class="td-body">
   <div class="full-page-container">
     <div class="api-shell">
-      <a class="back-link" href="welcome.html">&larr; Back to home</a>
+      <a class="back-link" href="welcome.html">&larr; Return to trial homepage</a>
       <h1><img src="../assets/images/denodo_logo_white.svg" alt="Denodo logo" class="denodo-logo" style="height: 28px; bottom: 6px;">
         Documentation</h1>
       <p>Interested in learning more about Denodo Developer? There is a wealth of information on the Denodo
@@ -210,6 +216,8 @@
       <footer>Property of Denodo. &copy; Copyright Denodo <span>2026</span></footer>
     </div>
   </div>
+  </div>
+ </div>
 
   <script>
     function showTab(name) {

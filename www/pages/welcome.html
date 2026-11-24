@@ -6,6 +6,7 @@
 <title>Welcome to your Denodo trial</title>
 <link rel="shortcut icon" href="../assets/images/favicon.ico">
 <link rel="stylesheet" href="../assets/css/challenge-context.css">
+<link rel="stylesheet" href="../assets/css/trial-nav.css">
 <!--
   Try Denodo, guided trial onboarding, UX prototype v4
   Drop-in for denodo-oneclick/www/index_v3.html
@@ -133,19 +134,21 @@ a{color:var(--peacock-blue)}
 .an-frame{position:relative;border-radius:14px;padding:14px;overflow:hidden;
   background:#fff radial-gradient(var(--line) 1px,transparent 1px) 0 0/22px 22px;
   border:1px solid var(--line)}
-.sc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:32px;align-items:center}
+.sc{display:grid;grid-template-columns:minmax(0,32fr) minmax(0,68fr);gap:22px;align-items:center}
+@media(max-width:1200px){.sc-foot .sc-dots{display:none}}
 .sc-txt{padding:6px 4px 6px 10px}
 .sc-eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--peacock-blue);margin:0 0 10px}
 .sc-txt h3{font-size:24px;line-height:1.2;color:var(--midnight-blue);margin:0 0 10px;min-height:1.2em}
 .sc-txt p.sc-c{font-size:15px;line-height:1.55;color:var(--gunmetal);margin:0 0 18px;min-height:4.65em}
 .sc-foot{display:flex;align-items:center;gap:14px}
 .sc-dots{display:flex;gap:6px}
-.sc-dots i{width:22px;height:4px;border-radius:2px;background:var(--light-grey);overflow:hidden;position:relative}
+.sc-dots i{width:16px;height:4px;border-radius:2px;background:var(--light-grey);overflow:hidden;position:relative}
 .sc-dots i.done{background:var(--peacock-blue)}
 .sc-dots i b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--peacock-blue)}
 .sc-n{font-size:12.5px;color:var(--muted);min-width:3.6em}
 .an-win{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;
   box-shadow:0 6px 26px rgba(17,37,51,.09)}
+/* the clip keeps its own 16:10 shape, so it fills the window with nothing cropped */
 .sc-view{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--light-grey-b)}
 .sc-view video,.sc-view img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .35s}
 .sc-view.fade video,.sc-view.fade img{opacity:0}
@@ -376,6 +379,36 @@ code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em
 .hero-sub{color:#fff;opacity:.92;text-align:center;font-size:17px;line-height:1.55;max-width:760px;margin:12px auto 0;position:relative;z-index:1;padding:0 20px}
 @media (max-width:760px){.hero-sub{font-size:15px}}
 .rows.off{opacity:.45;filter:grayscale(1);pointer-events:none;user-select:none}
+/* industry cards (from the "What would you like to work on?" page, now on this page) */
+.inds{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.ind{display:flex;text-align:left;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;padding:0;font:inherit;color:inherit;
+  transition:border-color .15s,box-shadow .15s}
+button.ind{cursor:pointer}
+button.ind:hover{border-color:var(--peacock-blue);box-shadow:0 2px 10px rgba(17,37,51,.08)}
+button.ind[aria-pressed="true"]{border-color:var(--peacock-blue);box-shadow:0 0 0 2px var(--peacock-blue) inset}
+.ind-m{position:relative;flex:0 0 38%;min-height:150px;background:#eef3f7}
+.ind-m img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.ind-tag{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.94);color:#112533;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px}
+.ind-b{display:flex;flex-direction:column;gap:6px;padding:16px 18px;flex:1;min-width:0}
+.ind-n{font-size:18px;color:var(--midnight-blue);font-weight:700}
+.ind-n .soon{margin-left:6px}
+.ind-d{font-size:14px;line-height:1.5;color:var(--gunmetal)}
+.ind-f{margin-top:auto;padding-top:10px;border-top:1px solid var(--light-grey);display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);font-weight:600}
+.ind-go{color:var(--peacock-blue);white-space:nowrap}
+button.ind[aria-pressed="true"] .ind-go::before{content:"✓ "}
+.ind.off{opacity:.5;filter:grayscale(.6);cursor:not-allowed}
+/* use cases: compact row */
+.uc-panel{padding:18px 22px 20px}
+.uc-h h2{font-size:17px;margin-bottom:2px}
+.uc-h .sub{font-size:13.5px;margin:0}
+.ucs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px;opacity:.55;pointer-events:none}
+.uc{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:10px 12px;background:#fff}
+.uc .sq{flex:none;transform:scale(.8);transform-origin:top left;margin-right:-6px}
+.uc h4{font-size:13.5px;line-height:1.35;color:var(--midnight-blue);margin:0 0 3px}
+.uc .time{font-size:12px;color:var(--muted)}
+@media(max-width:1100px){.ucs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.inds{grid-template-columns:1fr}}
+@media(max-width:560px){.ind{flex-direction:column}.ind-m{flex-basis:auto;min-height:120px}.ucs{grid-template-columns:1fr}}
 .soon{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#60707c;background:#eef0f2;border-radius:3px;padding:3px 8px;vertical-align:middle;margin-left:8px}
 .pv-bar{background:#fff4dc;color:#5c3d00;border-bottom:2px solid #e0a800;font-size:14px;line-height:1.5;padding:10px 24px;text-align:center}
 .pv-bar b{background:#e0a800;color:#fff;letter-spacing:.08em;padding:2px 8px;border-radius:3px;margin-right:8px}
@@ -398,18 +431,10 @@ if(PREVIEW){document.addEventListener('DOMContentLoaded',function(){
 
 <!-- ======== SCREEN A: WELCOME ======== -->
 <section id="s-welcome" class="screen active">
- <div class="app">
-  <aside class="nav">
-   <div class="brand"><img alt="Denodo" class="lg"></div>
-   <div class="nav-s">Trial</div>
-   <button class="navi on"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-5 2 2-5 5-2z"/></svg>Get started</button>
-   <div class="nav-s">Tools</div>
-   <a href="/denodo-design-studio/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5zM3 7l9 5 9-5M12 12v10"/></svg>Design Studio</a>
-   <a href="/denodo-data-catalog/#/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Data Marketplace</a>
-   <a href="/chatbot/"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l2 6.2L20 10l-6 1.8L12 18l-2-6.2L4 10l6-1.8L12 2z"/></svg>Ask a Question</a>
-   <a href="mcp-api.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 1 0-5.6-5.6L11.8 6.6M14 10a4 4 0 0 0-5.6 0l-3 3A4 4 0 0 0 11 18.6l1.2-1.2"/></svg>MCP and API</a>
-   <a href="documentation.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>Documentation</a>
-  </aside>
+ <div class="app td-app">
+  <aside data-trial-nav="home"></aside>
+  <script src="../assets/js/trial-logins.js"></script>
+  <script src="../assets/js/trial-nav.js"></script>
 
   <div class="main">
    <div class="hero">
@@ -445,21 +470,38 @@ if(PREVIEW){document.addEventListener('DOMContentLoaded',function(){
      </div>
     </div>
 
-    <!-- personas -->
-    <div class="panel panel-p" style="margin-top:24px">
+    <!-- industry: choose the sample company first; its role tours appear below -->
+    <div class="panel panel-p" style="margin-top:24px" id="ind-panel">
+     <h2>Choose your industry</h2>
+     <p class="sub">Each industry comes with its own sample company and data. Choose one to see its guided tours.</p>
+     <div class="inds" role="group" aria-label="Choose an industry">
+      <button class="ind" type="button" data-ind="crestbank" aria-pressed="false">
+       <span class="ind-m"><img src="../assets/images/card-banking.jpg" alt=""><span class="ind-tag">Banking</span></span>
+       <span class="ind-b"><b class="ind-n">Crestbank</b>
+        <span class="ind-d">Help a bank understand repayment activity among its Gold and Platinum customers.</span>
+        <span class="ind-f"><span>Customer and loan data</span><span class="ind-go">Select <span aria-hidden="true">→</span></span></span></span>
+      </button>
+      <div class="ind off" aria-disabled="true">
+       <span class="ind-m"><img src="../assets/images/card-pharma.jpg" alt=""><span class="ind-tag">Pharmaceuticals</span></span>
+       <span class="ind-b"><b class="ind-n">Medixit <span class="soon">Coming soon</span></b>
+        <span class="ind-d">Help a pharmaceutical company understand patient participation, study start dates and the X-ray images linked to trial patients.</span>
+        <span class="ind-f"><span>Clinical-trial and X-ray data</span></span></span>
+      </div>
+     </div>
+    </div>
+
+    <!-- personas: shown once an industry is chosen -->
+    <div class="panel panel-p" style="margin-top:20px" id="tours-panel" hidden>
      <h2>Choose a tour and get hands on in a few minutes!</h2>
-     <p class="sub" data-scenario-line>Crestbank needs to see the repayment activity recorded against its Gold and Platinum
-      customers. Choose the role you want to play in helping the bank achieve its objective!</p>
+     <p class="sub" data-scenario-line>Crestbank wants to understand loan repayment activity among Gold and Platinum customers. Choose the role you want to play in answering this question.</p>
      <div class="steps3" id="steps3"></div>
     </div>
 
-    <!-- use cases -->
-    <div class="panel" style="margin-top:20px">
-     <div class="panel-p" style="padding-bottom:2px">
-      <h2>Or choose a tour by use case <span class="soon">Coming soon</span></h2>
-      <p class="sub">Scenario-led tours on other sample data. They are not available in this trial yet.</p>
-     </div>
-     <div class="rows off" id="rows" aria-disabled="true"></div>
+    <!-- use cases: one compact row, not available yet -->
+    <div class="panel uc-panel" style="margin-top:20px">
+     <div class="uc-h"><h2>Tours by use case <span class="soon">Coming soon</span></h2>
+      <p class="sub">Scenario-led tours on other sample data. They are not available in this trial yet.</p></div>
+     <div class="ucs" id="rows" aria-disabled="true"></div>
     </div>
 
     <p style="font-size:12.5px;color:var(--muted);margin-top:28px">Property of Denodo. © Copyright Denodo 2026</p>
@@ -551,10 +593,8 @@ function render(){
  g.innerHTML=ORDER.map(card).join('');
  document.getElementById('rows').innerHTML=Object.keys(TOURS).filter(function(k){return TOURS[k].g==='u'})
   .map(function(k){var t=TOURS[k];
-   return '<div class="row-i"><span class="sq '+t.a+'">'+I[t.i]+'</span><div class="txt">'+
-    '<h4>'+t.t+'</h4><p>'+t.one+'</p></div>'+
-    '<div class="right"><span class="time">About '+t.time+'</span>'+
-    '<button class="lnk" type="button" disabled>Coming soon</button></div></div>';
+   return '<div class="uc"><span class="sq '+t.a+'">'+I[t.i]+'</span><div>'+
+    '<h4>'+t.t+'</h4><span class="time">About '+t.time+'</span></div></div>';
   }).join('');
 }
 
@@ -753,19 +793,19 @@ window.addEventListener('scroll',repos,true);   /* capture: catches inner panes 
    prefers reduced motion. The pause button stops the cycle. */
 var SC=[
  {k:'assistant',t:'Denodo Assistant',
-  c:'Ask in plain English. Denodo Assistant answers with a verified agent skill and shows the views it used.'},
+  c:'Ask in plain English and see the answer and the views it used.'},
  {k:'ai-sdk-agent',t:'AI SDK agent',
-  c:'An AI SDK agent finds the right views, writes the VQL and answers from governed data.'},
+  c:'Finds the right views, writes the VQL and answers from governed data.'},
  {k:'deepquery',t:'DeepQuery',
-  c:'Switch the chatbot to Deep Query. It plans a multi-step analysis and asks you to confirm the plan before it runs.'},
+  c:'Plans a multi-step analysis and asks you to confirm the plan before it runs.'},
  {k:'drag-and-drop',t:'Drag-and-drop query',
-  c:'Build a query without writing SQL: drag fields into place, then count and add them up.'},
+  c:'Build a query by dragging fields into place, without writing SQL.'},
  {k:'modeling-wizard',t:'Data Modeling Wizard',
-  c:'Describe a view in plain English. The wizard joins the sources, validates the view and shows the rows.'},
+  c:'Describe a view in plain English and the wizard builds it.'},
  {k:'ai-metadata',t:'AI-written metadata',
-  c:'The wizard suggests business-friendly field names and descriptions for the new view.'},
+  c:'Suggests business-friendly field names and descriptions.'},
  {k:'graph-360',t:'360 Graph',
-  c:'The 360 Graph draws how a data product connects to its views and data sources.'}
+  c:'Shows how a data product connects to its views and data sources.'}
 ];
 var scI=0, scOn=true, scSeen=true, scHold=null;
 var scRM=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -830,9 +870,29 @@ function renderResume(){
   '</b> tour, at step '+((g.step||0)+1)+'.</span><span class="sp">'+
   '<a class="btn btn-primary btn-sm" href="guided-personas.html?role='+r+'&start=1">Resume</a></span></div>';
 }
+/* Industry choice: the role tours for an industry appear once it is chosen. Only Crestbank has tours today.
+   The choice is kept in this browser, and in the session key that ../assets/js/challenge-context.js reads on the tours page. */
+var IND_KEY='trydenodo.selectedChallenge.v1';
+function showTours(scroll){
+ var p=document.getElementById('tours-panel'); p.hidden=false;
+ document.querySelectorAll('[data-ind]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-ind')===state.industry))});
+ var go=document.querySelector('[data-ind="'+state.industry+'"] .ind-go'); if(go) go.firstChild.nodeValue='Selected ';
+ if(scroll) p.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+}
+document.querySelectorAll('[data-ind]').forEach(function(b){
+ b.addEventListener('click',function(){
+  state.industry=b.getAttribute('data-ind'); save();
+  try{sessionStorage.setItem(IND_KEY,state.industry)}catch(e){}
+  showTours(true);
+ });
+});
+(function(){
+ var g={};try{g=JSON.parse(localStorage.getItem('denodo.guided.crestbank.v3')||'{}')}catch(e){}
+ if(!state.industry&&g.role) state.industry='crestbank';   /* someone who has already started a Crestbank tour */
+ if(state.industry==='crestbank') showTours(false);
+})();
 render();
 renderResume();
 </script>
-<script src="../assets/js/challenge-context.js"></script>
 </body>
 </html>

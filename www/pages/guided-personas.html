@@ -75,19 +75,21 @@ a{color:var(--peacock-blue)}
 .an-frame{position:relative;border-radius:14px;padding:14px;overflow:hidden;
   background:#fff radial-gradient(var(--line) 1px,transparent 1px) 0 0/22px 22px;
   border:1px solid var(--line)}
-.sc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:32px;align-items:center}
+.sc{display:grid;grid-template-columns:minmax(0,32fr) minmax(0,68fr);gap:22px;align-items:center}
+@media(max-width:1200px){.sc-foot .sc-dots{display:none}}
 .sc-txt{padding:6px 4px 6px 10px}
 .sc-eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--peacock-blue);margin:0 0 10px}
 .sc-txt h3{font-size:24px;line-height:1.2;color:var(--midnight-blue);margin:0 0 10px;min-height:1.2em}
 .sc-txt p.sc-c{font-size:15px;line-height:1.55;color:var(--gunmetal);margin:0 0 18px;min-height:4.65em}
 .sc-foot{display:flex;align-items:center;gap:14px}
 .sc-dots{display:flex;gap:6px}
-.sc-dots i{width:22px;height:4px;border-radius:2px;background:var(--light-grey);overflow:hidden;position:relative}
+.sc-dots i{width:16px;height:4px;border-radius:2px;background:var(--light-grey);overflow:hidden;position:relative}
 .sc-dots i.done{background:var(--peacock-blue)}
 .sc-dots i b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--peacock-blue)}
 .sc-n{font-size:12.5px;color:var(--muted);min-width:3.6em}
 .an-win{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;
   box-shadow:0 6px 26px rgba(17,37,51,.09)}
+/* the clip keeps its own 16:10 shape, so it fills the window with nothing cropped */
 .sc-view{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--light-grey-b)}
 .sc-view video,.sc-view img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .35s}
 .sc-view.fade video,.sc-view.fade img{opacity:0}
@@ -157,6 +159,8 @@ a{color:var(--peacock-blue)}
 .pv-bar b{background:#e0a800;color:#fff;letter-spacing:.08em;padding:2px 8px;border-radius:3px;margin-right:8px}
 .pv-off{opacity:.45;pointer-events:none;cursor:default}
 </style>
+<script src="../assets/js/trial-logins.js"></script>
+<script src="../assets/js/trial-nav.js"></script>
 </head>
 <body>
 <script>
@@ -251,19 +255,19 @@ if(PREVIEW){document.addEventListener('DOMContentLoaded',function(){
    prefers reduced motion. The pause button stops the cycle. */
 var SC=[
  {k:'assistant',t:'Denodo Assistant',
-  c:'Ask in plain English. Denodo Assistant answers with a verified agent skill and shows the views it used.'},
+  c:'Ask in plain English and see the answer and the views it used.'},
  {k:'ai-sdk-agent',t:'AI SDK agent',
-  c:'An AI SDK agent finds the right views, writes the VQL and answers from governed data.'},
+  c:'Finds the right views, writes the VQL and answers from governed data.'},
  {k:'deepquery',t:'DeepQuery',
-  c:'Switch the chatbot to Deep Query. It plans a multi-step analysis and asks you to confirm the plan before it runs.'},
+  c:'Plans a multi-step analysis and asks you to confirm the plan before it runs.'},
  {k:'drag-and-drop',t:'Drag-and-drop query',
-  c:'Build a query without writing SQL: drag fields into place, then count and add them up.'},
+  c:'Build a query by dragging fields into place, without writing SQL.'},
  {k:'modeling-wizard',t:'Data Modeling Wizard',
-  c:'Describe a view in plain English. The wizard joins the sources, validates the view and shows the rows.'},
+  c:'Describe a view in plain English and the wizard builds it.'},
  {k:'ai-metadata',t:'AI-written metadata',
-  c:'The wizard suggests business-friendly field names and descriptions for the new view.'},
+  c:'Suggests business-friendly field names and descriptions.'},
  {k:'graph-360',t:'360 Graph',
-  c:'The 360 Graph draws how a data product connects to its views and data sources.'}
+  c:'Shows how a data product connects to its views and data sources.'}
 ];
 var scI=0, scOn=true, scSeen=true, scHold=null;
 var scRM=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -337,8 +341,8 @@ try{state=Object.assign(state,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch
 if(!state.view){state.view='loan_repayment_360_'+Math.random().toString(36).replace(/[^a-z]/g,'').slice(0,3).padEnd(3,'x')}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
 save();
-/* Trial sign-in shown in the tours. Set TRIAL_PASSWORD to '' to stop showing the password. */
-const TRIAL_PASSWORD='try-Denodo9';
+/* Trial sign-in shown in the tours. The password is set in ../assets/js/trial-logins.js. */
+const TRIAL_PASSWORD=(window.TRY_DENODO_LOGINS&&window.TRY_DENODO_LOGINS.password)||'';
 let CUR_USER='';
 const fill=s=>s.split('{HOST}').join(HOST).split('{VIEW}').join(state.view)
  .split('{USER}').join(CUR_USER||'your Denodo user')
@@ -639,6 +643,19 @@ a{color:var(--peacock-blue)}
 .g-bar i{display:block;height:100%;width:0;background:var(--green-success);transition:width .25s}
 .g-tog{display:flex;width:100%;justify-content:space-between;align-items:center;margin-top:10px;font-size:13.5px;color:var(--gunmetal);padding:4px 0}
 .g-tog .chev{color:var(--peacock-blue);font-weight:600}
+.td-cred{margin-top:6px;border:1px solid var(--light-grey);border-radius:6px;font-size:13px;color:var(--gunmetal)}
+.td-cred summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:7px 10px;font-size:13.5px;font-weight:600;color:var(--midnight-blue)}
+.td-cred summary::-webkit-details-marker{display:none}
+.td-cred summary .chev{margin-left:auto;color:var(--peacock-blue);transition:transform .15s}
+.td-cred[open] summary .chev{transform:rotate(180deg)}
+.td-cred .td-c-b{padding:0 10px 10px;border-top:1px solid var(--light-grey);display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.td-cred .td-c-row{padding:8px 0 0;min-width:0}
+.td-cred .td-c-k{display:block;font-size:11.5px;color:var(--muted);margin-bottom:2px}
+.td-cred .td-c-v{display:flex;align-items:center;gap:6px}
+.td-cred code{font:600 12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--midnight-blue);background:var(--light-grey-b);border-radius:4px;padding:2px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.td-cred button{flex:none;font:600 11px/1 inherit;color:var(--peacock-blue);background:none;border:1px solid var(--light-grey);border-radius:4px;padding:4px 6px;cursor:pointer}
+.td-cred button:hover{background:#e1edf4}
+.td-cred .td-c-note{grid-column:1/-1;margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--muted)}
 .g-list{list-style:none;margin:8px 0 0;padding:0;max-height:300px;overflow:auto}
 .g-list li{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:4px;font-size:14px;cursor:pointer;color:var(--gunmetal)}
 .g-list li:hover{background:var(--light-grey-b)}
@@ -720,6 +737,7 @@ const GUIDE_HTML=`
  <div class="g-bar" aria-hidden="true"><i id="g-fill"></i></div>
  <button class="g-tog" id="g-tog" type="button" aria-expanded="false"><span id="g-cnt"></span><span class="chev">All steps ▾</span></button>
  <ol class="g-list" id="g-list" hidden></ol>
+ <div id="g-cred"></div>
 </div>
 <div class="g-b" id="g-b"></div>
 <div class="g-f" id="g-f">
@@ -778,6 +796,7 @@ function mount(win,mode){
  $('g-skip').onclick=()=>advance(false);
  $('g-next').onclick=()=>{if(view==='intro'){view='step';save();renderGuide()}else if(view==='done'){closeGuide('Tour finished. Your progress is saved.')}else advance(true)};
  $('g-x').onclick=()=>closeGuide('The guide is closed. Your progress is saved.');
+ if(window.TryDenodoCredentials)window.TryDenodoCredentials.wire($('g-cred'));
  $('g-tog').onclick=()=>{const l=$('g-list'),o=l.hidden;l.hidden=!o;$('g-tog').setAttribute('aria-expanded',String(o));$('g-tog').querySelector('.chev').textContent=o?'Hide steps ▴':'All steps ▾'};
  win.addEventListener('pagehide',()=>{if(guide&&guide.win===win){guide=null;renderCards();status('The guide is closed. Your progress is saved. Resume from the tour card or the button at the bottom right.')}});
  if(mode!=='inline')status('The guide is open'+(mode==='float'?' and stays on top of your other windows.':' in a window beside this one.')+' Each step opens Denodo in one browser tab.');
@@ -814,6 +833,7 @@ function renderGuide(){
  $('g-tour').textContent=t.name+' tour';
  $('g-fill').style.width=Math.round(done/n*100)+'%';
  $('g-cnt').textContent=done+' of '+n+' steps done';
+ const gc=$('g-cred');if(gc&&window.TryDenodoCredentials&&gc.dataset.user!==CUR_USER){gc.dataset.user=CUR_USER;gc.innerHTML=window.TryDenodoCredentials.html(CUR_USER)}
  const L=$('g-list');L.replaceChildren();
  t.steps.forEach((x,k)=>{const ok=isDone(r,k),li=mk(d,'li',(view==='step'&&k===i?'cur ':'')+(ok?'ok':''));
   const ci=mk(d,'span','ci');ci.innerHTML=ok?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6"/></svg>':'';
@@ -932,5 +952,12 @@ if(TOURS[wanted]){const c=document.querySelector('.s3[data-tour="'+wanted+'"]');
   b.onclick=()=>{s.hidden=true;start(wanted)};w.append(b);s.append(t,w);s.scrollIntoView({block:'center'});b.focus()}}
 </script>
 <script src="../assets/js/challenge-context.js"></script>
+<script>
+/* The industry is now chosen on the welcome page, so the banner's "Change challenge" link goes there. */
+document.addEventListener('DOMContentLoaded',function(){
+ var l=document.querySelector('.td-challenge-banner__link');
+ if(l){l.setAttribute('href','welcome.html#ind-panel');l.textContent='Change industry'}
+});
+</script>
 </body>
 </html>

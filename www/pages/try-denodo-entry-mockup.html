@@ -156,6 +156,8 @@ a{color:inherit}
 .next3 b{font-size:14.5px}.next3 p{margin:6px 0 0;font-size:13.5px;line-height:1.55;color:var(--ink-2)}
 
 @media (prefers-reduced-motion:reduce){.drawer,.veil{transition:none}.prog li.now .dot{animation:none}}
+@media (max-width:1240px){.nav,.nav .m{gap:18px}.nav .m{font-size:13px;white-space:nowrap}.nav .try,.nav .contact{font-size:13px;padding:0 14px;white-space:nowrap}}
+@media (max-width:1100px){.nav .m{display:none}}
 @media (max-width:900px){
  .nav .m,.util{display:none}.hero{grid-template-columns:1fr;padding:48px 22px}.hero h1{font-size:40px}.hero h2{font-size:23px}.layers{display:none}
  .role{grid-template-columns:1fr}.mini{min-height:96px}.two{grid-template-columns:1fr}.d-b{padding:22px 18px 30px}
@@ -170,7 +172,7 @@ a{color:inherit}
 <header class="nav">
  <img src="../assets/images/denodo_logo_black.png" alt="Denodo">
  <nav class="m" aria-label="Main"><span>Data Management</span><span>Product &amp; Services</span><span>Solutions</span><span>Partners</span><span>Resources &amp; Events</span><span>Company</span></nav>
- <div class="r"><span class="trywrap"><button class="try cue" type="button" data-open>Try Denodo</button><span class="coach" id="coach" role="note" hidden><b>Start here</b>Choose a role and get a guided trial of Denodo.<button class="cx" type="button" id="coach-x" aria-label="Close this note">×</button></span></span><span class="contact">Contact Us</span></div>
+ <div class="r"><span class="trywrap"><button class="try cue" type="button" data-open>Try Denodo</button><span class="coach" id="coach" role="note" hidden><b>Start here</b>Sign up and get a guided trial of Denodo.<button class="cx" type="button" id="coach-x" aria-label="Close this note">×</button></span></span><span class="contact">Contact Us</span></div>
 </header>
 
 <main class="hero">
@@ -198,42 +200,15 @@ a{color:inherit}
 
 <script>
 /* ============ Content ============ */
-const TOUR='guided-personas.html';   // the guided tours page in this repo
-const ROLES={
- analyst:{
-  name:'Business Analyst',ic:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',q:'Business Analyst',
-  p:'Uses Data Marketplace and Denodo Assistant to compare repayments by loyalty tier and find the top customers.',
-  meta:['About 4 min','Data Marketplace','Denodo Assistant'],
-  gets:['Find and review a governed data product','Compare Gold and Platinum customers with a few clicks','Ask Denodo Assistant the same question in plain English'],
-  pick:'I analyse data and build reports',
-  mini:`<div class="bar"></div><div class="row"><div class="c hl"></div><div class="c"></div></div><div class="row"><div class="c"></div><div class="c"></div></div>
-        <div class="bub me">Gold vs Platinum repayments?</div><div class="steps"><i class="on"></i><i class="on"></i><i></i></div>`},
- engineer:{
-  name:'Data Engineer',ic:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',q:'Data Engineer',
-  p:'Federates live customer, loan and payment data into a reusable data product, without copying or moving data.',
-  meta:['About 5 min','Design Studio','Data Modeling Wizard'],
-  gets:['Combine customers, loans and repayments from live sources','Let the Data Modeling Wizard build the joins and metadata','Publish the view and find it in the Data Marketplace'],
-  pick:'I build pipelines and data models',
-  mini:`<div class="bar"></div><svg viewBox="0 0 116 62" width="100%" height="62" aria-hidden="true">
-         <rect x="2" y="4" width="30" height="16" rx="3" fill="#fff" stroke="#c9d2d8"/><rect x="2" y="40" width="30" height="16" rx="3" fill="#fff" stroke="#c9d2d8"/>
-         <rect x="43" y="22" width="30" height="16" rx="3" fill="#fff" stroke="#c9d2d8"/><rect x="84" y="22" width="30" height="16" rx="3" fill="#fff" stroke="#df5b4f" stroke-width="1.5"/>
-         <path d="M32 12 L43 28 M32 48 L43 32 M73 30 L84 30" stroke="#006699" stroke-width="1.4" fill="none"/></svg>
-        <span class="pill">Publish</span><div class="steps"><i class="on"></i><i></i><i></i></div>`},
- ai:{
-  name:'AI Builder',ic:'<path d="M12 2l2.2 6.3L20 10l-5.8 1.7L12 18l-2.2-6.3L4 10l5.8-1.7z"/>',q:'AI Builder',
-  p:'Connects AI agents to live banking data through Denodo MCP Server to deliver accurate, up-to-date answers.',
-  meta:['About 5 min','AI SDK','MCP Server'],
-  gets:['Ask a business question through the AI SDK','Call the same governed data from your own code','Connect your own agent over MCP'],
-  pick:'I build AI agents and applications',
-  mini:`<div class="bub me">Top customers by repayments?</div><div class="tool">tool: denodo.query ✓</div>
-        <div class="bub">Customer 23 repaid the most…</div><div class="steps"><i class="on"></i><i></i><i></i></div>`}
-};
-const ORDER=['engineer','analyst','ai'];
+const TRIAL='welcome.html';   // "Welcome to your Denodo trial": the industry choice and the three tours start here
+const GETS=['A live Denodo Platform environment with sample data already connected',
+ 'Guided tours for three roles: Business Analyst, Data Engineer and AI Builder',
+ 'Real business scenarios: augmenting customer intelligence at a bank, or exploring clinical-trial data and X-ray images with AI (coming soon)'];
 
 /* ============ Drawer ============ */
 const $=id=>document.getElementById(id);
 const drawer=$('drawer'),veil=$('veil'),body=$('d-b'),back=$('d-back'),crumb=$('d-crumb');
-let state={view:'choose',role:null,rec:null,email:'',name:''};
+let state={view:'signup',email:'',name:''};
 let lastFocus=null;
 
 function dismissCue(){
@@ -268,55 +243,24 @@ document.addEventListener('keydown',e=>{
   else if(!e.shiftKey&&document.activeElement===z){a.focus();e.preventDefault()}
  }
 });
-back.onclick=()=>{state.view=state.view==='ready'?'signup':'choose';render()};
+back.onclick=()=>{state.view='signup';render()};
 
 function go(view){state.view=view;render()}
 
 function render(){
- back.hidden=state.view==='choose';
- crumb.textContent=state.view==='choose'?'Try Denodo':state.view==='signup'?'Try Denodo · Create your account':'Try Denodo · Your trial';
+ back.hidden=state.view==='signup';
+ crumb.textContent=state.view==='signup'?'Try Denodo · Create your account':'Try Denodo · Your trial';
  body.scrollTop=0;
- ({choose:renderChoose,signup:renderSignup,ready:renderReady})[state.view]();
+ ({signup:renderSignup,ready:renderReady})[state.view]();
  const h=body.querySelector('h3');if(h){h.id='d-title';h.tabIndex=-1;h.focus({preventScroll:true})}
 }
 
-/* ---------- View 1: choose a role ---------- */
-function renderChoose(){
+/* ---------- View 1: short sign-up ---------- */
+function renderSignup(){
  body.innerHTML=`
   <h3>Get access to a live Denodo environment in a few minutes</h3>
-  <p class="lead">Help Crestbank compare loan repayments from its Gold and Platinum customers and find its most valuable clients for retention. Which role will you play?</p>
-  <div class="ask" role="group" aria-label="Help me choose"><span>Not sure? Which sounds like you:</span>
-   ${ORDER.map(r=>`<button type="button" data-rec="${r}" aria-pressed="${state.rec===r}">${ROLES[r].pick}</button>`).join('')}</div>
-  <div id="roles"></div>
-  <div class="lbl">Other ways to try Denodo</div>
-  <div class="other">
-   <div class="o"><div><b>Free download</b><span>Install the Denodo Platform trial on your own machine.</span></div><a class="btn btn-line" href="#" onclick="return false">Download now</a></div>
-   <div class="o"><div><b>Managed cloud service</b><span>The full Denodo Platform with Agora, our fully managed cloud service.</span></div><a class="btn btn-line" href="#" onclick="return false">Start free trial</a></div>
-  </div>
-  <p class="fine">Already have a trial? <a href="${TOUR}">Open your guided tours</a>.</p>`;
- const box=body.querySelector('#roles');
- ORDER.forEach(r=>{
-  const x=ROLES[r],b=document.createElement('button');b.type='button';b.className='role'+(state.rec===r?' rec':'');
-  b.innerHTML=`<div class="mini" aria-hidden="true">${x.mini}</div>
-   <div><div class="q">${x.q}${state.rec===r?'<span class="badge">Suggested</span>':''}</div><p>${x.p}</p>
-   <div class="meta">${x.meta.map(m=>`<span>${m}</span>`).join('')}</div>
-   <span class="go">Start as ${x.name} →</span></div>`;
-  b.onclick=()=>{state.role=r;go('signup')};
-  box.append(b)});
- body.querySelectorAll('[data-rec]').forEach(b=>b.onclick=()=>{
-  state.rec=state.rec===b.dataset.rec?null:b.dataset.rec;renderChoose();
-  const c=body.querySelector('.role.rec');if(c)c.scrollIntoView({block:'nearest',behavior:'smooth'})});
-}
-
-/* ---------- View 2: short sign-up ---------- */
-function renderSignup(){
- const x=ROLES[state.role];
- body.innerHTML=`
-  <h3>Create your trial account</h3>
-  <div class="picked"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#006699" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${x.ic}</svg></div>
-   <div><b>${x.name} tour</b><span>${x.meta.join(' · ')}</span></div><button class="chg" type="button" id="chg">Change</button></div>
-  <div class="lbl" style="margin-top:0">In this tour you will</div>
-  <ul class="gets">${x.gets.map(g=>`<li>${g}</li>`).join('')}</ul>
+  <div class="lbl" style="margin-top:0">Your trial includes</div>
+  <ul class="gets">${GETS.map(g=>`<li>${g}</li>`).join('')}</ul>
   <form id="f" novalidate>
    <div class="f"><label for="em">Work email</label><input id="em" type="email" autocomplete="email" value="${state.email}" placeholder="name@company.com"><div class="err" id="em-e" hidden>Enter your work email, for example name@company.com.</div></div>
    <div class="two">
@@ -324,10 +268,9 @@ function renderSignup(){
     <div class="f"><label for="co">Company</label><input id="co" autocomplete="organization"></div>
    </div>
    <div class="f"><label for="ct">Country</label><select id="ct"><option>Singapore</option><option>Australia</option><option>India</option><option>Japan</option><option>United Kingdom</option><option>United States</option><option>Other</option></select></div>
-   <button class="btn btn-red btn-wide" type="submit">Create my ${x.name} trial</button>
+   <button class="btn btn-red btn-wide" type="submit">Create my trial</button>
    <p class="fine">By continuing you agree to the Denodo trial terms and privacy policy. In this mockup nothing is sent.</p>
   </form>`;
- body.querySelector('#chg').onclick=()=>go('choose');
  body.querySelector('#f').onsubmit=e=>{
   e.preventDefault();
   const em=body.querySelector('#em'),ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim());
@@ -337,9 +280,9 @@ function renderSignup(){
  };
 }
 
-/* ---------- View 3: trial ready (simulated) ---------- */
+/* ---------- View 2: trial ready (simulated) ---------- */
 function renderReady(){
- const x=ROLES[state.role],first=(state.name||'').split(' ')[0];
+ const first=(state.name||'').split(' ')[0];
  body.innerHTML=`
   <span class="sim">Simulated in this mockup</span>
   <h3>${first?first+', your':'Your'} trial is being prepared</h3>
@@ -347,11 +290,11 @@ function renderReady(){
   <ol class="prog" id="prog">
    <li><span class="dot"></span>Account created</li>
    <li><span class="dot"></span>Denodo Platform environment started</li>
-   <li><span class="dot"></span>Crestbank sample data connected</li>
-   <li><span class="dot"></span>${x.name} tour ready</li>
+   <li><span class="dot"></span>Sample data connected</li>
+   <li><span class="dot"></span>Guided tours ready</li>
   </ol>
-  <a class="btn btn-red btn-wide" id="startT" href="${TOUR}?role=${state.role}&start=1" aria-disabled="true" style="opacity:.45;pointer-events:none">Start the ${x.name} tour</a>
-  <div class="next3"><b>Each tour stands on its own</b><p>The three tours share one Crestbank story. Take them in any order: the Business Analyst finds the answer, the Data Engineer builds the data product, and the AI Builder puts it behind an agent.</p></div>`;
+  <a class="btn btn-red btn-wide" id="startT" href="${TRIAL}" aria-disabled="true" style="opacity:.45;pointer-events:none">Open your Denodo trial</a>
+  <div class="next3"><b>What happens next</b><p>Your trial opens on its welcome page. Choose an industry, then a guided tour for the role you want to play: Business Analyst, Data Engineer or AI Builder.</p></div>`;
  const li=[...body.querySelectorAll('#prog li')];let k=0;
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const tick=()=>{li.forEach((l,i)=>{l.className=i<k?'done':i===k?'now':''});
