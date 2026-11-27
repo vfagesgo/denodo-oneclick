@@ -72,7 +72,7 @@ REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/vfagesgo/denod
 # derived from these further down, once CLI parsing has settled their
 # final values, rather than fixed here.
 IMAGE_NAME="denodo-oneclick"
-IMAGE_TAG="beta"
+IMAGE_TAG="9.6.0"
 
 MODE="docker"
 RESET=0
