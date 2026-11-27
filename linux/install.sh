@@ -1073,6 +1073,7 @@ if [ "$NEED_PLATFORM_INSTALL" = "1" ]; then
   #mkdir -p jre
   #cd jre
   #ln -sfn "$JAVA_HOME" jre-linux
+  
   cd "$DENODO_INSTALL"
 
   ###### Start Denodo Install
@@ -1277,13 +1278,6 @@ else
   git clean -fd
 fi
 dl_end
-
-## VFG AISDK Agents
-## Creating AISDK Agents
-#mkdir -p /opt/denodo/denodo-aisdk/api/agents/custom
-#cp -a /opt/denodo-oneclick/samples/ai-sdk/chatbot_agent/custom/. \
-#      /opt/denodo/denodo-aisdk/api/agents/custom/
-#chown -R denodo:denodo /opt/denodo/denodo-aisdk/api/agents/custom/
 
 # Section 13:
 # The AI SDK depends on a fairly large native/Python build toolchain on
@@ -1616,62 +1610,6 @@ until (echo > /dev/tcp/localhost/9999) >/dev/null 2>&1; do
 done
 
 log_step "Denodo VDP is listening on TCP port 9999"
-
-###VFG 
-### Remove install VQL
-### Remove DM deploy
-
-# Load the AI SDK's metadata into its vector DB, so it can answer natural-
-# language questions about the sample data. The AI SDK needs a valid
-# OPENAI_API_KEY to start at all (Section 12 just wrote whatever was passed
-# on this run into sdk_config.env/chatbot_config.env) - without one it would
-# just crash on start, and the "Waiting for AI SDK to start" loop below
-# would spend the full timeout waiting for something that's never coming up
-# before failing the whole script. Check the config file itself
-# (aisdk_has_openai_key(), defined near the top) rather than the
-# OPENAI_API_KEY env var directly, so an --upgrade that doesn't repeat
-# --OPENAI_API_KEY still correctly starts the AI SDK if a key was configured
-# on an earlier run.
-if aisdk_has_openai_key; then
-  start_denodo_ai_services
-  log_step "Waiting for AI SDK to start"
-  until curl -fsS "http://localhost:8008/docs" >/dev/null 2>&1; do
-    if [ "$VDP_WAITED" -ge "$VDP_TIMEOUT" ]; then
-      log_step "ERROR: Denodo AI SDK did not start within ${VDP_TIMEOUT} seconds"
-      exit 1
-    fi
-
-    sleep 2
-    VDP_WAITED=$((VDP_WAITED + 2))
-  done
-else
-  log_step "No OPENAI_API_KEY configured for the AI SDK - skipping its start and vector DB metadata sync"
-fi
-
-#########################################
-# Loading Sample models on the platform
-#########################################
-log_section "17" "Import Metadata"
-
-# The sample import scripts run as separate processes, so export the
-# parameters they rely on into their environment. Each script also has safe
-# defaults, but exporting here keeps a single source of truth. Paths are
-# resolved from $REPO_ROOT (this repo's root) rather than hardcoded.
-export DENODO_VDP_PWD="${DENODO_VDP_PWD:-admin}"
-export OPENAI_API_KEY="${OPENAI_API_KEY:-}"
-
-#log_step "Importing admin VDB"
-#"$REPO_ROOT/samples/demo-models/vdb_admin/vdb_admin_install.sh"
-
-#log_step "Importing asset_extensions VDB"
-#"$REPO_ROOT/samples/demo-models/vdb_asset_extensions/vdb_asset_extensions_install.sh"
-
-#log_step "Importing bank_demo VDB"
-#"$REPO_ROOT/samples/demo-models/vdb_bank_demo/vdb_bank_demo_install.sh"
-
-#log_step "Importing pharm_ai VDB"
-#"$REPO_ROOT/samples/demo-models/vdb_pharm_ai/vdb_pharm_ai_install.sh"
-
 
 # Started here, at the very end, rather than back in Section 01 right after
 # cloudflared is installed: a full install still has a lot of network-
